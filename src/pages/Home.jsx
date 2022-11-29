@@ -106,50 +106,50 @@ const Home = () => {
           </div>
 
           <div className="relative flex flex-col w-full justify-center items-start gap-4 bg-gray-200">
-            <div className="grid grid-cols-2 grid-rows-2 w-full justify-items-stretch px-12 gap-4">
+            <div className="grid sm:grid-cols-2 sm:grid-rows-2 grid-cols-1 w-full justify-items-stretch sm:px-12 px-2 gap-4">
               <div className="flex flex-col px-4 py-8 shadow-2xl mx-4 bg-gray-50 rounded-lg justify-center cursor-pointer items-center gap-3">
-                <span className="text-xl font-semibold">
+                <span className="sm:text-xl text-sm font-semibold">
                   <Laptop className="!text-[2rem] mr-3" /> Live Classes
                   Completed
                 </span>
-                <span className="text-2xl font-bold">0 Classes</span>
+                <span className="sm:text-2xl text-sm font-bold">0 Classes</span>
                 <span className="text-sm font-semibold text-gray-400">
                   No Changes Since Last Week
                 </span>
               </div>
               <div className="flex flex-col px-4 py-4 shadow-2xl mx-4 rounded-lg bg-gray-50 justify-center cursor-pointer items-center gap-3">
-                <span className="text-xl font-semibold">
+                <span className="sm:text-xl text-sm font-semibold">
                   <Visibility className="!text-[2rem] mr-3" />
                   DIGITAL CONTENT VIEWED
                 </span>
-                <span className="text-2xl font-bold">196 / 510</span>
+                <span className="sm:text-2xl text-sm font-bold">196 / 510</span>
                 <span className="text-sm font-semibold text-gray-400">
                   No Changes Since Last Week
                 </span>
               </div>
               <div className="flex flex-col px-4 py-4 shadow-2xl mx-4 rounded-lg bg-gray-50 justify-center cursor-pointer items-center gap-3">
-                <span className="text-xl font-semibold">
+                <span className="sm:text-xl text-sm font-semibold">
                   <SupervisorAccount className="!text-[2rem] mr-3" />
                   PARENTS INSTALLED
                 </span>
-                <span className="text-2xl font-bold">510 / 802</span>
+                <span className="sm:text-2xl text-sm font-bold">510 / 802</span>
                 <span className="text-sm font-semibold text-gray-400">
                   No Changes Since Last Week
                 </span>
               </div>
               <div className="flex flex-col px-4 py-4 shadow-2xl mx-4 rounded-lg bg-gray-50 justify-center cursor-pointer items-center gap-3">
-                <span className="text-xl font-semibold">
+                <span className="sm:text-xl text-sm font-semibold">
                   <Grading className="!text-[2rem] mr-3" /> PERIODS COMPLETED
                 </span>
-                <span className="text-2xl font-bold">0 / 452</span>
+                <span className="sm:text-2xl text-sm font-bold">0 / 452</span>
                 <span className="text-sm font-semibold text-gray-400">
                   No Changes Since Last Week
                 </span>
               </div>
             </div>
-            <div className="w-full px-8 my-[3rem]">
+            <div className="w-full hidden md:block px-8 my-[3rem]">
               <div className="w-full relative flex bg-gray-50 flex-col rounded-lg pt-[3rem] pb-10 px-8 gap-8 items-center shadow-2xl justify-center">
-                <div className="flex w-full flex-col gap-2">
+                <div className="flex w-full items-center flex-col gap-2">
                   <span className="text-gray-600 font-semibold">
                     PRS - Revision SA1
                   </span>
@@ -168,27 +168,27 @@ const Home = () => {
                   <Stepper />
                 </div>
                 <div className="absolute top-4 right-4">
-                  <BasicButton text={"View All"} />
+                  <BasicButton text={"View All"} size={"small"} />
                 </div>
               </div>
             </div>
             <div className="w-full px-8 my-[3rem]">
-              <div className="w-full justify-start flex gap-4">
-                <div className="w-[40%] rounded-lg py-4 px-4 bg-gray-50 flex flex-col gap-4">
+              <div className="w-full justify-start flex md:flex-row flex-col gap-4">
+                <div className="md:w-[40%] w-full rounded-lg py-4 px-4 bg-gray-50 flex flex-col gap-4">
                   <div className="w-full flex items-center justify-between">
                     <span className="font-semibold text-gray-700">
                       Report Downloads
                     </span>
-                    <BasicButton text={"View All"} />
+                    <BasicButton text={"View All"} size={"small"} />
                   </div>
                   <LeftPositionedTimeline />
                 </div>
-                <div className="w-[60%] flex flex-col justify-between rounded-lg py-4 bg-gray-50">
+                <div className="md:w-[60%] w-full flex flex-col justify-between rounded-lg py-4 bg-gray-50">
                   <div className="w-full flex items-center px-4 justify-between">
                     <span className="font-semibold text-gray-700">
                       CTTP PROGRESS TRACKER
                     </span>
-                    <BasicButton text={"View All"} />
+                    <BasicButton text={"View All"} size={"small"} />
                   </div>
                   <div className="w-full flex justify-center">
                     <span className="font-semibold text-gray-400">

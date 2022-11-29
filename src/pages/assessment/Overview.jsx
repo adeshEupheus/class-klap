@@ -169,7 +169,7 @@ const OverView = () => {
                     { value: "SA3" },
                   ]}
                   variant={"outlined"}
-                  Name={"examSetUp"}
+                  Name={"Overview"}
                   defaultValue={{ value: "FA1" }}
                   size={"small"}
                 />

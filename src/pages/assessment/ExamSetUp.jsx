@@ -1,8 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { useState } from "react";
-// import Navbar from "../components/Navbar";
 import Sidebar from "../../components/Sidebar";
-// import axios from "axios";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -10,47 +8,60 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-
-import { useNavigate } from "react-router-dom";
-
 import SwipeableTemporaryDrawer from "../../components/Material/MaterialSidebar";
-import { Switch } from "@mui/material";
-import {
-  //   Grading,
-  //   Laptop,
-  Menu,
-  //   SupervisorAccount,
-  //   Visibility,
-} from "@mui/icons-material";
-// import Stepper from "../../components/Material/Stepper";
-// import LeftPositionedTimeline from "../../components/Material/TimeLine";
-import { useQuery } from "@tanstack/react-query";
-import { setSchoolId } from "../../apis/fectcher/SetSchoolId";
+import { Skeleton, Switch } from "@mui/material";
+import { Menu } from "@mui/icons-material";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Breadcrumbs from "../../components/Material/BreadCrumbs";
 import SearchDropDown from "../../components/Material/SearchDropDown";
-import BasicTable from "../../components/Material/BasicTable";
-import BasicButton from "../../components/Material/Button";
 import BasicTextFields from "../../components/Material/TextField";
 import SwitchLabels from "../../components/Material/Switch";
+import { GetExamSetUpData } from "../../apis/fectcher/assessment/examSetUp/examSetUp";
 const ExamSetUp = () => {
+  const [id, setId] = useState("FA1");
+
+  const [mainData, setMainData] = useState([]);
   const {
-    data: schoolRes,
-    isError,
+    data: Exam_setUpData,
     isLoading,
     refetch,
-  } = useQuery(["setSchoolId"], setSchoolId(8188));
-  console.log(schoolRes);
+  } = useQuery({
+    queryKey: ["exam_setup_data", id],
+    queryFn: () => GetExamSetUpData(id),
+    onSuccess: (data) => {
+      console.log(data);
+      setMainData(data);
+    },
+    // enabled: false,
+    refetchOnWindowFocus: false,
+  });
+  console.log(mainData);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  const rows = ["Nursery", "LKG", "UKG", "1", "2", "3", "4", "5"];
-
-  const navigate = useNavigate();
   const show = null;
+
+  // const queryClient = useQueryClient();
+
+  const updateData = (class_name) => {
+    if (class_name != "All") {
+      const newArray = Exam_setUpData.filter(
+        (item) => item.grade.displayName === class_name
+      );
+      setMainData(newArray);
+    } else {
+      setMainData(Exam_setUpData);
+    }
+  };
 
   const sidebarRef = useRef();
 
   const handleDropDown = (value, type) => {
     console.log(value, type);
+    if (type === "class") {
+      updateData(value.value);
+    } else if ((type = "exam_setup")) {
+      setId(value.value);
+    }
     // switch (type) {
     //   case "Overview":
     //     setId(value.value);
@@ -62,13 +73,12 @@ const ExamSetUp = () => {
   };
 
   const handleSidebarCollapsed = () => {
-    // setSidebarCollapsed(!sidebarCollapsed);
     sidebarRef.current.openSidebar();
   };
 
   useEffect(() => {
     document.title = "Exam Set Up - ClassKlap";
-
+    // setMainData(Exam_setUpData);
     const handleWidth = () => {
       if (window.innerWidth > 1024) {
         setSidebarCollapsed(false);
@@ -106,10 +116,6 @@ const ExamSetUp = () => {
             window.innerWidth < 1024 ? null : "md:ml-[30vw] ml-[85vw]"
           } `}
         >
-          {/* <Navbar
-            handleSidebarCollapsed={handleSidebarCollapsed}
-            info={navInfo}
-          /> */}
           <div
             className="lg:hidden absolute cursor-pointer top-4 left-4"
             onClick={handleSidebarCollapsed}
@@ -147,143 +153,198 @@ const ExamSetUp = () => {
                     { value: "SA3" },
                   ]}
                   variant={"outlined"}
-                  Name={"Overview"}
+                  Name={"exam_setup"}
                   defaultValue={{ value: "FA1" }}
                   size={"small"}
                 />
               </div>
-
-              <TableContainer
-                className="sm:!w-full !overflow-auto max-h-[70vh] "
-                component={Paper}
-              >
-                <Table
-                  className="!w-full"
-                  //   sx={{ width: 1000 }}
-                  aria-label="simple table"
-                  // className="!overflow-auto"
+              {isLoading ? (
+                <Skeleton
+                  // sx={{ bgcolor: "grey.400" }}
+                  animation="wave"
+                  variant="rectangular"
+                  height={300}
+                />
+              ) : (
+                <TableContainer
+                  className="sm:!w-full !overflow-auto max-h-[70vh] "
+                  component={Paper}
                 >
-                  <TableHead className="w-full">
-                    <TableRow className="w-full">
-                      <TableCell align="right" className="w-[10%]">
-                        <div className="flex flex-col items-center gap-2">
-                          <h1 className="font-bold">Class</h1>
-                          <div className="w-[5rem]">
-                            <SearchDropDown
-                              data={[
-                                { value: "FA1" },
-                                { value: "FA2" },
-                                { value: "FA3" },
-                                { value: "FA4" },
-                              ]}
-                              variant={"outlined"}
-                              Name={"Overview"}
-                              value={{ value: "FA1" }}
-                              size={"small"}
-                            />
+                  <Table
+                    className="!w-full"
+                    //   sx={{ width: 1000 }}
+                    aria-label="simple table"
+                  >
+                    <TableHead className="w-full">
+                      <TableRow className="w-full">
+                        <TableCell align="right" className="w-[10%]">
+                          <div className="flex flex-col items-center gap-2">
+                            <h1 className="font-bold">Class</h1>
+                            <div className="w-[5rem]">
+                              <SearchDropDown
+                                handleDropDown={handleDropDown}
+                                data={[
+                                  {
+                                    value: "All",
+                                  },
+                                  ...Exam_setUpData.map((item) => {
+                                    return { value: item.grade.displayName };
+                                  }),
+                                ]}
+                                variant={"outlined"}
+                                Name={"class"}
+                                defaultValue={{
+                                  value: "All",
+                                }}
+                                size={"small"}
+                              />
+                            </div>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell align="right" className="w-[25%]">
-                        <div className="flex flex-col items-center gap-2">
-                          <h1 className="font-bold">Exam Name</h1>
-                        </div>
-                      </TableCell>
-                      <TableCell align="right" className="w-[25%]">
-                        <div className="flex flex-col items-center gap-2">
-                          <h1 className="font-bold">
-                            Exam Type - Delivery Format
-                          </h1>
-                        </div>
-                      </TableCell>
-                      <TableCell align="right" className="w-[25%]">
-                        <div className="flex flex-col items-center gap-2">
-                          <h1 className="font-semibold">
-                            Marks - Syllabus - Difficulty
-                          </h1>
-                        </div>
-                      </TableCell>
-                      <TableCell align="right" className="w-[10%]">
-                        <div className="flex flex-col items-center gap-2">
-                          <h1 className="font-semibold">Duration (in Min)</h1>
-                        </div>
-                      </TableCell>
-                      <TableCell align="right" className="w-[5%]">
-                        <div className="flex flex-col items-center gap-2">
-                          <h1 className="font-semibold">Lock</h1>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row, index) => (
-                      <TableRow
-                        key={index}
-                        sx={{
-                          "&:last-child td, &:last-child th": { border: 0 },
-                        }}
-                      >
-                        <TableCell component="th" scope="row" align="center">
-                          <h1 className="font-bold">{row}</h1>
                         </TableCell>
-                        <TableCell align="center">
-                          <SearchDropDown
-                            minWidth={"14rem"}
-                            data={[
-                              { value: "Formative Assessment 1" },
-                              { value: "Unit Test 1" },
-                            ]}
-                            variant={"outlined"}
-                            Name={"exam_name"}
-                            value={{ value: "Formative Assessment 1" }}
-                            size={"small"}
-                          />
+                        <TableCell align="right" className="w-[25%]">
+                          <div className="flex flex-col items-center gap-2">
+                            <h1 className="font-bold">Exam Name</h1>
+                          </div>
                         </TableCell>
-                        <TableCell align="center">
-                          <SearchDropDown
-                            minWidth={"12rem"}
-                            data={[
-                              { value: "Subjective-Pdf Copy" },
-                              { value: "Objective-Pdf Copy" },
-                              { value: "Objective Learning App" },
-                            ]}
-                            variant={"outlined"}
-                            Name={"exam_type"}
-                            value={{ value: "Subjective-Pdf Copy" }}
-                            size={"small"}
-                          />
+                        <TableCell align="right" className="w-[25%]">
+                          <div className="flex flex-col items-center gap-2">
+                            <h1 className="font-bold">
+                              Exam Type - Delivery Format
+                            </h1>
+                          </div>
                         </TableCell>
-                        <TableCell align="center">
-                          <SearchDropDown
-                            minWidth={"12rem"}
-                            data={[
-                              { value: "30M Full Beginner" },
-                              { value: "30M Reduced Beginner" },
-                              { value: "20M Full Beginner" },
-                              { value: "20M Reduced Beginner" },
-                            ]}
-                            variant={"outlined"}
-                            Name={"mark_syllabus_difficulty"}
-                            value={{ value: "30M Full Beginner" }}
-                            size={"small"}
-                          />
+                        <TableCell align="right" className="w-[25%]">
+                          <div className="flex flex-col items-center gap-2">
+                            <h1 className="font-semibold">
+                              Marks - Syllabus - Difficulty
+                            </h1>
+                          </div>
                         </TableCell>
-                        <TableCell align="center">
-                          <BasicTextFields
-                            variant={"standard"}
-                            value={45}
-                            lable={"Time"}
-                            type={"number"}
-                          />
+                        <TableCell align="right" className="w-[10%]">
+                          <div className="flex flex-col items-center gap-2">
+                            <h1 className="font-semibold">Duration (in Min)</h1>
+                          </div>
                         </TableCell>
-                        <TableCell align="center">
-                          <SwitchLabels />
+                        <TableCell align="right" className="w-[5%]">
+                          <div className="flex flex-col items-center gap-2">
+                            <h1 className="font-semibold">Lock</h1>
+                          </div>
                         </TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                      {mainData?.map((item, index) => (
+                        <TableRow
+                          key={index}
+                          sx={{
+                            "&:last-child td, &:last-child th": { border: 0 },
+                          }}
+                        >
+                          <TableCell component="th" scope="row" align="center">
+                            <h1 className="font-bold">
+                              {item.grade.displayName}
+                            </h1>
+                          </TableCell>
+                          <TableCell align="center">
+                            <SearchDropDown
+                              minWidth={"14rem"}
+                              handleDropDown={handleDropDown}
+                              data={[
+                                ...item.applicableExamNames.map((item) => {
+                                  return { value: item.displayName };
+                                }),
+                              ]}
+                              variant={"outlined"}
+                              Name={"exam_name"}
+                              defaultValue={{
+                                value: item.examName.displayName,
+                              }}
+                              size={"small"}
+                              disable={item.locked}
+                            />
+                          </TableCell>
+                          <TableCell align="center">
+                            <SearchDropDown
+                              minWidth={"12rem"}
+                              disable={item.locked}
+                              handleDropDown={handleDropDown}
+                              data={[
+                                ...item.applicableQuestionPaperDeliveryModeTypes.map(
+                                  (item) => {
+                                    return { value: item.displayName };
+                                  }
+                                ),
+                              ]}
+                              variant={"outlined"}
+                              Name={"exam_type"}
+                              defaultValue={{
+                                value:
+                                  item.questionPaperDeliveryModeType
+                                    .displayName,
+                              }}
+                              size={"small"}
+                            />
+                          </TableCell>
+                          <TableCell align="center">
+                            {Object.keys(item.applicableMarksSyllabus)[0] ===
+                            "SUBJECTIVE" ? (
+                              <SearchDropDown
+                                minWidth={"12rem"}
+                                handleDropDown={handleDropDown}
+                                disable={item.locked}
+                                data={[
+                                  ...item?.applicableMarksSyllabus?.SUBJECTIVE?.map(
+                                    (item) => {
+                                      return { value: item.displayName };
+                                    }
+                                  ),
+                                ]}
+                                variant={"outlined"}
+                                Name={"mark_syllabus_difficulty"}
+                                defaultValue={{
+                                  value: item.selectedMarksSyllabus.displayName,
+                                }}
+                                size={"small"}
+                              />
+                            ) : (
+                              <SearchDropDown
+                                minWidth={"12rem"}
+                                handleDropDown={handleDropDown}
+                                disable={item.locked}
+                                data={[
+                                  ...item?.applicableMarksSyllabus?.OBJECTIVE?.map(
+                                    (item) => {
+                                      return { value: item.displayName };
+                                    }
+                                  ),
+                                ]}
+                                variant={"outlined"}
+                                Name={"mark_syllabus_difficulty"}
+                                defaultValue={{
+                                  value: item.selectedMarksSyllabus.displayName,
+                                }}
+                                size={"small"}
+                              />
+                            )}
+                          </TableCell>
+                          <TableCell align="center">
+                            <BasicTextFields
+                              variant={"standard"}
+                              defaultValue={item.duration}
+                              disable={item.locked}
+                              lable={"Time"}
+                              type={"number"}
+                            />
+                          </TableCell>
+                          <TableCell align="center">
+                            <SwitchLabels checked={item.locked} />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
             </div>
           </div>
         </div>

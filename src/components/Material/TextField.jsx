@@ -2,13 +2,22 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 
-export default function BasicTextFields({ variant, value, lable, type }) {
+export default function BasicTextFields({
+  variant,
+  value,
+  lable,
+  type,
+  defaultValue,
+  disable,
+}) {
   return (
     <TextField
       id="standard-basic"
       label={lable}
+      disabled={disable}
       type={type}
-      value={value}
+      defaultValue={defaultValue}
+      // value={value}
       variant={variant}
     />
   );

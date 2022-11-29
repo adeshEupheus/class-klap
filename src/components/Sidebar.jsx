@@ -17,7 +17,7 @@ import logoLight from "../assets/classklap_logo.png";
 import { Collapse } from "@mui/material";
 
 const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
-  const [eLearning, setELearning] = useState(true);
+  const [eLearning, setELearning] = useState(false);
   const [setUp, setSetUp] = useState(show === 2 ? true : false);
   const [assessment, setAssessment] = useState(false);
   const [user, setUser] = useState({});
@@ -46,7 +46,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
           />
         </div>
 
-        <Link to="/">
+        <Link to="/dashboard">
           <aside
             className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
               highLight === "dashboard" ? "bg-gray-500" : ""
@@ -71,7 +71,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
           </aside>
         </Link>
 
-        <Link to="/manageSchool">
+        <Link>
           <aside
             className={`px-6 py-2 flex gap-4 cursor-pointer ${
               highLight === "manageSchool" ? "bg-gray-500" : ""
@@ -99,7 +99,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
             Teacher Progress
           </span>
         </aside>
-        <Link to="/order_processing">
+        <Link>
           <aside
             className={`px-6 py-2 flex gap-4 ${
               highLight === "order_pro" ? "bg-gray-500" : ""
@@ -199,7 +199,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
                   </h1>
                 </div>
               </Link>
-              <Link to="/school/schools">
+              <Link to="/assessment/exam_timetable">
                 <div
                   className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
                 >
@@ -217,7 +217,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
                   </h1>
                 </div>
               </Link>
-              <Link to="/school/schools">
+              <Link>
                 <div
                   className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
                 >
@@ -235,7 +235,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
                   </h1>
                 </div>
               </Link>
-              <Link to="/school/schools">
+              <Link>
                 <div
                   className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
                 >
@@ -253,7 +253,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
                   </h1>
                 </div>
               </Link>
-              <Link to="/school/schools">
+              <Link>
                 <div
                   className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
                 >
@@ -314,7 +314,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
                 eLearning ? "h-[10vh] opacity-100 visible" : null
               } transition-all ease-linear duration-200`}
             >
-              <Link to="/school/tagging">
+              <Link>
                 <div
                   className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
                 >
@@ -336,7 +336,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
                   </h1>
                 </div>
               </Link>
-              <Link to="/school/schools">
+              <Link>
                 <div
                   className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
                 >
@@ -398,7 +398,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
                 eLearning ? "h-[16vh] opacity-100 visible" : null
               } transition-all ease-linear duration-200`}
             >
-              <Link to="/school/tagging">
+              <Link>
                 <div
                   className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
                 >
@@ -420,7 +420,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
                   </h1>
                 </div>
               </Link>
-              <Link to="/school/schools">
+              <Link>
                 <div
                   className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
                 >
@@ -459,7 +459,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
             </div>
           </Collapse>
         </Link>
-        <Link to="/manage_order">
+        <Link>
           <aside
             className={`px-6 py-2 flex gap-4 ${
               highLight === "manageOrder" ? "bg-gray-500" : ""

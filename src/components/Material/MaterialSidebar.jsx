@@ -22,6 +22,8 @@ import { Link } from "react-router-dom";
 const SwipeableTemporaryDrawer = React.forwardRef((props, ref) => {
   const [eLearning, setELearning] = useState(false);
   const [setUp, setSetUp] = useState(false);
+  const [assessment, setAssessment] = useState(false);
+
   const [isSchoolClicked, setIsSchoolClicked] = useState(
     props.show === 2 ? false : true
   );
@@ -75,9 +77,9 @@ const SwipeableTemporaryDrawer = React.forwardRef((props, ref) => {
         />
       </div>
 
-      <Link to="/">
+      <Link to="/dashboard">
         <aside
-          className={`px-6 mt-[2rem] py-2  hover:bg-gray-500 flex ${
+          className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
             highLight === "dashboard" ? "bg-gray-500" : ""
           } rounded-md gap-4 cursor-pointer group`}
         >
@@ -98,9 +100,9 @@ const SwipeableTemporaryDrawer = React.forwardRef((props, ref) => {
         </aside>
       </Link>
 
-      <Link to="/manageSchool">
+      <Link>
         <aside
-          className={`px-6 py-2 flex gap-4  cursor-pointer ${
+          className={`px-6 py-2 flex gap-4 cursor-pointer ${
             highLight === "manageSchool" ? "bg-gray-500" : ""
           } group hover:bg-gray-500 rounded-md transition-all duration-150 ease-linear`}
         >
@@ -124,9 +126,9 @@ const SwipeableTemporaryDrawer = React.forwardRef((props, ref) => {
           Teacher Progress
         </span>
       </aside>
-      <Link to="/order_processing">
+      <Link>
         <aside
-          className={`px-6 py-2  flex gap-4 ${
+          className={`px-6 py-2 flex gap-4 ${
             highLight === "order_pro" ? "bg-gray-500" : ""
           } cursor-pointer group hover:bg-gray-500 rounded-md transition-all duration-150 ease-linear`}
         >
@@ -144,25 +146,158 @@ const SwipeableTemporaryDrawer = React.forwardRef((props, ref) => {
           </span>
         </aside>
       </Link>
-      <Link to="/manage_order">
+      <Link>
         <aside
-          className={`px-6 py-2 flex gap-4 ${
+          onClick={() => setAssessment(!assessment)}
+          className={`px-6 py-2 flex justify-between gap-4 ${
             highLight === "manageOrder" ? "bg-gray-500" : ""
           } cursor-pointer group hover:bg-gray-500 rounded-md transition-all duration-150 ease-linear`}
         >
-          <Assessment
-            className={`${
-              highLight === "manageOrder" ? "!text-gray-100" : "!text-gray-400"
-            } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
-          />
-          <span
-            className={`${
-              highLight === "manageOrder" ? "text-gray-200" : "text-gray-600"
-            } group-hover:!text-gray-100 transition-all duration-150 ease-linear font-semibold`}
+          <div className="flex gap-4">
+            <Devices
+              className={`${
+                highLight === "manageOrder"
+                  ? "!text-gray-100"
+                  : "!text-gray-400"
+              } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
+            />
+            <span
+              className={`${
+                highLight === "manageOrder" ? "text-gray-200" : "text-gray-600"
+              } group-hover:!text-gray-100 font-semibold transition-all duration-150 ease-linear`}
+            >
+              Assessment
+            </span>
+          </div>
+          <div
+            className={`transition-all duration-200  ease-linear ${
+              assessment ? null : "-rotate-90"
+            }`}
           >
-            Assessment
-          </span>
+            <KeyboardArrowDown className={`text-gray-600 `} />
+          </div>
         </aside>
+        <Collapse in={assessment}>
+          {" "}
+          <div
+            className={`${
+              eLearning ? "h-[40vh] opacity-100 visible" : null
+            } transition-all ease-linear duration-200`}
+          >
+            <Link to="/assessment/overview">
+              <div
+                className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
+              >
+                <Circle
+                  className={`!text-[.7rem] !transition-all !ease-linear !duration-200 ${
+                    highLight === "schoolTagging"
+                      ? "text-white"
+                      : "text-gray-600"
+                  } `}
+                />
+                <h1
+                  className={`pl-9 ${
+                    highLight === "schoolTagging"
+                      ? "text-white"
+                      : "text-gray-600 "
+                  } transition-all ease-linear font-semibold duration-200  py-2 cursor-pointer`}
+                >
+                  Overview
+                </h1>
+              </div>
+            </Link>
+            <Link to="/assessment/exam_set_up">
+              <div
+                className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
+              >
+                <Circle
+                  className={`!text-[.7rem] !transition-all !ease-linear !duration-200 ${
+                    highLight === "schools" ? "text-white" : "text-gray-600"
+                  } `}
+                />
+                <h1
+                  className={`pl-9 ${
+                    highLight === "schools" ? "text-white" : "text-gray-600"
+                  } transition-all ease-linear font-semibold duration-200  py-2 cursor-pointer`}
+                >
+                  Exam Step Up
+                </h1>
+              </div>
+            </Link>
+            <Link to="/assessment/exam_timetable">
+              <div
+                className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
+              >
+                <Circle
+                  className={`!text-[.7rem] !transition-all !ease-linear !duration-200 ${
+                    highLight === "schools" ? "text-white" : "text-gray-600"
+                  } `}
+                />
+                <h1
+                  className={`pl-9 ${
+                    highLight === "schools" ? "text-white" : "text-gray-600"
+                  } transition-all ease-linear font-semibold duration-200  py-2 cursor-pointer`}
+                >
+                  Exam Timetable
+                </h1>
+              </div>
+            </Link>
+            <Link>
+              <div
+                className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
+              >
+                <Circle
+                  className={`!text-[.7rem] !transition-all !ease-linear !duration-200 ${
+                    highLight === "schools" ? "text-white" : "text-gray-600"
+                  } `}
+                />
+                <h1
+                  className={`pl-9 ${
+                    highLight === "schools" ? "text-white" : "text-gray-600"
+                  } transition-all ease-linear font-semibold duration-200  py-2 cursor-pointer`}
+                >
+                  Marks Entry
+                </h1>
+              </div>
+            </Link>
+            <Link>
+              <div
+                className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
+              >
+                <Circle
+                  className={`!text-[.7rem] !transition-all !ease-linear !duration-200 ${
+                    highLight === "schools" ? "text-white" : "text-gray-600"
+                  } `}
+                />
+                <h1
+                  className={`pl-9 ${
+                    highLight === "schools" ? "text-white" : "text-gray-600"
+                  } transition-all ease-linear font-semibold duration-200  py-2 cursor-pointer`}
+                >
+                  Scoreboard
+                </h1>
+              </div>
+            </Link>
+            <Link>
+              <div
+                className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
+              >
+                <Circle
+                  className={`!text-[.7rem] !transition-all !ease-linear !duration-200 ${
+                    highLight === "schools" ? "text-white" : "text-gray-600"
+                  } `}
+                />
+                <h1
+                  className={`pl-9 ${
+                    highLight === "schools" ? "text-white" : "text-gray-600"
+                  } transition-all ease-linear font-semibold duration-200  py-2 cursor-pointer`}
+                >
+                  Add Exam Set Up
+                </h1>
+              </div>
+            </Link>
+          </div>
+        </Collapse>
       </Link>
       <Link>
         <aside
@@ -199,10 +334,10 @@ const SwipeableTemporaryDrawer = React.forwardRef((props, ref) => {
           {" "}
           <div
             className={`${
-              eLearning ? "h-[12vh] opacity-100 visible" : null
+              eLearning ? "h-[10vh] opacity-100 visible" : null
             } transition-all ease-linear duration-200`}
           >
-            <Link to="/school/tagging">
+            <Link>
               <div
                 className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
               >
@@ -224,7 +359,7 @@ const SwipeableTemporaryDrawer = React.forwardRef((props, ref) => {
                 </h1>
               </div>
             </Link>
-            <Link to="/school/schools">
+            <Link>
               <div
                 className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
               >
@@ -245,6 +380,7 @@ const SwipeableTemporaryDrawer = React.forwardRef((props, ref) => {
           </div>
         </Collapse>
       </Link>
+
       <Link>
         <aside
           onClick={() => setSetUp(!setUp)}
@@ -280,10 +416,10 @@ const SwipeableTemporaryDrawer = React.forwardRef((props, ref) => {
           {" "}
           <div
             className={`${
-              setUp ? "h-[18vh] mb-4 opacity-100 visible" : null
+              eLearning ? "h-[16vh] opacity-100 visible" : null
             } transition-all ease-linear duration-200`}
           >
-            <Link to="/school/tagging">
+            <Link>
               <div
                 className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
               >
@@ -305,7 +441,7 @@ const SwipeableTemporaryDrawer = React.forwardRef((props, ref) => {
                 </h1>
               </div>
             </Link>
-            <Link to="/school/schools">
+            <Link>
               <div
                 className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
               >
@@ -344,7 +480,7 @@ const SwipeableTemporaryDrawer = React.forwardRef((props, ref) => {
           </div>
         </Collapse>
       </Link>
-      <Link to="/manage_order">
+      <Link>
         <aside
           className={`px-6 py-2 flex gap-4 ${
             highLight === "manageOrder" ? "bg-gray-500" : ""

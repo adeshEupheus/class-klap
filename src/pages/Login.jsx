@@ -19,17 +19,17 @@ const Login = () => {
 
   return (
     <div className="min-h-[100vh] bg-gray-200 flex flex-col gap-4">
-      <div className="flex justify-around items-center py-2 bg-gray-100">
+      <div className="flex flex-col md:flex-row justify-around md:gap-0 gap-4 items-center py-2 bg-gray-100">
         <img src={ckLogo} className="w-[8rem] h-auto" alt="" />
-        <span className="font-extrabold text-3xl gradient-text">
+        <span className="font-extrabold md:text-3xl text-xs gradient-text">
           FUTURE-READY SCHOOLS. FUTURE-READY STUDENTS.
         </span>
       </div>
       <div className="w-[100vw] flex gap-8 px-4">
-        <div className="bg-white w-[70%] h-fit rounded-md shadow-xl">
+        <div className="bg-white hidden md:block w-[70%] h-fit rounded-md shadow-xl">
           <Slider />
         </div>
-        <div className="bg-white w-[32%] shadow-xl rounded-md items-start pl-8 py-8 flex flex-col gap-4">
+        <div className="bg-white md:w-[32%] w-full shadow-xl rounded-md items-start pl-8 py-8 flex flex-col gap-4">
           <span className=" text-3xl font-semibold text-cyan-800">
             Welcome Back :)
           </span>

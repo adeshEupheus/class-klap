@@ -55,6 +55,7 @@ const SearchDropDown = ({
           size={size}
           disabled={disable}
           disableClearable
+          // sx={{ width: "fit-content" }}
           // value={value}
           defaultValue={defaultValue}
           onChange={(event, newValue) => handleOnChange(newValue, Name)}
@@ -63,6 +64,7 @@ const SearchDropDown = ({
             <TextField
               {...params}
               label={label}
+              sx={{ width: `${minWidth ? minWidth : "100%"}` }}
               variant={variant}
               InputLabelProps={{ style: { color: color } }}
             />

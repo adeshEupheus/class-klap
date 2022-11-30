@@ -9,17 +9,32 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import SwipeableTemporaryDrawer from "../../components/Material/MaterialSidebar";
-import { Skeleton, Switch } from "@mui/material";
-import { Download, Menu, Visibility } from "@mui/icons-material";
+import {
+  Collapse,
+  IconButton,
+  Skeleton,
+  Switch,
+  Typography,
+} from "@mui/material";
+import {
+  Download,
+  KeyboardArrowDown,
+  KeyboardArrowUp,
+  Menu,
+  Visibility,
+} from "@mui/icons-material";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Breadcrumbs from "../../components/Material/BreadCrumbs";
 import SearchDropDown from "../../components/Material/SearchDropDown";
 import BasicTextFields from "../../components/Material/TextField";
 import SwitchLabels from "../../components/Material/Switch";
-import { GetExamSetUpData } from "../../apis/fectcher/assessment/examSetUp/examSetUp";
+// import { GetExamSetUpData } from "../../apis/fectcher/assessment/examSetUp/examSetUp";
 import { GetExamTimetableData } from "../../apis/fectcher/assessment/examTimetable/examTimetable";
 import BasicButton from "../../components/Material/Button";
 import ResponsiveTimePickers from "../../components/Material/TimePicker";
+import ResponsiveDatePickers from "../../components/Material/DatePicker";
+import { Box } from "@mui/system";
+// import ResponsiveTimePickers from "../../components/Material/";
 const ExamTimeTable = () => {
   const [examId, setExamId] = useState("FA1");
   const [gradeId, setGradeId] = useState("NUR");
@@ -58,19 +73,17 @@ const ExamTimeTable = () => {
 
   const handleDropDown = (value, type) => {
     console.log(value, type);
-    // if (type === "class") {
-    //   updateData(value.value);
-    // } else if ((type = "exam_setup")) {
-    //   setId(value.value);
-    // }
-    // switch (type) {
-    //   case "Overview":
-    //     setId(value.value);
-    //     break;
+    switch (type) {
+      case "exam":
+        setExamId(value.value);
+        break;
+      case "grade":
+        setGradeId(value.value);
+        break;
 
-    //   default:
-    //     break;
-    // }
+      default:
+        break;
+    }
   };
 
   const handleSidebarCollapsed = () => {
@@ -113,7 +126,7 @@ const ExamTimeTable = () => {
           />
         </div>
         <div
-          className={`flex flex-col w-[100vw] bg-gray-200 relative transition-all ease-linear duration-300 lg:w-[83vw] lg:ml-[18vw] ${
+          className={`flex flex-col w-[100vw] bg-gray-200 relative transition-all ease-linear duration-300 overflow-hidden lg:w-[83vw] lg:ml-[18vw] ${
             window.innerWidth < 1024 ? null : "md:ml-[30vw] ml-[85vw]"
           } `}
         >
@@ -154,7 +167,7 @@ const ExamTimeTable = () => {
                     { value: "SA3" },
                   ]}
                   variant={"outlined"}
-                  Name={"exam_setup"}
+                  Name={"exam"}
                   defaultValue={{ value: "FA1" }}
                   size={"small"}
                 />
@@ -171,14 +184,22 @@ const ExamTimeTable = () => {
                     { value: "5" },
                   ]}
                   variant={"outlined"}
-                  Name={"exam_setup"}
+                  Name={"grade"}
                   defaultValue={{ value: "Nursery" }}
                   size={"small"}
                 />
               </div>
               <div className="w-full flex items-center flex-col gap-1">
                 <h1 className="text-xl font-semibold text-gray-600">
-                  Formative Assessment 1
+                  {isLoading ? (
+                    <Skeleton
+                      animation="wave"
+                      variant="text"
+                      sx={{ fontSize: "1rem", width: "12rem" }}
+                    />
+                  ) : (
+                    ExamTimetableData.examinationName
+                  )}
                 </h1>
                 <div className="flex gap-2 items-center">
                   <h1 className="text-gray-600 text-sm">
@@ -231,7 +252,9 @@ const ExamTimeTable = () => {
                       <TableRow className="w-full">
                         <TableCell align="right" className="w-[10%]">
                           <div className="flex flex-col w-full items-center gap-2">
-                            <h1 className="font-bold">Subjects</h1>
+                            <h1 className="font-bold sm:text-sm text-xs">
+                              Subjects
+                            </h1>
                             <div className="w-full">
                               <SearchDropDown
                                 handleDropDown={handleDropDown}
@@ -257,155 +280,179 @@ const ExamTimeTable = () => {
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell align="right" className="w-[10%]">
+                        <TableCell align="right" className="w-[15%]">
                           <div className="flex flex-col items-center gap-2">
-                            <h1 className="font-bold">Exam Date</h1>
+                            <h1 className="font-bold sm:text-sm text-xs">
+                              Exam Date
+                            </h1>
+                          </div>
+                        </TableCell>
+                        <TableCell align="right" className="w-[15%]">
+                          <div className="flex flex-col items-center gap-2">
+                            <h1 className="font-bold sm:text-sm text-xs">
+                              Exam Start Time
+                            </h1>
                           </div>
                         </TableCell>
                         <TableCell align="right" className="w-[10%]">
                           <div className="flex flex-col items-center gap-2">
-                            <h1 className="font-bold">Exam Start Time</h1>
-                          </div>
-                        </TableCell>
-                        <TableCell align="right" className="w-[10%]">
-                          <div className="flex flex-col items-center gap-2">
-                            <h1 className="font-semibold">
+                            <h1 className="font-semibold sm:text-sm text-xs">
                               Duration (In Mins)
                             </h1>
                           </div>
                         </TableCell>
                         <TableCell align="right" className="w-[20%]">
                           <div className="flex flex-col items-center gap-2">
-                            <h1 className="font-semibold">
+                            <h1 className="font-semibold sm:text-sm text-xs">
                               Exam Type - Delivery Format
                             </h1>
                           </div>
                         </TableCell>
                         <TableCell align="right" className="w-[20%]">
                           <div className="flex flex-col items-center gap-2">
-                            <h1 className="font-semibold">Marks - Syllabus</h1>
+                            <h1 className="font-semibold sm:text-sm text-xs">
+                              Marks - Syllabus
+                            </h1>
                           </div>
                         </TableCell>
-                        <TableCell align="right" className="w-[10%]">
+                        <TableCell align="right" className="w-[5%]">
                           <div className="flex flex-col items-center gap-2">
-                            <h1 className="font-semibold">View/Edit QP</h1>
+                            <h1 className="font-semibold sm:text-sm text-xs">
+                              View/Edit QP
+                            </h1>
                           </div>
                         </TableCell>
-                        <TableCell align="right" className="w-[10%]">
+                        <TableCell align="right" className="w-[5%]">
                           <div className="flex flex-col items-center gap-2">
-                            <h1 className="font-semibold">Status</h1>
+                            <h1 className="font-semibold sm:text-sm text-xs">
+                              Status
+                            </h1>
                           </div>
                         </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
+                      {ExamTimetableData.subjectLevelConfigurationResponses
+                        .length < 1 && (
+                        <TableRow>
+                          <TableCell colSpan={8} align="center">
+                            <h1 className="sm:text-lg text-base font-semibold text-gray-600">
+                              No Records Found
+                            </h1>
+                          </TableCell>
+                        </TableRow>
+                      )}
                       {ExamTimetableData.subjectLevelConfigurationResponses.map(
                         (item, index) => (
-                          <TableRow
-                            key={index}
-                            sx={{
-                              "&:last-child td, &:last-child th": { border: 0 },
-                            }}
-                          >
-                            <TableCell
-                              component="th"
-                              scope="row"
-                              align="center"
-                            >
-                              <h1 className="font-bold">
-                                {item.subject.displayName}
-                              </h1>
-                            </TableCell>
-                            <TableCell align="center">DatePicker</TableCell>
-                            <TableCell align="center">
-                              {/* <ResponsiveTimePickers /> */}
-                              TimePicker
-                            </TableCell>
+                          // <TableRow
+                          //   key={index}
+                          //   sx={{
+                          //     "&:last-child td, &:last-child th": { border: 0 },
+                          //   }}
+                          // >
+                          //   <TableCell
+                          //     component="th"
+                          //     scope="row"
+                          //     align="center"
+                          //   >
+                          //     <h1 className="font-bold">
+                          //       {item.subject.displayName}
+                          //     </h1>
+                          //   </TableCell>
+                          //   <TableCell align="center">
+                          //     {/* <ResponsiveDatePickers /> */}
+                          //     <ResponsiveDatePickers />
+                          //   </TableCell>
+                          //   <TableCell align="center">
+                          //     <ResponsiveTimePickers />
+                          //     {/* TimePicker */}
+                          //   </TableCell>
 
-                            <TableCell align="center">
-                              <BasicTextFields
-                                variant={"standard"}
-                                defaultValue={item.duration}
-                                disable={item.locked}
-                                lable={"Time"}
-                                type={"number"}
-                              />
-                            </TableCell>
-                            <TableCell align="center">
-                              <SearchDropDown
-                                handleDropDown={handleDropDown}
-                                data={[
-                                  ...item?.applicableQuestionPaperDeliveryModeType.map(
-                                    (item) => {
-                                      return { value: item.displayName };
-                                    }
-                                  ),
-                                ]}
-                                variant={"outlined"}
-                                Name={"mark_syllabus_difficulty"}
-                                defaultValue={{
-                                  value:
-                                    item.questionPaperDeliveryModeType
-                                      .displayName,
-                                }}
-                                size={"small"}
-                              />
-                            </TableCell>
-                            <TableCell align="center">
-                              {Object.keys(
-                                item.qpSetTypeApplicableMarksMap
-                              )[0] === "SUBJECTIVE" ? (
-                                <SearchDropDown
-                                  minWidth={"12rem"}
-                                  handleDropDown={handleDropDown}
-                                  disable={item.locked}
-                                  data={[
-                                    ...item?.qpSetTypeApplicableMarksMap?.SUBJECTIVE?.map(
-                                      (item) => {
-                                        return { value: item.displayName };
-                                      }
-                                    ),
-                                  ]}
-                                  variant={"outlined"}
-                                  Name={"mark_syllabus_difficulty"}
-                                  defaultValue={{
-                                    value:
-                                      item.qpSetTypeApplicableMarksMap
-                                        .SUBJECTIVE[0].displayName,
-                                  }}
-                                  size={"small"}
-                                />
-                              ) : (
-                                <SearchDropDown
-                                  minWidth={"12rem"}
-                                  handleDropDown={handleDropDown}
-                                  disable={item.locked}
-                                  data={[
-                                    ...item?.applicableMarksSyllabus?.OBJECTIVE?.map(
-                                      (item) => {
-                                        return { value: item.displayName };
-                                      }
-                                    ),
-                                  ]}
-                                  variant={"outlined"}
-                                  Name={"mark_syllabus_difficulty"}
-                                  defaultValue={{
-                                    value:
-                                      item.selectedMarksSyllabus.displayName,
-                                  }}
-                                  size={"small"}
-                                />
-                              )}
-                            </TableCell>
-                            <TableCell align="center">
-                              <Visibility className="!text-gray-600 !cursor-pointer" />
-                            </TableCell>
-                            <TableCell align="center">
-                              <h1 className="text-red-600 text-xs font-semibold">
-                                {item.examStatus.displayName}
-                              </h1>
-                            </TableCell>
-                          </TableRow>
+                          //   <TableCell align="center">
+                          //     <BasicTextFields
+                          //       variant={"standard"}
+                          //       defaultValue={item.duration}
+                          //       disable={item.locked}
+                          //       lable={"Time"}
+                          //       type={"number"}
+                          //     />
+                          //   </TableCell>
+                          //   <TableCell align="center">
+                          //     <SearchDropDown
+                          //       handleDropDown={handleDropDown}
+                          //       data={[
+                          //         ...item?.applicableQuestionPaperDeliveryModeType.map(
+                          //           (item) => {
+                          //             return { value: item.displayName };
+                          //           }
+                          //         ),
+                          //       ]}
+                          //       variant={"outlined"}
+                          //       Name={"mark_syllabus_difficulty"}
+                          //       defaultValue={{
+                          //         value:
+                          //           item.questionPaperDeliveryModeType
+                          //             .displayName,
+                          //       }}
+                          //       size={"small"}
+                          //     />
+                          //   </TableCell>
+                          //   <TableCell align="center">
+                          //     {Object.keys(
+                          //       item.qpSetTypeApplicableMarksMap
+                          //     )[0] === "SUBJECTIVE" ? (
+                          //       <SearchDropDown
+                          //         minWidth={"12rem"}
+                          //         handleDropDown={handleDropDown}
+                          //         disable={item.locked}
+                          //         data={[
+                          //           ...item?.qpSetTypeApplicableMarksMap?.SUBJECTIVE?.map(
+                          //             (item) => {
+                          //               return { value: item.displayName };
+                          //             }
+                          //           ),
+                          //         ]}
+                          //         variant={"outlined"}
+                          //         Name={"mark_syllabus_difficulty"}
+                          //         defaultValue={{
+                          //           value:
+                          //             item.qpSetTypeApplicableMarksMap
+                          //               .SUBJECTIVE[0].displayName,
+                          //         }}
+                          //         size={"small"}
+                          //       />
+                          //     ) : (
+                          //       <SearchDropDown
+                          //         minWidth={"12rem"}
+                          //         handleDropDown={handleDropDown}
+                          //         disable={item.locked}
+                          //         data={[
+                          //           ...item?.applicableMarksSyllabus?.OBJECTIVE?.map(
+                          //             (item) => {
+                          //               return { value: item.displayName };
+                          //             }
+                          //           ),
+                          //         ]}
+                          //         variant={"outlined"}
+                          //         Name={"mark_syllabus_difficulty"}
+                          //         defaultValue={{
+                          //           value:
+                          //             item.selectedMarksSyllabus.displayName,
+                          //         }}
+                          //         size={"small"}
+                          //       />
+                          //     )}
+                          //   </TableCell>
+                          //   <TableCell align="center">
+                          //     <Visibility className="!text-gray-600 !cursor-pointer" />
+                          //   </TableCell>
+                          //   <TableCell align="center">
+                          //     <h1 className="text-red-600 text-xs font-semibold">
+                          //       {item.examStatus.displayName}
+                          //     </h1>
+                          //   </TableCell>
+                          // </TableRow>
+                          <Row row={item} key={index} />
                         )
                       )}
                     </TableBody>
@@ -419,5 +466,184 @@ const ExamTimeTable = () => {
     </>
   );
 };
+
+function Row(props) {
+  const { row } = props;
+  const [open, setOpen] = React.useState(false);
+
+  const handleDropDown = (value, type) => {
+    console.log(value, type);
+    // if (type === "class") {
+    //   updateData(value.value);
+    // } else if ((type = "exam_setup")) {
+    //   setId(value.value);
+    // }
+    // switch (type) {
+    //   case "Overview":
+    //     setId(value.value);
+    //     break;
+
+    //   default:
+    //     break;
+    // }
+  };
+
+  return (
+    <React.Fragment>
+      <TableRow
+        sx={{
+          "&:last-child td, &:last-child th": { border: 0 },
+        }}
+      >
+        <TableCell component="th" scope="row" align="center">
+          <h1 className="font-bold">
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={() => setOpen(!open)}
+            >
+              {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+            </IconButton>
+            {row.subject.displayName}
+          </h1>
+        </TableCell>
+        <TableCell align="center">
+          {/* <ResponsiveDatePickers /> */}
+          <ResponsiveDatePickers />
+        </TableCell>
+        <TableCell align="center">
+          <ResponsiveTimePickers />
+          {/* TimePicker */}
+        </TableCell>
+
+        <TableCell align="center">
+          <BasicTextFields
+            variant={"standard"}
+            defaultValue={row.duration}
+            disable={row.locked}
+            lable={"Time"}
+            type={"number"}
+          />
+        </TableCell>
+        <TableCell align="center">
+          <SearchDropDown
+            handleDropDown={handleDropDown}
+            data={[
+              ...row?.applicableQuestionPaperDeliveryModeType.map((item) => {
+                return { value: item.displayName };
+              }),
+            ]}
+            variant={"outlined"}
+            minWidth={"12rem"}
+            Name={"mark_syllabus_difficulty"}
+            defaultValue={{
+              value: row.questionPaperDeliveryModeType.displayName,
+            }}
+            size={"small"}
+          />
+        </TableCell>
+        <TableCell align="center">
+          {Object.keys(row.qpSetTypeApplicableMarksMap)[0] === "SUBJECTIVE" ? (
+            <SearchDropDown
+              minWidth={"12rem"}
+              handleDropDown={handleDropDown}
+              disable={row.locked}
+              data={[
+                ...row?.qpSetTypeApplicableMarksMap?.SUBJECTIVE?.map((item) => {
+                  return { value: item.displayName };
+                }),
+              ]}
+              variant={"outlined"}
+              Name={"mark_syllabus_difficulty"}
+              defaultValue={{
+                value:
+                  row.qpSetTypeApplicableMarksMap.SUBJECTIVE[0].displayName,
+              }}
+              size={"small"}
+            />
+          ) : (
+            <SearchDropDown
+              minWidth={"12rem"}
+              handleDropDown={handleDropDown}
+              disable={row.locked}
+              data={[
+                ...row?.applicableMarksSyllabus?.OBJECTIVE?.map((item) => {
+                  return { value: item.displayName };
+                }),
+              ]}
+              variant={"outlined"}
+              Name={"mark_syllabus_difficulty"}
+              defaultValue={{
+                value: row.selectedMarksSyllabus.displayName,
+              }}
+              size={"small"}
+            />
+          )}
+        </TableCell>
+        <TableCell align="center">
+          <Visibility className="!text-gray-600 !cursor-pointer" />
+        </TableCell>
+        <TableCell align="center">
+          <h1 className="text-red-600 text-xs font-semibold">
+            {row.examStatus.displayName}
+          </h1>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Box sx={{ margin: 1 }}>
+              <Table size="small" aria-label="purchases">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <div className="flex gap-2 items-center">
+                        <h1 className="text-sm font-semibold text-gray-600">
+                          Exam Attendance:
+                        </h1>
+                        {row.studentsPresent}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2 items-center">
+                        <h1 className="text-sm font-semibold text-gray-600">
+                          Exam Required:
+                        </h1>
+                        <SwitchLabels checked={row.examRequired} />
+                      </div>
+                    </TableCell>
+                    <TableCell align="right">
+                      <div className="flex gap-2 items-center">
+                        <h1 className="text-sm font-semibold text-gray-600">
+                          Feedback Required:
+                        </h1>
+
+                        <SwitchLabels checked={row.feedbackRequired} />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                {/* <TableBody>
+                  {row.history.map((historyRow) => (
+                    <TableRow key={historyRow.date}>
+                      <TableCell component="th" scope="row">
+                        {historyRow.date}
+                      </TableCell>
+                      <TableCell>{historyRow.customerId}</TableCell>
+                      <TableCell align="right">{historyRow.amount}</TableCell>
+                      <TableCell align="right">
+                        {Math.round(historyRow.amount * row.price * 100) / 100}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody> */}
+              </Table>
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </React.Fragment>
+  );
+}
 
 export default ExamTimeTable;

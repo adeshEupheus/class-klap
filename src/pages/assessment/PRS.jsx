@@ -16,62 +16,65 @@ import Breadcrumbs from "../../components/Material/BreadCrumbs";
 import SearchDropDown from "../../components/Material/SearchDropDown";
 import BasicTextFields from "../../components/Material/TextField";
 import SwitchLabels from "../../components/Material/Switch";
-import { GetExamSetUpData } from "../../apis/fectcher/assessment/examSetUp/examSetUp";
-import { useLayoutEffect } from "react";
-import axios from "axios";
-const ExamSetUp = () => {
-  const [id, setId] = useState("FA1");
+import HorizontalStepper from "../../components/Material/Stepper";
+import { GetPrsTrackerData } from "../../apis/fectcher/assessment/prsOverview/TrackerData";
+import { GetPrsTableData } from "../../apis/fectcher/assessment/prsOverview/TableData";
 
-  const [mainData, setMainData] = useState([]);
+const PRSOverview = () => {
+  const [id, setId] = useState("RSA1");
+
+  //   const [mainData, setMainData] = useState([]);
   const {
-    data: Exam_setUpData,
-    isLoading,
+    data: PRS_Tracker,
+    isLoading: Tracker_Loading,
     refetch,
   } = useQuery({
-    queryKey: ["exam_setup_data", id],
-    queryFn: () => GetExamSetUpData(id),
+    queryKey: ["prs_tracker", id],
+    queryFn: () => GetPrsTrackerData(id),
     onSuccess: (data) => {
       console.log(data);
-      setMainData(data);
+      //   setMainData(data);
     },
     // enabled: false,
     refetchOnWindowFocus: false,
   });
-  console.log(mainData);
+
+  const { data: PRS_Table, isLoading: PRS_Table_Loading } = useQuery({
+    queryKey: ["prs_table", id],
+    queryFn: () => GetPrsTableData(id),
+    onSuccess: (data) => {
+      console.log(data);
+      //   setMainData(data);
+    },
+    // enabled: false,
+    refetchOnWindowFocus: false,
+  });
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const show = null;
 
   // const queryClient = useQueryClient();
 
-  const updateData = (class_name) => {
-    if (class_name != "All") {
-      const newArray = Exam_setUpData.filter(
-        (item) => item.grade.displayName === class_name
-      );
-      setMainData(newArray);
-    } else {
-      setMainData(Exam_setUpData);
-    }
-  };
+  //   const updateData = (class_name) => {
+  //     if (class_name != "All") {
+  //       const newArray = Exam_setUpData.filter(
+  //         (item) => item.grade.displayName === class_name
+  //       );
+  //       setMainData(newArray);
+  //     } else {
+  //       setMainData(Exam_setUpData);
+  //     }
+  //   };
 
   const sidebarRef = useRef();
 
   const handleDropDown = (value, type) => {
     console.log(value, type);
     if (type === "class") {
-      updateData(value.value);
+      //   updateData(value.value);
     } else if ((type = "exam_setup")) {
       setId(value.value);
     }
-    // switch (type) {
-    //   case "Overview":
-    //     setId(value.value);
-    //     break;
-
-    //   default:
-    //     break;
-    // }
   };
 
   const handleSidebarCollapsed = () => {
@@ -79,7 +82,7 @@ const ExamSetUp = () => {
   };
 
   useEffect(() => {
-    document.title = "Exam Set Up - ClassKlap";
+    document.title = "PRS Overview - ClassKlap";
     // setMainData(Exam_setUpData);
     const handleWidth = () => {
       if (window.innerWidth > 1024) {
@@ -137,30 +140,30 @@ const ExamSetUp = () => {
 
           <div className="relative flex flex-col w-full justify-center items-start gap-4 bg-gray-200">
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4">
-              <Breadcrumbs crumbs={["Home", "Assessment", "Exam Set Up"]} />
-              <h1 className="font-bold sm:text-2xl text-xl">Exam Set Up</h1>
-              <div className="w-[5rem]">
+              <Breadcrumbs
+                crumbs={["Home", "Assessment", "Personal Revision Sheet"]}
+              />
+              <h1 className="font-bold sm:text-2xl text-xl">
+                Personal Revision Sheet - Overview
+              </h1>
+              <div className="w-[9rem]">
                 <SearchDropDown
                   handleDropDown={handleDropDown}
                   data={[
-                    { value: "FA1" },
-                    { value: "FA2" },
-                    { value: "FA3" },
-                    { value: "FA4" },
-                    { value: "RSA1" },
-                    { value: "RSA2" },
-                    { value: "RSA3" },
-                    { value: "SA1" },
-                    { value: "SA2" },
-                    { value: "SA3" },
+                    { value: "Revision 1" },
+                    { value: "Revision 2" },
+                    { value: "Revision 3" },
                   ]}
                   variant={"outlined"}
                   Name={"exam_setup"}
-                  defaultValue={{ value: "FA1" }}
+                  defaultValue={{ value: "Revision 1" }}
                   size={"small"}
                 />
               </div>
-              {isLoading ? (
+              <div className="w-full flex justify-center">
+                <HorizontalStepper />
+              </div>
+              {PRS_Table_Loading ? (
                 <Skeleton
                   // sx={{ bgcolor: "grey.400" }}
                   animation="wave"
@@ -179,7 +182,7 @@ const ExamSetUp = () => {
                   >
                     <TableHead className="w-full">
                       <TableRow className="w-full">
-                        <TableCell align="right" className="w-[10%]">
+                        <TableCell align="right" className="w-[15%]">
                           <div className="flex flex-col items-center gap-2">
                             <h1 className="font-bold">Class</h1>
                             <div className="w-[5rem]">
@@ -189,8 +192,8 @@ const ExamSetUp = () => {
                                   {
                                     value: "All",
                                   },
-                                  ...Exam_setUpData.map((item) => {
-                                    return { value: item.grade.displayName };
+                                  ...PRS_Table.map((item) => {
+                                    return { value: item.className };
                                   }),
                                 ]}
                                 variant={"outlined"}
@@ -203,39 +206,35 @@ const ExamSetUp = () => {
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell align="right" className="w-[25%]">
+                        <TableCell align="right" className="w-[15%]">
                           <div className="flex flex-col items-center gap-2">
-                            <h1 className="font-bold">Exam Name</h1>
+                            <h1 className="font-bold">Roll List</h1>
                           </div>
                         </TableCell>
                         <TableCell align="right" className="w-[25%]">
                           <div className="flex flex-col items-center gap-2">
-                            <h1 className="font-bold">
-                              Exam Type - Delivery Format
-                            </h1>
+                            <h1 className="font-bold">Exam Status</h1>
                           </div>
                         </TableCell>
-                        <TableCell align="right" className="w-[25%]">
+                        <TableCell align="right" className="w-[15%]">
                           <div className="flex flex-col items-center gap-2">
-                            <h1 className="font-semibold">
-                              Marks - Syllabus - Difficulty
-                            </h1>
+                            <h1 className="font-semibold">Print Status</h1>
                           </div>
                         </TableCell>
-                        <TableCell align="right" className="w-[10%]">
+                        <TableCell align="right" className="w-[15%]">
                           <div className="flex flex-col items-center gap-2">
-                            <h1 className="font-semibold">Duration (in Min)</h1>
+                            <h1 className="font-semibold">Download Status</h1>
                           </div>
                         </TableCell>
-                        <TableCell align="right" className="w-[5%]">
+                        <TableCell align="right" className="w-[15%]">
                           <div className="flex flex-col items-center gap-2">
-                            <h1 className="font-semibold">Lock</h1>
+                            <h1 className="font-semibold">Feedback status</h1>
                           </div>
                         </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {mainData?.map((item, index) => (
+                      {PRS_Table?.map((item, index) => (
                         <TableRow
                           key={index}
                           sx={{
@@ -243,103 +242,30 @@ const ExamSetUp = () => {
                           }}
                         >
                           <TableCell component="th" scope="row" align="center">
-                            <h1 className="font-bold">
-                              {item.grade.displayName}
+                            <h1 className="font-bold">{item.className}</h1>
+                          </TableCell>
+                          <TableCell align="center">
+                            <h1 className="font-bold text-blue-500">
+                              {item.rollListStatus}
                             </h1>
                           </TableCell>
                           <TableCell align="center">
-                            <SearchDropDown
-                              minWidth={"14rem"}
-                              handleDropDown={handleDropDown}
-                              data={[
-                                ...item.applicableExamNames.map((item) => {
-                                  return { value: item.displayName };
-                                }),
-                              ]}
-                              variant={"outlined"}
-                              Name={"exam_name"}
-                              defaultValue={{
-                                value: item.examName.displayName,
-                              }}
-                              size={"small"}
-                              disable={item.locked}
-                            />
+                            <h1 className="font-bold text-blue-500 text-sm">
+                              {item.examStatus}
+                            </h1>
                           </TableCell>
                           <TableCell align="center">
-                            <SearchDropDown
-                              minWidth={"12rem"}
-                              disable={item.locked}
-                              handleDropDown={handleDropDown}
-                              data={[
-                                ...item.applicableQuestionPaperDeliveryModeTypes.map(
-                                  (item) => {
-                                    return { value: item.displayName };
-                                  }
-                                ),
-                              ]}
-                              variant={"outlined"}
-                              Name={"exam_type"}
-                              defaultValue={{
-                                value:
-                                  item.questionPaperDeliveryModeType
-                                    .displayName,
-                              }}
-                              size={"small"}
-                            />
+                            <h1 className="font-bold">{item.printStatus}</h1>
                           </TableCell>
                           <TableCell align="center">
-                            {Object.keys(item.applicableMarksSyllabus)[0] ===
-                            "SUBJECTIVE" ? (
-                              <SearchDropDown
-                                minWidth={"12rem"}
-                                handleDropDown={handleDropDown}
-                                disable={item.locked}
-                                data={[
-                                  ...item?.applicableMarksSyllabus?.SUBJECTIVE?.map(
-                                    (item) => {
-                                      return { value: item.displayName };
-                                    }
-                                  ),
-                                ]}
-                                variant={"outlined"}
-                                Name={"mark_syllabus_difficulty"}
-                                defaultValue={{
-                                  value: item.selectedMarksSyllabus.displayName,
-                                }}
-                                size={"small"}
-                              />
-                            ) : (
-                              <SearchDropDown
-                                minWidth={"12rem"}
-                                handleDropDown={handleDropDown}
-                                disable={item.locked}
-                                data={[
-                                  ...item?.applicableMarksSyllabus?.OBJECTIVE?.map(
-                                    (item) => {
-                                      return { value: item.displayName };
-                                    }
-                                  ),
-                                ]}
-                                variant={"outlined"}
-                                Name={"mark_syllabus_difficulty"}
-                                defaultValue={{
-                                  value: item.selectedMarksSyllabus.displayName,
-                                }}
-                                size={"small"}
-                              />
-                            )}
+                            <h1 className="font-bold ">
+                              {item.downloadStatus}
+                            </h1>
                           </TableCell>
                           <TableCell align="center">
-                            <BasicTextFields
-                              variant={"standard"}
-                              defaultValue={item.duration}
-                              disable={item.locked}
-                              lable={"Time"}
-                              type={"number"}
-                            />
-                          </TableCell>
-                          <TableCell align="center">
-                            <SwitchLabels checked={item.locked} />
+                            <h1 className="font-bold text-blue-500 text-sm">
+                              {item.performanceStatus}
+                            </h1>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -355,4 +281,4 @@ const ExamSetUp = () => {
   );
 };
 
-export default ExamSetUp;
+export default PRSOverview;

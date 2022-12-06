@@ -112,7 +112,7 @@ const ExamTimeTable = () => {
     <>
       <div className="flex w-[100%] min-h-[100vh]">
         <Sidebar
-          highLight={"dashboard"}
+          highLight={"exam_timetable"}
           sidebarCollapsed={sidebarCollapsed}
           show={show}
         />
@@ -122,7 +122,7 @@ const ExamTimeTable = () => {
             ref={sidebarRef}
             sidebarCollapsed={sidebarCollapsed}
             show={show}
-            highLight={"dashboard"}
+            highLight={"exam_timetable"}
           />
         </div>
         <div

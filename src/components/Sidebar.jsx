@@ -11,10 +11,12 @@ import {
   Message,
   Circle,
   KeyboardArrowDown,
+  Scoreboard,
 } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import logoLight from "../assets/classklap_logo.png";
 import { Collapse } from "@mui/material";
+import Loader from "./Material/Loader";
 
 const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
   const [eLearning, setELearning] = useState(false);
@@ -36,7 +38,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
       } lg:py-2 md:py-4 py-8 z-[100] w-[85vw] lg:w-[18vw] md:w-[30vw] bg-gray-200 h-[100vh] overflow-auto`}
     >
       <div
-        className={`flex flex-col gap-6 transition-all ease-linear duration-100`}
+        className={`flex flex-col gap-2 transition-all ease-linear duration-100`}
       >
         <div className="flex items-center mt-[1rem] gap-3 justify-center">
           <img
@@ -45,8 +47,152 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
             alt=""
           />
         </div>
+        <Link to="/assessment/overview">
+          <aside
+            className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
+              highLight === "overview" ? "bg-gray-500" : ""
+            } rounded-md gap-4 cursor-pointer group`}
+          >
+            <div className="flex gap-4">
+              <Home
+                className={`${
+                  highLight === "overview" ? "!text-gray-100" : "!text-gray-400"
+                } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
+              />
+              <span
+                className={`${
+                  highLight === "overview" ? "text-gray-200" : "text-gray-600"
+                } group-hover:!text-gray-100 transition-all duration-150 font-semibold ease-linear`}
+              >
+                Overview
+              </span>
+            </div>
+          </aside>
+        </Link>
+        <Link to="/assessment/exam_set_up">
+          <aside
+            className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
+              highLight === "exam_setup" ? "bg-gray-500" : ""
+            } rounded-md gap-4 cursor-pointer group`}
+          >
+            <div className="flex gap-4">
+              <Settings
+                className={`${
+                  highLight === "exam_setup"
+                    ? "!text-gray-100"
+                    : "!text-gray-400"
+                } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
+              />
+              <span
+                className={`${
+                  highLight === "exam_setup" ? "text-gray-200" : "text-gray-600"
+                } group-hover:!text-gray-100 transition-all duration-150 font-semibold ease-linear`}
+              >
+                Exam Setup
+              </span>
+            </div>
+          </aside>
+        </Link>
+        <Link to="/assessment/exam_timetable">
+          <aside
+            className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
+              highLight === "exam_timetable" ? "bg-gray-500" : ""
+            } rounded-md gap-4 cursor-pointer group`}
+          >
+            <div className="flex gap-4">
+              <Assessment
+                className={`${
+                  highLight === "exam_timetable"
+                    ? "!text-gray-100"
+                    : "!text-gray-400"
+                } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
+              />
+              <span
+                className={`${
+                  highLight === "exam_timetable"
+                    ? "text-gray-200"
+                    : "text-gray-600"
+                } group-hover:!text-gray-100 transition-all duration-150 font-semibold ease-linear`}
+              >
+                Exam Timetable
+              </span>
+            </div>
+          </aside>
+        </Link>
+        <Link>
+          <aside
+            className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
+              highLight === "dashboard" ? "bg-gray-500" : ""
+            } rounded-md gap-4 cursor-pointer group`}
+          >
+            <div className="flex gap-4">
+              <Laptop
+                className={`${
+                  highLight === "dashboard"
+                    ? "!text-gray-100"
+                    : "!text-gray-400"
+                } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
+              />
+              <span
+                className={`${
+                  highLight === "dashboard" ? "text-gray-200" : "text-gray-600"
+                } group-hover:!text-gray-100 transition-all duration-150 font-semibold ease-linear`}
+              >
+                Marks Entry
+              </span>
+            </div>
+          </aside>
+        </Link>
+        <Link>
+          <aside
+            className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
+              highLight === "dashboard" ? "bg-gray-500" : ""
+            } rounded-md gap-4 cursor-pointer group`}
+          >
+            <div className="flex gap-4">
+              <Scoreboard
+                className={`${
+                  highLight === "dashboard"
+                    ? "!text-gray-100"
+                    : "!text-gray-400"
+                } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
+              />
+              <span
+                className={`${
+                  highLight === "dashboard" ? "text-gray-200" : "text-gray-600"
+                } group-hover:!text-gray-100 transition-all duration-150 font-semibold ease-linear`}
+              >
+                Scoreboard
+              </span>
+            </div>
+          </aside>
+        </Link>
+        <Link>
+          <aside
+            className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
+              highLight === "dashboard" ? "bg-gray-500" : ""
+            } rounded-md gap-4 cursor-pointer group`}
+          >
+            <div className="flex gap-4">
+              <Monitor
+                className={`${
+                  highLight === "dashboard"
+                    ? "!text-gray-100"
+                    : "!text-gray-400"
+                } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
+              />
+              <span
+                className={`${
+                  highLight === "dashboard" ? "text-gray-200" : "text-gray-600"
+                } group-hover:!text-gray-100 transition-all duration-150 font-semibold ease-linear`}
+              >
+                Add Exam Setup
+              </span>
+            </div>
+          </aside>
+        </Link>
 
-        <Link to="/dashboard">
+        {/* <Link to="/dashboard">
           <aside
             className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
               highLight === "dashboard" ? "bg-gray-500" : ""
@@ -69,9 +215,9 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
               </span>
             </div>
           </aside>
-        </Link>
+        </Link> */}
 
-        <Link>
+        {/* <Link>
           <aside
             className={`px-6 py-2 flex gap-4 cursor-pointer ${
               highLight === "manageSchool" ? "bg-gray-500" : ""
@@ -92,14 +238,14 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
               Live Class
             </span>
           </aside>
-        </Link>
-        <aside className="px-6 py-2 flex gap-4 cursor-pointer group hover:bg-gray-500 rounded-md transition-all duration-150 ease-linear">
+        </Link> */}
+        {/* <aside className="px-6 py-2 flex gap-4 cursor-pointer group hover:bg-gray-500 rounded-md transition-all duration-150 ease-linear">
           <Laptop className="!text-gray-400 group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear" />
           <span className="text-gray-600 font-semibold group-hover:!text-gray-100 transition-all duration-150 ease-linear">
             Teacher Progress
           </span>
-        </aside>
-        <Link>
+        </aside> */}
+        {/* <Link>
           <aside
             className={`px-6 py-2 flex gap-4 ${
               highLight === "order_pro" ? "bg-gray-500" : ""
@@ -118,8 +264,8 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
               Students
             </span>
           </aside>
-        </Link>
-        <Link>
+        </Link> */}
+        {/* <Link>
           <aside
             onClick={() => setAssessment(!assessment)}
             className={`px-6 py-2 flex justify-between gap-4 ${
@@ -273,8 +419,8 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
               </Link>
             </div>
           </Collapse>
-        </Link>
-        <Link>
+        </Link> */}
+        {/* <Link>
           <aside
             onClick={() => setELearning(!eLearning)}
             className={`px-6 py-2 flex justify-between gap-4 ${
@@ -356,9 +502,9 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
               </Link>
             </div>
           </Collapse>
-        </Link>
+        </Link> */}
 
-        <Link>
+        {/* <Link>
           <aside
             onClick={() => setSetUp(!setUp)}
             className={`px-6 py-2 flex justify-between gap-4 ${
@@ -458,8 +604,8 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
               </Link>
             </div>
           </Collapse>
-        </Link>
-        <Link>
+        </Link> */}
+        {/* <Link>
           <aside
             className={`px-6 py-2 flex gap-4 ${
               highLight === "manageOrder" ? "bg-gray-500" : ""
@@ -480,7 +626,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
               Messenger
             </span>
           </aside>
-        </Link>
+        </Link> */}
       </div>
     </div>
   );

@@ -114,7 +114,7 @@ const OverView = () => {
       <div className="flex w-[100%] min-h-[100vh]">
         <Loader loading={loading} />
         <Sidebar
-          highLight={"dashboard"}
+          highLight={"overview"}
           sidebarCollapsed={sidebarCollapsed}
           show={show}
         />
@@ -124,7 +124,7 @@ const OverView = () => {
             ref={sidebarRef}
             sidebarCollapsed={sidebarCollapsed}
             show={show}
-            highLight={"dashboard"}
+            highLight={"overview"}
           />
         </div>
         <div

@@ -15,6 +15,7 @@ import {
   Message,
   Circle,
   KeyboardArrowDown,
+  Scoreboard,
 } from "@mui/icons-material";
 import { Collapse } from "@mui/material";
 import { Link } from "react-router-dom";
@@ -77,7 +78,164 @@ const SwipeableTemporaryDrawer = React.forwardRef((props, ref) => {
         />
       </div>
 
-      <Link to="/dashboard">
+      <Link to="/assessment/overview">
+        <aside
+          className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
+            props.highLight === "overview" ? "bg-gray-500" : ""
+          } rounded-md gap-4 cursor-pointer group`}
+        >
+          <div className="flex gap-4">
+            <Home
+              className={`${
+                props.highLight === "overview"
+                  ? "!text-gray-100"
+                  : "!text-gray-400"
+              } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
+            />
+            <span
+              className={`${
+                props.highLight === "overview"
+                  ? "text-gray-200"
+                  : "text-gray-600"
+              } group-hover:!text-gray-100 transition-all duration-150 font-semibold ease-linear`}
+            >
+              Overview
+            </span>
+          </div>
+        </aside>
+      </Link>
+      <Link to="/assessment/exam_set_up">
+        <aside
+          className={`px-6 py-2 hover:bg-gray-500 flex ${
+            props.highLight === "exam_setup" ? "bg-gray-500" : ""
+          } rounded-md gap-4 cursor-pointer group`}
+        >
+          <div className="flex gap-4">
+            <Settings
+              className={`${
+                props.highLight === "exam_setup"
+                  ? "!text-gray-100"
+                  : "!text-gray-400"
+              } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
+            />
+            <span
+              className={`${
+                props.highLight === "exam_setup"
+                  ? "text-gray-200"
+                  : "text-gray-600"
+              } group-hover:!text-gray-100 transition-all duration-150 font-semibold ease-linear`}
+            >
+              Exam Setup
+            </span>
+          </div>
+        </aside>
+      </Link>
+      <Link to="/assessment/exam_timetable">
+        <aside
+          className={`px-6 py-2 hover:bg-gray-500 flex ${
+            props.highLight === "exam_timetable" ? "bg-gray-500" : ""
+          } rounded-md gap-4 cursor-pointer group`}
+        >
+          <div className="flex gap-4">
+            <Assessment
+              className={`${
+                props.highLight === "exam_timetable"
+                  ? "!text-gray-100"
+                  : "!text-gray-400"
+              } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
+            />
+            <span
+              className={`${
+                props.highLight === "exam_timetable"
+                  ? "text-gray-200"
+                  : "text-gray-600"
+              } group-hover:!text-gray-100 transition-all duration-150 font-semibold ease-linear`}
+            >
+              Exam Timetable
+            </span>
+          </div>
+        </aside>
+      </Link>
+      <Link>
+        <aside
+          className={`px-6 py-2 hover:bg-gray-500 flex ${
+            props.highLight === "dashboard" ? "bg-gray-500" : ""
+          } rounded-md gap-4 cursor-pointer group`}
+        >
+          <div className="flex gap-4">
+            <Laptop
+              className={`${
+                props.highLight === "dashboard"
+                  ? "!text-gray-100"
+                  : "!text-gray-400"
+              } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
+            />
+            <span
+              className={`${
+                props.highLight === "dashboard"
+                  ? "text-gray-200"
+                  : "text-gray-600"
+              } group-hover:!text-gray-100 transition-all duration-150 font-semibold ease-linear`}
+            >
+              Marks Entry
+            </span>
+          </div>
+        </aside>
+      </Link>
+      <Link>
+        <aside
+          className={`px-6 py-2 hover:bg-gray-500 flex ${
+            props.highLight === "dashboard" ? "bg-gray-500" : ""
+          } rounded-md gap-4 cursor-pointer group`}
+        >
+          <div className="flex gap-4">
+            <Scoreboard
+              className={`${
+                props.highLight === "dashboard"
+                  ? "!text-gray-100"
+                  : "!text-gray-400"
+              } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
+            />
+            <span
+              className={`${
+                props.highLight === "dashboard"
+                  ? "text-gray-200"
+                  : "text-gray-600"
+              } group-hover:!text-gray-100 transition-all duration-150 font-semibold ease-linear`}
+            >
+              Scoreboard
+            </span>
+          </div>
+        </aside>
+      </Link>
+      <Link>
+        <aside
+          className={`px-6 py-2 hover:bg-gray-500 flex ${
+            props.highLight === "dashboard" ? "bg-gray-500" : ""
+          } rounded-md gap-4 cursor-pointer group`}
+        >
+          <div className="flex gap-4">
+            <Monitor
+              className={`${
+                props.highLight === "dashboard"
+                  ? "!text-gray-100"
+                  : "!text-gray-400"
+              } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
+            />
+            <span
+              className={`${
+                props.highLight === "dashboard"
+                  ? "text-gray-200"
+                  : "text-gray-600"
+              } group-hover:!text-gray-100 transition-all duration-150 font-semibold ease-linear`}
+            >
+              Add Exam Setup
+            </span>
+          </div>
+        </aside>
+      </Link>
+
+      {/* <Link to="/dashboard">
         <aside
           className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
             highLight === "dashboard" ? "bg-gray-500" : ""
@@ -499,7 +657,7 @@ const SwipeableTemporaryDrawer = React.forwardRef((props, ref) => {
             Messenger
           </span>
         </aside>
-      </Link>
+      </Link> */}
     </Box>
   );
 

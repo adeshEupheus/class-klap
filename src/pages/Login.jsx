@@ -7,6 +7,8 @@ import OtpInput from "react-otp-input";
 import { Google } from "@mui/icons-material";
 import Slider from "../components/Slider";
 import { Link } from "react-router-dom";
+import { useLayoutEffect } from "react";
+import axios from "axios";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -16,6 +18,21 @@ const Login = () => {
   const handleChange = (e) => {
     setOtp(e);
   };
+
+  useLayoutEffect(() => {
+    const setAcademic = async () => {
+      await axios.get(
+        "https://schoolsbcontent.imaxprogram.com/app/schoolApp/selectedSchool/?schoolAcademicYearId=8188"
+      );
+    };
+    const ValidateOtp = async () => {
+      await axios.post(
+        "https://schoolsbcontent.imaxprogram.com/app/schoolApp/login/otp/validate"
+      );
+    };
+    setAcademic();
+    ValidateOtp();
+  }, []);
 
   return (
     <div className="min-h-[100vh] bg-gray-200 flex flex-col gap-4">
@@ -83,7 +100,7 @@ const Login = () => {
                 separator={<span>-</span>}
               />
             </div>
-            <Link to="/dashboard">
+            <Link to="/assessment/overview">
               <Stack className="!shadow-xl" direction="row" spacing={2}>
                 <LoadingButton
                   loading={loading}

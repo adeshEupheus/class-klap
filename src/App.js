@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import OverView from "./pages/assessment/Overview";
 import ExamSetUp from "./pages/assessment/ExamSetUp";
 import ExamTimeTable from "./pages/assessment/ExamTimeTable";
+import PRSOverview from "./pages/assessment/PRS";
 
 function App() {
   const client = new QueryClient();
@@ -22,6 +23,7 @@ function App() {
               path="/assessment/exam_timetable"
               element={<ExamTimeTable />}
             />
+            <Route path="/assessment/prs_overview" element={<PRSOverview />} />
             <Route path="*" element={<h1>Page Not Found ... 404</h1>} />
           </Routes>
         </BrowserRouter>

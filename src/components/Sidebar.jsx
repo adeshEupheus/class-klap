@@ -191,6 +191,28 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
             </div>
           </aside>
         </Link>
+        <Link to="/assessment/prs_overview">
+          <aside
+            className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
+              highLight === "prs" ? "bg-gray-500" : ""
+            } rounded-md gap-4 cursor-pointer group`}
+          >
+            <div className="flex gap-4">
+              <Monitor
+                className={`${
+                  highLight === "prs" ? "!text-gray-100" : "!text-gray-400"
+                } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
+              />
+              <span
+                className={`${
+                  highLight === "prs" ? "text-gray-200" : "text-gray-600"
+                } group-hover:!text-gray-100 transition-all duration-150 font-semibold ease-linear`}
+              >
+                PRS
+              </span>
+            </div>
+          </aside>
+        </Link>
 
         {/* <Link to="/dashboard">
           <aside

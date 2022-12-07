@@ -9,7 +9,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import SwipeableTemporaryDrawer from "../../components/Material/MaterialSidebar";
-import { Skeleton, Switch } from "@mui/material";
+import { Chip, Skeleton, Switch } from "@mui/material";
 import { Menu } from "@mui/icons-material";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Breadcrumbs from "../../components/Material/BreadCrumbs";
@@ -72,8 +72,9 @@ const PRSOverview = () => {
     console.log(value, type);
     if (type === "class") {
       //   updateData(value.value);
-    } else if ((type = "exam_setup")) {
-      setId(value.value);
+    } else if ((type = "prs")) {
+      //   console.log(value.value.split(" ")[1]);
+      setId(`RSA ${value.value.split(" ")[1]}`);
     }
   };
 
@@ -103,7 +104,7 @@ const PRSOverview = () => {
     <>
       <div className="flex w-[100%] min-h-[100vh]">
         <Sidebar
-          highLight={"exam_setup"}
+          highLight={"prs"}
           sidebarCollapsed={sidebarCollapsed}
           show={show}
         />
@@ -113,7 +114,7 @@ const PRSOverview = () => {
             ref={sidebarRef}
             sidebarCollapsed={sidebarCollapsed}
             show={show}
-            highLight={"exam_setup"}
+            highLight={"prs"}
           />
         </div>
         <div
@@ -155,14 +156,23 @@ const PRSOverview = () => {
                     { value: "Revision 3" },
                   ]}
                   variant={"outlined"}
-                  Name={"exam_setup"}
+                  Name={"prs"}
                   defaultValue={{ value: "Revision 1" }}
                   size={"small"}
                 />
               </div>
-              <div className="w-full flex justify-center">
-                <HorizontalStepper />
-              </div>
+              {Tracker_Loading ? (
+                <Skeleton
+                  // sx={{ bgcolor: "grey.400" }}
+                  animation="wave"
+                  variant="rectangular"
+                  height={100}
+                />
+              ) : (
+                <div className="w-full flex justify-center bg-gray-100 shadow-2xl rounded-lg overflow-auto py-[2rem]">
+                  <HorizontalStepper data={PRS_Tracker} />
+                </div>
+              )}
               {PRS_Table_Loading ? (
                 <Skeleton
                   // sx={{ bgcolor: "grey.400" }}
@@ -255,12 +265,25 @@ const PRSOverview = () => {
                             </h1>
                           </TableCell>
                           <TableCell align="center">
-                            <h1 className="font-bold">{item.printStatus}</h1>
+                            <Chip
+                              variant="outlined"
+                              label={item.printStatus}
+                              color="success"
+                              size="small"
+                            />
+
+                            {/* <h1 className="font-bold">{item.printStatus}</h1> */}
                           </TableCell>
                           <TableCell align="center">
-                            <h1 className="font-bold ">
+                            <Chip
+                              variant="outlined"
+                              label={item.downloadStatus}
+                              color="warning"
+                              size="small"
+                            />
+                            {/* <h1 className="font-bold ">
                               {item.downloadStatus}
-                            </h1>
+                            </h1> */}
                           </TableCell>
                           <TableCell align="center">
                             <h1 className="font-bold text-blue-500 text-sm">

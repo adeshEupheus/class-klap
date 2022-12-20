@@ -6,18 +6,20 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker/MobileTimePicker";
 
-export default function ResponsiveTimePickers() {
-  const [value, setValue] = React.useState(dayjs("2018-01-01T00:00:00.000Z"));
-
+export default function ResponsiveTimePickers(props) {
+  const { time, handleTimeChange } = props;
+  const [value, setValue] = React.useState(dayjs(`2020-01-01 ${time}`));
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Stack spacing={3}>
         <MobileTimePicker
-          //   label="For mobile"
-
           value={value}
           onChange={(newValue) => {
             setValue(newValue);
+          }}
+          // closeOnSelect
+          onAccept={(e) => {
+            handleTimeChange(e);
           }}
           renderInput={(params) => (
             <TextField {...params} sx={{ width: "6rem" }} />

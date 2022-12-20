@@ -28,46 +28,312 @@ import Breadcrumbs from "../../components/Material/BreadCrumbs";
 import SearchDropDown from "../../components/Material/SearchDropDown";
 import BasicTextFields from "../../components/Material/TextField";
 import SwitchLabels from "../../components/Material/Switch";
-// import { GetExamSetUpData } from "../../apis/fectcher/assessment/examSetUp/examSetUp";
 import { GetExamTimetableData } from "../../apis/fectcher/assessment/examTimetable/examTimetable";
 import BasicButton from "../../components/Material/Button";
 import ResponsiveTimePickers from "../../components/Material/TimePicker";
 import ResponsiveDatePickers from "../../components/Material/DatePicker";
 import { Box } from "@mui/system";
-// import ResponsiveTimePickers from "../../components/Material/";
+import {
+  ConductExam,
+  QpGenerate,
+  ToggleExamRequired,
+  ToggleNotification,
+  UpdateTimeTable,
+} from "../../apis/mutation/examTimeTable";
+import DialogSlide from "../../components/Material/Dialog";
+import Snackbars from "../../components/Material/Snackbar";
+import Loader from "../../components/Material/Loader";
 const ExamTimeTable = () => {
   const [examId, setExamId] = useState("FA1");
   const [gradeId, setGradeId] = useState("NUR");
+  const [filter, setFilter] = useState("All");
+  const [loading, setLoading] = useState(false);
+  const [snackbarMsg, setSnackbarMsg] = useState("");
+  const [snackbarErr, setSnackbarErr] = useState(false);
 
+  const examReqrefs = useRef([]);
+  examReqrefs.current = [];
+
+  const addToExamReqRef = (el) => {
+    if (el && !examReqrefs.current.includes(el)) {
+      examReqrefs.current.push(el);
+    }
+  };
+
+  const feedbackReqrefs = useRef([]);
+  feedbackReqrefs.current = [];
+
+  const addToFeedbackRef = (el) => {
+    if (el && !feedbackReqrefs.current.includes(el)) {
+      feedbackReqrefs.current.push(el);
+    }
+  };
+
+  // table Data
   const {
     data: ExamTimetableData,
     isLoading,
     refetch,
+    isRefetching,
   } = useQuery({
     queryKey: ["exam_timetable_data", examId, gradeId],
     queryFn: () => GetExamTimetableData(examId, gradeId),
+    cacheTime: 0,
     onSuccess: (data) => {
       console.log(data);
     },
-    // enabled: false,
     refetchOnWindowFocus: false,
   });
+
+  // change notification lapp
+
+  const mutation = useMutation({
+    mutationFn: async (data) => {
+      let res;
+      let index;
+      if (!data) {
+        res = await ToggleNotification(
+          ExamTimetableData.examNotificationEnabled ? "disable" : "enable"
+        );
+        if (res.success) {
+          refetch();
+          switchRef.current.toggle();
+          setSnackbarErr(false);
+          setSnackbarMsg(res.message);
+          snackbarRef.current.openSnackbar();
+        }
+      }
+      if (data.name === "exam_req_status") {
+        setLoading(true);
+        res = await ToggleExamRequired(examId, gradeId, data.item.subject.name);
+        if (res.success) {
+          refetch();
+          setSnackbarErr(false);
+          index = ExamTimetableData.subjectLevelConfigurationResponses.indexOf(
+            data.item
+          );
+          setSnackbarMsg(res.message);
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+          examReqrefs.current[index].toggle();
+          // console.log(examReqrefs);
+        } else {
+          setSnackbarErr(true);
+          setSnackbarMsg(res.message);
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        }
+      }
+      if (data.name === "feedback_status") {
+        setLoading(true);
+        const apiBodyData = {
+          duration: data.item.duration,
+          examDate: data.item.examDate,
+          examTime: data.item.examTime,
+          feedbackRequired: !data.item.feedbackRequired,
+          // qpSetTypeDeliveryMode: data.item.questionPaperDeliveryModeType.name,
+          // skuId: data.item.selectedSku,
+        };
+        res = await UpdateTimeTable(
+          examId,
+          gradeId,
+          data.item.subject.name,
+          apiBodyData
+        );
+        if (res.success) {
+          refetch();
+          setSnackbarErr(false);
+          index = ExamTimetableData.subjectLevelConfigurationResponses.indexOf(
+            data.item
+          );
+          feedbackReqrefs.current[index].toggle();
+          setSnackbarMsg(res.message);
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+          // console.log(examReqrefs);
+        } else {
+          setSnackbarErr(true);
+          setSnackbarMsg(res.message);
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        }
+      }
+      if (data.name === "date") {
+        setLoading(true);
+        const apiBodyData = {
+          duration: data.item.duration,
+          examDate: `${data.item.newDate.$y}-${data.item.newDate.$M + 1}-${
+            data.item.newDate.$D
+          }`,
+          examTime: data.item.examTime,
+          feedbackRequired: data.item.feedbackRequired,
+          qpSetTypeDeliveryMode: data.item.questionPaperDeliveryModeType.name,
+          skuId: data.item.selectedSku,
+        };
+        res = await UpdateTimeTable(
+          examId,
+          gradeId,
+          data.item.subject.name,
+          apiBodyData
+        );
+        if (res.success) {
+          refetch();
+          setSnackbarErr(false);
+          setSnackbarMsg(res.message);
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        } else {
+          setSnackbarErr(true);
+          setSnackbarMsg(res.message);
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        }
+      }
+      if (data.name === "time") {
+        console.log(data);
+        setLoading(true);
+        const apiBodyData = {
+          duration: data.item.duration,
+          examDate: data.item.examDate,
+          examTime: data.item.newTime,
+          feedbackRequired: data.item.feedbackRequired,
+          qpSetTypeDeliveryMode: data.item.questionPaperDeliveryModeType.name,
+          skuId: data.item.selectedSku,
+        };
+        res = await UpdateTimeTable(
+          examId,
+          gradeId,
+          data.item.subject.name,
+          apiBodyData
+        );
+        if (res.success) {
+          refetch();
+          setSnackbarErr(false);
+          setSnackbarMsg(res.message);
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        } else {
+          setSnackbarErr(true);
+          setSnackbarMsg(res.message);
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        }
+      }
+      if (data.name === "duration") {
+        console.log(data);
+        setLoading(true);
+        const apiBodyData = {
+          duration: data.item.newDuration,
+          examDate: data.item.examDate,
+          examTime: data.item.examTime,
+          feedbackRequired: data.item.feedbackRequired,
+          qpSetTypeDeliveryMode: data.item.questionPaperDeliveryModeType.name,
+          skuId: data.item.selectedSku,
+        };
+        res = await UpdateTimeTable(
+          examId,
+          gradeId,
+          data.item.subject.name,
+          apiBodyData
+        );
+        if (res.success) {
+          refetch();
+          setSnackbarErr(false);
+          setSnackbarMsg(res.message);
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        } else {
+          setSnackbarErr(true);
+          setSnackbarMsg(res.message);
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        }
+      }
+      if (data.name === "conductExam") {
+        setLoading(true);
+        res = await ConductExam(gradeId, examId).catch((err) => {
+          // console.log(err.response.data.message)
+          setSnackbarErr(true);
+          setSnackbarMsg(err.response.data.message);
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        });
+        if (res.success) {
+          refetch();
+          setSnackbarErr(false);
+          setSnackbarMsg("Conducted Successfully");
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        } else {
+          setSnackbarErr(true);
+          setSnackbarMsg(res.message);
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        }
+      }
+      if (data.name === "QpGenerate") {
+        setLoading(true);
+        res = await QpGenerate(gradeId, examId).catch((err) => {
+          setSnackbarErr(true);
+          setSnackbarMsg(err.response.data.message);
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        });
+        if (res.success) {
+          refetch();
+          setSnackbarErr(false);
+          setSnackbarMsg(
+            "QP generation initiated. please check back in some time"
+          );
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        } else {
+          setSnackbarErr(true);
+          setSnackbarMsg(res.message);
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        }
+      }
+    },
+  });
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const show = null;
 
-  // const queryClient = useQueryClient();
+  const dialogRef = useRef();
+  const snackbarRef = useRef();
+  const switchRef = useRef();
 
-  // const updateData = (class_name) => {
-  //   if (class_name != "All") {
-  //     const newArray = Exam_setUpData.filter(
-  //       (item) => item.grade.displayName === class_name
-  //     );
-  //     setMainData(newArray);
-  //   } else {
-  //     setMainData(Exam_setUpData);
-  //   }
-  // };
+  const returnData = () => {
+    if (filter === "All") {
+      return ExamTimetableData.subjectLevelConfigurationResponses;
+    }
+
+    const newArray =
+      ExamTimetableData.subjectLevelConfigurationResponses.filter(
+        (item) => item.subject.displayName === filter
+      );
+    return newArray;
+  };
+
+  const handleSwitchChange = (name, status, item) => {
+    if (name === "conduct_exam_status") {
+      dialogRef.current.openDialog();
+    }
+    if (name === "exam_req_status") {
+      mutation.mutate({ item: item, name });
+    }
+    if (name === "feedback_status") {
+      mutation.mutate({ item: item, name });
+    }
+    console.log(name, status, item);
+  };
+
+  const handleDialogButton = async () => {
+    refetch();
+    mutation.mutate();
+  };
 
   const sidebarRef = useRef();
 
@@ -75,10 +341,15 @@ const ExamTimeTable = () => {
     console.log(value, type);
     switch (type) {
       case "exam":
+        setFilter("All");
         setExamId(value.value);
         break;
       case "grade":
-        setGradeId(value.value);
+        setFilter("All");
+        setGradeId(value.name);
+        break;
+      case "class":
+        setFilter(value.value);
         break;
 
       default:
@@ -86,13 +357,206 @@ const ExamTimeTable = () => {
     }
   };
 
+  function Row(props) {
+    const { row } = props;
+    const [open, setOpen] = React.useState(true);
+
+    const dateRef = useRef();
+
+    const handleDateChange = (value) => {
+      row.newDate = value;
+      mutation.mutate({ item: row, name: "date" });
+    };
+
+    const handleTimeChange = (value) => {
+      const newTime = `${value.$d.toString().split(" ")[4].split(":")[0]}:${
+        value.$d.toString().split(" ")[4].split(":")[1]
+      }`;
+      row.newTime = newTime;
+      mutation.mutate({ item: row, name: "time" });
+    };
+
+    const handleOnBlur = (value) => {
+      row.newDuration = value;
+      mutation.mutate({ item: row, name: "duration" });
+    };
+
+    const handleDropDown = (value, type) => {
+      console.log(value, type);
+    };
+
+    return (
+      <React.Fragment>
+        <TableRow
+          sx={{
+            "&:last-child td, &:last-child th": { border: 0 },
+          }}
+        >
+          <TableCell component="th" scope="row" align="center">
+            <h1 className="font-bold">
+              <IconButton
+                aria-label="expand row"
+                size="small"
+                onClick={() => setOpen(!open)}
+              >
+                {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+              </IconButton>
+              {row.subject.displayName}
+            </h1>
+          </TableCell>
+          <TableCell align="center">
+            <ResponsiveDatePickers
+              date={row.examDate}
+              ref={dateRef}
+              handleDateChange={handleDateChange}
+            />
+          </TableCell>
+          <TableCell align="center">
+            <ResponsiveTimePickers
+              time={row.examTime}
+              handleTimeChange={handleTimeChange}
+            />
+          </TableCell>
+          <TableCell align="center">
+            <BasicTextFields
+              variant={"standard"}
+              defaultValue={row.duration}
+              handleOnBlur={handleOnBlur}
+              disable={row.locked}
+              lable={"Time"}
+              type={"number"}
+            />
+          </TableCell>
+          <TableCell align="center">
+            <SearchDropDown
+              handleDropDown={handleDropDown}
+              data={[
+                ...row?.applicableQuestionPaperDeliveryModeType.map((item) => {
+                  return { value: item.displayName };
+                }),
+              ]}
+              variant={"outlined"}
+              minWidth={"12rem"}
+              Name={"mark_syllabus_difficulty"}
+              defaultValue={{
+                value: row.questionPaperDeliveryModeType.displayName,
+              }}
+              size={"small"}
+            />
+          </TableCell>
+          <TableCell align="center">
+            {Object.keys(row.qpSetTypeApplicableMarksMap)[0] ===
+            "SUBJECTIVE" ? (
+              <SearchDropDown
+                minWidth={"12rem"}
+                handleDropDown={handleDropDown}
+                disable={row.locked}
+                data={[
+                  ...row?.qpSetTypeApplicableMarksMap?.SUBJECTIVE?.map(
+                    (item) => {
+                      return { value: item.displayName };
+                    }
+                  ),
+                ]}
+                variant={"outlined"}
+                Name={"mark_syllabus_difficulty"}
+                defaultValue={{
+                  value:
+                    row.qpSetTypeApplicableMarksMap.SUBJECTIVE[0].displayName,
+                }}
+                size={"small"}
+              />
+            ) : (
+              <SearchDropDown
+                minWidth={"12rem"}
+                handleDropDown={handleDropDown}
+                disable={row.locked}
+                data={[
+                  ...row?.qpSetTypeApplicableMarksMap?.OBJECTIVE?.map(
+                    (item) => {
+                      return { value: item.displayName };
+                    }
+                  ),
+                ]}
+                variant={"outlined"}
+                Name={"mark_syllabus_difficulty"}
+                defaultValue={{
+                  value: row?.selectedMarksSyllabus?.displayName,
+                }}
+                size={"small"}
+              />
+            )}
+          </TableCell>
+          <TableCell align="center">
+            <Visibility className="!text-gray-600 !cursor-pointer" />
+          </TableCell>
+          <TableCell align="center">
+            <h1 className="text-red-600 text-xs font-semibold">
+              {row.examStatus.displayName}
+            </h1>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <Box sx={{ margin: 1 }}>
+                <Table size="small" aria-label="purchases">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>
+                        <div className="flex gap-2 items-center">
+                          <h1 className="text-sm font-semibold text-gray-600">
+                            Exam Attendance:
+                          </h1>
+                          {row.studentsPresent}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2 items-center">
+                          <h1 className="text-sm font-semibold text-gray-600">
+                            Exam Required:
+                          </h1>
+                          <SwitchLabels
+                            checked={row.examRequired}
+                            ref={addToExamReqRef}
+                            item={row}
+                            name={"exam_req_status"}
+                            handleSwitchChange={handleSwitchChange}
+                          />
+                        </div>
+                      </TableCell>
+                      <TableCell align="right">
+                        <div className="flex gap-2 items-center">
+                          <h1 className="text-sm font-semibold text-gray-600">
+                            Feedback Required:
+                          </h1>
+
+                          <SwitchLabels
+                            checked={row.feedbackRequired}
+                            ref={addToFeedbackRef}
+                            item={row}
+                            name={"feedback_status"}
+                            handleSwitchChange={handleSwitchChange}
+                          />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                </Table>
+              </Box>
+            </Collapse>
+          </TableCell>
+        </TableRow>
+      </React.Fragment>
+    );
+  }
+
   const handleSidebarCollapsed = () => {
     sidebarRef.current.openSidebar();
   };
 
   useEffect(() => {
     document.title = "Exam Timetable - ClassKlap";
-    // setMainData(Exam_setUpData);
     const handleWidth = () => {
       if (window.innerWidth > 1024) {
         setSidebarCollapsed(false);
@@ -110,11 +574,25 @@ const ExamTimeTable = () => {
   }, []);
   return (
     <>
+      <Snackbars
+        ref={snackbarRef}
+        message={snackbarMsg}
+        snackbarErrStatus={snackbarErr}
+      />
       <div className="flex w-[100%] min-h-[100vh]">
         <Sidebar
           highLight={"exam_timetable"}
           sidebarCollapsed={sidebarCollapsed}
           show={show}
+        />
+        <Loader loading={loading} />
+
+        <DialogSlide
+          ref={dialogRef}
+          handleDialogButton={handleDialogButton}
+          text={`Are you sure you want to ${
+            ExamTimetableData?.examNotificationEnabled ? "disable" : "enable"
+          } sending exam notification to the students ?`}
         />
 
         <div>
@@ -150,7 +628,7 @@ const ExamTimeTable = () => {
           <div className="relative flex flex-col w-full justify-center items-start gap-4 bg-gray-200">
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4">
               <Breadcrumbs crumbs={["Home", "Assessment", "Exam Timetable"]} />
-              <h1 className="font-bold sm:text-2xl text-xl">Exam Set Up</h1>
+              <h1 className="font-bold sm:text-2xl text-xl">Exam Timetable</h1>
               <div className="w-[15rem] flex gap-2">
                 <SearchDropDown
                   handleDropDown={handleDropDown}
@@ -174,14 +652,14 @@ const ExamTimeTable = () => {
                 <SearchDropDown
                   handleDropDown={handleDropDown}
                   data={[
-                    { value: "Nursery" },
-                    { value: "LKG" },
-                    { value: "UKG" },
-                    { value: "1" },
-                    { value: "2" },
-                    { value: "3" },
-                    { value: "4" },
-                    { value: "5" },
+                    { value: "Nursery", name: "NUR" },
+                    { value: "LKG", name: "LKG" },
+                    { value: "UKG", name: "UKG" },
+                    { value: "1", name: "GRADE_1" },
+                    { value: "2", name: "GRADE_2" },
+                    { value: "3", name: "GRADE_3" },
+                    { value: "4", name: "GRADE_4" },
+                    { value: "5", name: "GRADE_5" },
                   ]}
                   variant={"outlined"}
                   Name={"grade"}
@@ -198,19 +676,52 @@ const ExamTimeTable = () => {
                       sx={{ fontSize: "1rem", width: "12rem" }}
                     />
                   ) : (
-                    ExamTimetableData.examinationName
+                    ExamTimetableData?.examinationName
                   )}
                 </h1>
                 <div className="flex gap-2 items-center">
-                  <h1 className="text-gray-600 text-sm">
-                    Conduct Exam on Learning App?
-                  </h1>
-                  <SwitchLabels />
+                  {isLoading ? (
+                    <Skeleton
+                      animation="wave"
+                      variant="text"
+                      sx={{ fontSize: "1rem", width: "12rem" }}
+                    />
+                  ) : (
+                    <>
+                      <h1 className="text-gray-600 text-sm">
+                        Conduct Exam on Learning App?
+                      </h1>
+                      <SwitchLabels
+                        checked={ExamTimetableData.examNotificationEnabled}
+                        ref={switchRef}
+                        name={"conduct_exam_status"}
+                        handleSwitchChange={handleSwitchChange}
+                      />
+                    </>
+                  )}
                 </div>
-                <BasicButton
-                  text={"Conduct exam for Class Nursery"}
-                  size={"small"}
-                />
+                {isLoading ? (
+                  <Skeleton
+                    animation="wave"
+                    variant="text"
+                    sx={{ fontSize: "2rem", width: "12rem" }}
+                  />
+                ) : (
+                  <div
+                    onClick={() =>
+                      mutation.mutate({ item: {}, name: "conductExam" })
+                    }
+                  >
+                    <BasicButton
+                      text={`${
+                        ExamTimetableData.examConducted
+                          ? "Re-Conduct"
+                          : "Conduct"
+                      } exam for Class Nursery`}
+                      size={"small"}
+                    />
+                  </div>
+                )}
                 <h1 className="text-gray-600 text-xs italic">
                   Click here to generate exam timetable for students.
                 </h1>
@@ -219,8 +730,16 @@ const ExamTimeTable = () => {
                     <h1 className="text-gray-600 font-semibold text-sm">
                       Question papers for all subjects
                     </h1>
-                    <BasicButton size={"small"} text={"Generate"} />
-                    <Download className="!text-gray-600 !cursor-pointer" />
+                    <div
+                      onClick={() =>
+                        mutation.mutate({ item: {}, name: "QpGenerate" })
+                      }
+                    >
+                      <BasicButton size={"small"} text={"Generate"} />
+                    </div>
+                    <a href={ExamTimetableData?.questionPaperLink}>
+                      <Download className="!text-gray-600 !cursor-pointer" />
+                    </a>
                   </div>
                   <div className="px-8 py-4 w-full justify-center flex gap-3 shadow-lg rounded-md items-center bg-slate-300">
                     <h1 className="text-gray-600 font-semibold text-sm">
@@ -342,119 +861,9 @@ const ExamTimeTable = () => {
                           </TableCell>
                         </TableRow>
                       )}
-                      {ExamTimetableData.subjectLevelConfigurationResponses.map(
-                        (item, index) => (
-                          // <TableRow
-                          //   key={index}
-                          //   sx={{
-                          //     "&:last-child td, &:last-child th": { border: 0 },
-                          //   }}
-                          // >
-                          //   <TableCell
-                          //     component="th"
-                          //     scope="row"
-                          //     align="center"
-                          //   >
-                          //     <h1 className="font-bold">
-                          //       {item.subject.displayName}
-                          //     </h1>
-                          //   </TableCell>
-                          //   <TableCell align="center">
-                          //     {/* <ResponsiveDatePickers /> */}
-                          //     <ResponsiveDatePickers />
-                          //   </TableCell>
-                          //   <TableCell align="center">
-                          //     <ResponsiveTimePickers />
-                          //     {/* TimePicker */}
-                          //   </TableCell>
-
-                          //   <TableCell align="center">
-                          //     <BasicTextFields
-                          //       variant={"standard"}
-                          //       defaultValue={item.duration}
-                          //       disable={item.locked}
-                          //       lable={"Time"}
-                          //       type={"number"}
-                          //     />
-                          //   </TableCell>
-                          //   <TableCell align="center">
-                          //     <SearchDropDown
-                          //       handleDropDown={handleDropDown}
-                          //       data={[
-                          //         ...item?.applicableQuestionPaperDeliveryModeType.map(
-                          //           (item) => {
-                          //             return { value: item.displayName };
-                          //           }
-                          //         ),
-                          //       ]}
-                          //       variant={"outlined"}
-                          //       Name={"mark_syllabus_difficulty"}
-                          //       defaultValue={{
-                          //         value:
-                          //           item.questionPaperDeliveryModeType
-                          //             .displayName,
-                          //       }}
-                          //       size={"small"}
-                          //     />
-                          //   </TableCell>
-                          //   <TableCell align="center">
-                          //     {Object.keys(
-                          //       item.qpSetTypeApplicableMarksMap
-                          //     )[0] === "SUBJECTIVE" ? (
-                          //       <SearchDropDown
-                          //         minWidth={"12rem"}
-                          //         handleDropDown={handleDropDown}
-                          //         disable={item.locked}
-                          //         data={[
-                          //           ...item?.qpSetTypeApplicableMarksMap?.SUBJECTIVE?.map(
-                          //             (item) => {
-                          //               return { value: item.displayName };
-                          //             }
-                          //           ),
-                          //         ]}
-                          //         variant={"outlined"}
-                          //         Name={"mark_syllabus_difficulty"}
-                          //         defaultValue={{
-                          //           value:
-                          //             item.qpSetTypeApplicableMarksMap
-                          //               .SUBJECTIVE[0].displayName,
-                          //         }}
-                          //         size={"small"}
-                          //       />
-                          //     ) : (
-                          //       <SearchDropDown
-                          //         minWidth={"12rem"}
-                          //         handleDropDown={handleDropDown}
-                          //         disable={item.locked}
-                          //         data={[
-                          //           ...item?.applicableMarksSyllabus?.OBJECTIVE?.map(
-                          //             (item) => {
-                          //               return { value: item.displayName };
-                          //             }
-                          //           ),
-                          //         ]}
-                          //         variant={"outlined"}
-                          //         Name={"mark_syllabus_difficulty"}
-                          //         defaultValue={{
-                          //           value:
-                          //             item.selectedMarksSyllabus.displayName,
-                          //         }}
-                          //         size={"small"}
-                          //       />
-                          //     )}
-                          //   </TableCell>
-                          //   <TableCell align="center">
-                          //     <Visibility className="!text-gray-600 !cursor-pointer" />
-                          //   </TableCell>
-                          //   <TableCell align="center">
-                          //     <h1 className="text-red-600 text-xs font-semibold">
-                          //       {item.examStatus.displayName}
-                          //     </h1>
-                          //   </TableCell>
-                          // </TableRow>
-                          <Row row={item} key={index} />
-                        )
-                      )}
+                      {returnData().map((item, index) => (
+                        <Row row={item} key={index} />
+                      ))}
                     </TableBody>
                   </Table>
                 </TableContainer>
@@ -466,184 +875,5 @@ const ExamTimeTable = () => {
     </>
   );
 };
-
-function Row(props) {
-  const { row } = props;
-  const [open, setOpen] = React.useState(false);
-
-  const handleDropDown = (value, type) => {
-    console.log(value, type);
-    // if (type === "class") {
-    //   updateData(value.value);
-    // } else if ((type = "exam_setup")) {
-    //   setId(value.value);
-    // }
-    // switch (type) {
-    //   case "Overview":
-    //     setId(value.value);
-    //     break;
-
-    //   default:
-    //     break;
-    // }
-  };
-
-  return (
-    <React.Fragment>
-      <TableRow
-        sx={{
-          "&:last-child td, &:last-child th": { border: 0 },
-        }}
-      >
-        <TableCell component="th" scope="row" align="center">
-          <h1 className="font-bold">
-            <IconButton
-              aria-label="expand row"
-              size="small"
-              onClick={() => setOpen(!open)}
-            >
-              {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-            </IconButton>
-            {row.subject.displayName}
-          </h1>
-        </TableCell>
-        <TableCell align="center">
-          {/* <ResponsiveDatePickers /> */}
-          <ResponsiveDatePickers />
-        </TableCell>
-        <TableCell align="center">
-          <ResponsiveTimePickers />
-          {/* TimePicker */}
-        </TableCell>
-
-        <TableCell align="center">
-          <BasicTextFields
-            variant={"standard"}
-            defaultValue={row.duration}
-            disable={row.locked}
-            lable={"Time"}
-            type={"number"}
-          />
-        </TableCell>
-        <TableCell align="center">
-          <SearchDropDown
-            handleDropDown={handleDropDown}
-            data={[
-              ...row?.applicableQuestionPaperDeliveryModeType.map((item) => {
-                return { value: item.displayName };
-              }),
-            ]}
-            variant={"outlined"}
-            minWidth={"12rem"}
-            Name={"mark_syllabus_difficulty"}
-            defaultValue={{
-              value: row.questionPaperDeliveryModeType.displayName,
-            }}
-            size={"small"}
-          />
-        </TableCell>
-        <TableCell align="center">
-          {Object.keys(row.qpSetTypeApplicableMarksMap)[0] === "SUBJECTIVE" ? (
-            <SearchDropDown
-              minWidth={"12rem"}
-              handleDropDown={handleDropDown}
-              disable={row.locked}
-              data={[
-                ...row?.qpSetTypeApplicableMarksMap?.SUBJECTIVE?.map((item) => {
-                  return { value: item.displayName };
-                }),
-              ]}
-              variant={"outlined"}
-              Name={"mark_syllabus_difficulty"}
-              defaultValue={{
-                value:
-                  row.qpSetTypeApplicableMarksMap.SUBJECTIVE[0].displayName,
-              }}
-              size={"small"}
-            />
-          ) : (
-            <SearchDropDown
-              minWidth={"12rem"}
-              handleDropDown={handleDropDown}
-              disable={row.locked}
-              data={[
-                ...row?.applicableMarksSyllabus?.OBJECTIVE?.map((item) => {
-                  return { value: item.displayName };
-                }),
-              ]}
-              variant={"outlined"}
-              Name={"mark_syllabus_difficulty"}
-              defaultValue={{
-                value: row.selectedMarksSyllabus.displayName,
-              }}
-              size={"small"}
-            />
-          )}
-        </TableCell>
-        <TableCell align="center">
-          <Visibility className="!text-gray-600 !cursor-pointer" />
-        </TableCell>
-        <TableCell align="center">
-          <h1 className="text-red-600 text-xs font-semibold">
-            {row.examStatus.displayName}
-          </h1>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
-              <Table size="small" aria-label="purchases">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>
-                      <div className="flex gap-2 items-center">
-                        <h1 className="text-sm font-semibold text-gray-600">
-                          Exam Attendance:
-                        </h1>
-                        {row.studentsPresent}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2 items-center">
-                        <h1 className="text-sm font-semibold text-gray-600">
-                          Exam Required:
-                        </h1>
-                        <SwitchLabels checked={row.examRequired} />
-                      </div>
-                    </TableCell>
-                    <TableCell align="right">
-                      <div className="flex gap-2 items-center">
-                        <h1 className="text-sm font-semibold text-gray-600">
-                          Feedback Required:
-                        </h1>
-
-                        <SwitchLabels checked={row.feedbackRequired} />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                {/* <TableBody>
-                  {row.history.map((historyRow) => (
-                    <TableRow key={historyRow.date}>
-                      <TableCell component="th" scope="row">
-                        {historyRow.date}
-                      </TableCell>
-                      <TableCell>{historyRow.customerId}</TableCell>
-                      <TableCell align="right">{historyRow.amount}</TableCell>
-                      <TableCell align="right">
-                        {Math.round(historyRow.amount * row.price * 100) / 100}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody> */}
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </React.Fragment>
-  );
-}
 
 export default ExamTimeTable;

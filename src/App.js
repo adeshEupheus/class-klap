@@ -6,6 +6,7 @@ import OverView from "./pages/assessment/Overview";
 import ExamSetUp from "./pages/assessment/ExamSetUp";
 import ExamTimeTable from "./pages/assessment/ExamTimeTable";
 import PRSOverview from "./pages/assessment/PRS";
+import MarksEntryOverview from "./pages/assessment/MarksEntryOverview";
 
 function App() {
   const client = new QueryClient();
@@ -24,6 +25,10 @@ function App() {
               element={<ExamTimeTable />}
             />
             <Route path="/assessment/prs_overview" element={<PRSOverview />} />
+            <Route
+              path="/marks_entry_overview"
+              element={<MarksEntryOverview />}
+            />
             <Route path="*" element={<h1>Page Not Found ... 404</h1>} />
           </Routes>
         </BrowserRouter>

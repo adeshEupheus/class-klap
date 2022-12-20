@@ -6,10 +6,17 @@ export default function BasicTextFields({
   variant,
   value,
   lable,
+  item,
   type,
   defaultValue,
+  handleOnBlur,
   disable,
 }) {
+  const onBlur = (e) => {
+    handleOnBlur(e.target.value, item);
+    // console.log(e.target.value);
+  };
+
   return (
     <TextField
       id="standard-basic"
@@ -17,6 +24,7 @@ export default function BasicTextFields({
       disabled={disable}
       type={type}
       defaultValue={defaultValue}
+      onBlur={onBlur}
       // value={value}
       variant={variant}
     />

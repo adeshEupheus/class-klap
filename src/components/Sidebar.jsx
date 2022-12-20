@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import {
   Monitor,
   Home,
-  Laptop,
-  Hail,
+  // Laptop,
+  // Hail,
   Assessment,
   Devices,
   Settings,
-  Message,
+  // Message,
   Circle,
   KeyboardArrowDown,
   Scoreboard,
@@ -16,13 +16,13 @@ import {
 import { Link } from "react-router-dom";
 import logoLight from "../assets/classklap_logo.png";
 import { Collapse } from "@mui/material";
-import Loader from "./Material/Loader";
+// import Loader from "./Material/Loader";
 
 const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
-  const [eLearning, setELearning] = useState(false);
-  const [setUp, setSetUp] = useState(show === 2 ? true : false);
-  const [assessment, setAssessment] = useState(false);
-  const [user, setUser] = useState({});
+  const [marsksEntry, setMarksEntry] = useState(false);
+  // const [setUp, setSetUp] = useState(show === 2 ? true : false);
+  // const [assessment, setAssessment] = useState(false);
+  // const [user, setUser] = useState({});
 
   //   useEffect(() => {
   //     if (show === null) {
@@ -49,7 +49,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
         </div>
         <Link to="/assessment/overview">
           <aside
-            className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
+            className={`px-6 mt-[1rem] py-2 hover:bg-gray-500 flex ${
               highLight === "overview" ? "bg-gray-500" : ""
             } rounded-md gap-4 cursor-pointer group`}
           >
@@ -71,7 +71,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
         </Link>
         <Link to="/assessment/exam_set_up">
           <aside
-            className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
+            className={`px-6 mt-[1rem] py-2 hover:bg-gray-500 flex ${
               highLight === "exam_setup" ? "bg-gray-500" : ""
             } rounded-md gap-4 cursor-pointer group`}
           >
@@ -95,7 +95,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
         </Link>
         <Link to="/assessment/exam_timetable">
           <aside
-            className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
+            className={`px-6 mt-[1rem] py-2 hover:bg-gray-500 flex ${
               highLight === "exam_timetable" ? "bg-gray-500" : ""
             } rounded-md gap-4 cursor-pointer group`}
           >
@@ -119,9 +119,9 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
             </div>
           </aside>
         </Link>
-        <Link>
+        {/* <Link>
           <aside
-            className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
+            className={`px-6 mt-[1rem] py-2 hover:bg-gray-500 flex ${
               highLight === "dashboard" ? "bg-gray-500" : ""
             } rounded-md gap-4 cursor-pointer group`}
           >
@@ -142,10 +142,93 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
               </span>
             </div>
           </aside>
+        </Link> */}
+        <Link>
+          <aside
+            onClick={() => setMarksEntry(!marsksEntry)}
+            className={`px-6 py-2 mt-[1rem] flex justify-between gap-4 ${
+              highLight === "manageOrder" ? "bg-gray-500" : ""
+            } cursor-pointer group hover:bg-gray-500 rounded-md transition-all duration-150 ease-linear`}
+          >
+            <div className="flex gap-4">
+              <Devices
+                className={`${
+                  highLight === "manageOrder"
+                    ? "!text-gray-100"
+                    : "!text-gray-400"
+                } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
+              />
+              <span
+                className={`${
+                  highLight === "manageOrder"
+                    ? "text-gray-200"
+                    : "text-gray-600"
+                } group-hover:!text-gray-100 font-semibold transition-all duration-150 ease-linear`}
+              >
+                Marks Entry
+              </span>
+            </div>
+            <div
+              className={`transition-all duration-200  ease-linear ${
+                marsksEntry ? null : "-rotate-90"
+              }`}
+            >
+              <KeyboardArrowDown className={`text-gray-600 `} />
+            </div>
+          </aside>
+          <Collapse in={marsksEntry}>
+            {" "}
+            <div
+              className={`${
+                marsksEntry ? "h-[10vh] opacity-100 visible" : null
+              } transition-all ease-linear duration-200`}
+            >
+              <Link to="/marks_entry_overview">
+                <div
+                  className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
+                >
+                  <Circle
+                    className={`!text-[.7rem] !transition-all !ease-linear !duration-200 ${
+                      highLight === "schoolTagging"
+                        ? "text-white"
+                        : "text-gray-600"
+                    } `}
+                  />
+                  <h1
+                    className={`pl-9 ${
+                      highLight === "schoolTagging"
+                        ? "text-white"
+                        : "text-gray-600 "
+                    } transition-all ease-linear text-sm font-semibold duration-200  py-2 cursor-pointer`}
+                  >
+                    Overview
+                  </h1>
+                </div>
+              </Link>
+              <Link to="/sub_marks_entry">
+                <div
+                  className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
+                >
+                  <Circle
+                    className={`!text-[.7rem] !transition-all !ease-linear !duration-200 ${
+                      highLight === "schools" ? "text-white" : "text-gray-600"
+                    } `}
+                  />
+                  <h1
+                    className={`pl-9 ${
+                      highLight === "schools" ? "text-white" : "text-gray-600"
+                    } transition-all ease-linear text-sm font-semibold duration-200  py-2 cursor-pointer`}
+                  >
+                    Subject Marks Entry
+                  </h1>
+                </div>
+              </Link>
+            </div>
+          </Collapse>
         </Link>
         <Link>
           <aside
-            className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
+            className={`px-6 mt-[1rem] py-2 hover:bg-gray-500 flex ${
               highLight === "dashboard" ? "bg-gray-500" : ""
             } rounded-md gap-4 cursor-pointer group`}
           >
@@ -169,7 +252,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
         </Link>
         <Link>
           <aside
-            className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
+            className={`px-6 mt-[1rem] py-2 hover:bg-gray-500 flex ${
               highLight === "dashboard" ? "bg-gray-500" : ""
             } rounded-md gap-4 cursor-pointer group`}
           >
@@ -193,7 +276,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
         </Link>
         <Link to="/assessment/prs_overview">
           <aside
-            className={`px-6 mt-[2rem] py-2 hover:bg-gray-500 flex ${
+            className={`px-6 mt-[1rem] py-2 hover:bg-gray-500 flex ${
               highLight === "prs" ? "bg-gray-500" : ""
             } rounded-md gap-4 cursor-pointer group`}
           >

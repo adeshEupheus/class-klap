@@ -11,67 +11,220 @@ import Paper from "@mui/material/Paper";
 import SwipeableTemporaryDrawer from "../../components/Material/MaterialSidebar";
 import { Skeleton, Switch } from "@mui/material";
 import { Menu } from "@mui/icons-material";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import Breadcrumbs from "../../components/Material/BreadCrumbs";
 import SearchDropDown from "../../components/Material/SearchDropDown";
 import BasicTextFields from "../../components/Material/TextField";
 import SwitchLabels from "../../components/Material/Switch";
 import { GetExamSetUpData } from "../../apis/fectcher/assessment/examSetUp/examSetUp";
-import { useLayoutEffect } from "react";
-import axios from "axios";
+import { LockExamSetup, UnLockExamSetup } from "../../apis/mutation/examSetUp";
+import Snackbars from "../../components/Material/Snackbar";
+import Loader from "../../components/Material/Loader";
 const ExamSetUp = () => {
   const [id, setId] = useState("FA1");
+  const [filter, setFilter] = useState("All");
+  const [loading, setLoading] = useState(false);
+  const [snackbarMsg, setSnackbarMsg] = useState("");
+  const [snackbarErr, setSnackbarErr] = useState(false);
 
-  const [mainData, setMainData] = useState([]);
+  const snackbarRef = useRef();
+  const switchRefs = useRef([]);
+  switchRefs.current = [];
+
+  const addToRef = (el) => {
+    // console.count(el);
+    if (el && !switchRefs.current.includes(el)) {
+      switchRefs.current.push(el);
+    }
+  };
+
   const {
     data: Exam_setUpData,
     isLoading,
     refetch,
+    isRefetching,
   } = useQuery({
     queryKey: ["exam_setup_data", id],
     queryFn: () => GetExamSetUpData(id),
+    cacheTime: 0,
     onSuccess: (data) => {
       console.log(data);
-      setMainData(data);
     },
-    // enabled: false,
     refetchOnWindowFocus: false,
   });
-  console.log(mainData);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const lockMutation = useMutation({
+    mutationFn: async (data) => {
+      console.log(data);
+      setLoading(true);
+      let res;
+      let index;
+      if (data.item) {
+        if (!data.item.locked) {
+          res = await LockExamSetup(data.examType, data.gradeId, data.data);
+        } else {
+          res = await UnLockExamSetup(data.examType, data.gradeId);
+        }
+      } else {
+        res = await LockExamSetup(data.examType, data.gradeId, data.data);
+      }
+      if (res.success) {
+        refetch();
+        setSnackbarErr(false);
+        if (data.item) {
+          index = Exam_setUpData.indexOf(data.item);
+        }
+        setSnackbarMsg(res.message.replace(/<b>/g, " ").replace("</b>", " "));
+        snackbarRef.current.openSnackbar();
+        setLoading(false);
+        if (data.item) {
+          switchRefs.current[index].toggle();
+        }
+      } else {
+        setSnackbarErr(true);
+        setSnackbarMsg(res.message.replace(/<b>/g, " ").replace("</b>", " "));
+        snackbarRef.current.openSnackbar();
+        setLoading(false);
+      }
+    },
+  });
 
   const show = null;
 
-  // const queryClient = useQueryClient();
+  const handleSwitchChange = (name, status, item) => {
+    // console.log(!item.locked);
+    const apiDataBody = {
+      grade: item.grade.name,
+      exam: id,
+      examName: item.examName.name,
+      duration: item.duration,
+      locked: !item.locked,
+      marksSyllabus: item.selectedMarksSyllabus.name,
+      questionPaperTypeDeliveryFormat: item.questionPaperDeliveryModeType.name,
+    };
+    lockMutation.mutate({
+      examType: id,
+      gradeId: apiDataBody.grade,
+      data: apiDataBody,
+      item,
+    });
+  };
 
-  const updateData = (class_name) => {
-    if (class_name != "All") {
-      const newArray = Exam_setUpData.filter(
-        (item) => item.grade.displayName === class_name
-      );
-      setMainData(newArray);
-    } else {
-      setMainData(Exam_setUpData);
+  const returnData = () => {
+    if (filter === "All") {
+      return Exam_setUpData;
     }
+
+    const newArray = Exam_setUpData.filter(
+      (item) => item.grade.displayName === filter
+    );
+    return newArray;
   };
 
   const sidebarRef = useRef();
 
-  const handleDropDown = (value, type) => {
-    console.log(value, type);
-    if (type === "class") {
-      updateData(value.value);
-    } else if ((type = "exam_setup")) {
-      setId(value.value);
-    }
-    // switch (type) {
-    //   case "Overview":
-    //     setId(value.value);
-    //     break;
+  const handleDropDown = (value, type, item) => {
+    console.log(value, type, item);
+    let test;
+    let apiDataBody;
+    switch (type) {
+      case "class":
+        setFilter(value.value);
+        break;
+      case "exam_setup":
+        setFilter("All");
+        setId(value.value);
+        break;
+      case "exam_name":
+        test = item.applicableExamNames.filter(
+          (item) => item.displayName === value.value
+        );
+        // console.log(test[0].name);
+        apiDataBody = {
+          grade: item.grade.name,
+          exam: id,
+          examName: test[0].name,
+          duration: item.duration,
+          locked: false,
+          marksSyllabus: item.selectedMarksSyllabus.name,
+          questionPaperTypeDeliveryFormat:
+            item.questionPaperDeliveryModeType.name,
+        };
 
-    //   default:
-    //     break;
-    // }
+        lockMutation.mutate({
+          examType: id,
+          gradeId: apiDataBody.grade,
+          data: apiDataBody,
+        });
+        break;
+
+      case "exam_type":
+        test = item.applicableQuestionPaperDeliveryModeTypes.filter(
+          (item) => item.displayName === value.value
+        );
+        // console.log(test[0].name);
+        apiDataBody = {
+          grade: item.grade.name,
+          exam: id,
+          examName: item.examName.name,
+          duration: item.duration,
+          locked: false,
+          marksSyllabus: item.selectedMarksSyllabus.name,
+          questionPaperTypeDeliveryFormat: test[0].name,
+        };
+        lockMutation.mutate({
+          examType: id,
+          gradeId: apiDataBody.grade,
+          data: apiDataBody,
+        });
+        break;
+      case "mark_syllabus_difficulty":
+        test = item.applicableMarksSyllabus.SUBJECTIVE.filter(
+          (item) => item.displayName === value.value
+        );
+        // console.log(test[0].name);
+        apiDataBody = {
+          grade: item.grade.name,
+          exam: id,
+          examName: item.examName.name,
+          duration: item.duration,
+          locked: false,
+          marksSyllabus: test[0].name,
+          questionPaperTypeDeliveryFormat:
+            item.questionPaperDeliveryModeType.name,
+        };
+        // console.log(apiDataBody);
+
+        lockMutation.mutate({
+          examType: id,
+          gradeId: apiDataBody.grade,
+          data: apiDataBody,
+        });
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const handleOnBlur = (value, item) => {
+    const apiDataBody = {
+      grade: item.grade.name,
+      exam: id,
+      examName: item.examName.name,
+      duration: Number(value),
+      locked: false,
+      marksSyllabus: item.selectedMarksSyllabus.name,
+      questionPaperTypeDeliveryFormat: item.questionPaperDeliveryModeType.name,
+    };
+    // console.log(apiDataBody);
+
+    lockMutation.mutate({
+      examType: id,
+      gradeId: apiDataBody.grade,
+      data: apiDataBody,
+    });
   };
 
   const handleSidebarCollapsed = () => {
@@ -80,7 +233,6 @@ const ExamSetUp = () => {
 
   useEffect(() => {
     document.title = "Exam Set Up - ClassKlap";
-    // setMainData(Exam_setUpData);
     const handleWidth = () => {
       if (window.innerWidth > 1024) {
         setSidebarCollapsed(false);
@@ -98,12 +250,18 @@ const ExamSetUp = () => {
   }, []);
   return (
     <>
+      <Snackbars
+        ref={snackbarRef}
+        message={snackbarMsg}
+        snackbarErrStatus={snackbarErr}
+      />
       <div className="flex w-[100%] min-h-[100vh]">
         <Sidebar
           highLight={"exam_setup"}
           sidebarCollapsed={sidebarCollapsed}
           show={show}
         />
+        <Loader loading={loading} />
 
         <div>
           <SwipeableTemporaryDrawer
@@ -235,7 +393,7 @@ const ExamSetUp = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {mainData?.map((item, index) => (
+                      {returnData()?.map((item, index) => (
                         <TableRow
                           key={index}
                           sx={{
@@ -251,6 +409,7 @@ const ExamSetUp = () => {
                             <SearchDropDown
                               minWidth={"14rem"}
                               handleDropDown={handleDropDown}
+                              item={item}
                               data={[
                                 ...item.applicableExamNames.map((item) => {
                                   return { value: item.displayName };
@@ -270,6 +429,7 @@ const ExamSetUp = () => {
                               minWidth={"12rem"}
                               disable={item.locked}
                               handleDropDown={handleDropDown}
+                              item={item}
                               data={[
                                 ...item.applicableQuestionPaperDeliveryModeTypes.map(
                                   (item) => {
@@ -294,6 +454,7 @@ const ExamSetUp = () => {
                                 minWidth={"12rem"}
                                 handleDropDown={handleDropDown}
                                 disable={item.locked}
+                                item={item}
                                 data={[
                                   ...item?.applicableMarksSyllabus?.SUBJECTIVE?.map(
                                     (item) => {
@@ -313,6 +474,7 @@ const ExamSetUp = () => {
                                 minWidth={"12rem"}
                                 handleDropDown={handleDropDown}
                                 disable={item.locked}
+                                item={item}
                                 data={[
                                   ...item?.applicableMarksSyllabus?.OBJECTIVE?.map(
                                     (item) => {
@@ -332,14 +494,22 @@ const ExamSetUp = () => {
                           <TableCell align="center">
                             <BasicTextFields
                               variant={"standard"}
+                              item={item}
                               defaultValue={item.duration}
                               disable={item.locked}
+                              handleOnBlur={handleOnBlur}
                               lable={"Time"}
                               type={"number"}
                             />
                           </TableCell>
                           <TableCell align="center">
-                            <SwitchLabels checked={item.locked} />
+                            <SwitchLabels
+                              checked={item.locked}
+                              item={item}
+                              ref={addToRef}
+                              name={"exam_setup"}
+                              handleSwitchChange={handleSwitchChange}
+                            />
                           </TableCell>
                         </TableRow>
                       ))}

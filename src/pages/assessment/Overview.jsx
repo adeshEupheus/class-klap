@@ -19,15 +19,12 @@ import { GetOverviewData } from "../../apis/fectcher/assessment/overview/overvie
 import Loader from "../../components/Material/Loader";
 const OverView = () => {
   const [id, setId] = useState("FA1");
+  const [filter, setFilter] = useState("All");
 
   const { data: overviewData, isLoading } = useQuery({
     queryKey: ["overview_data", id],
     queryFn: () => GetOverviewData(id),
   });
-
-  // const [mainData, setMainData] = useState(overviewData);
-
-  // console.log(mainData);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -36,12 +33,26 @@ const OverView = () => {
     console.log(value, type);
     switch (type) {
       case "Overview":
+        setFilter("All");
         setId(value.value);
+        break;
+      case "class":
+        setFilter(value.value);
+        // setId(value.value);
         break;
 
       default:
         break;
     }
+  };
+
+  const returnData = () => {
+    if (filter === "All") {
+      return overviewData;
+    }
+
+    const newArray = overviewData.filter((item) => item.schoolClass === filter);
+    return newArray;
   };
 
   const show = null;
@@ -224,7 +235,7 @@ const OverView = () => {
                         <TableCell align="right">
                           <div className="flex flex-col items-center gap-2">
                             <h1>Exam Name</h1>
-                            <SearchDropDown
+                            {/* <SearchDropDown
                               handleDropDown={handleDropDown}
                               data={[
                                 {
@@ -244,13 +255,13 @@ const OverView = () => {
                                 value: overviewData[0].examName,
                               }}
                               size={"small"}
-                            />
+                            /> */}
                           </div>
                         </TableCell>
                         <TableCell align="right">
                           <div className="flex flex-col items-center gap-2">
                             <h1>Exam Set Up</h1>
-                            <SearchDropDown
+                            {/* <SearchDropDown
                               handleDropDown={handleDropDown}
                               data={[
                                 {
@@ -270,13 +281,13 @@ const OverView = () => {
                                 value: overviewData[0].examSetup,
                               }}
                               size={"small"}
-                            />
+                            /> */}
                           </div>
                         </TableCell>
                         <TableCell align="right">
                           <div className="flex flex-col items-center gap-2">
                             <h1>Exam Schedule</h1>
-                            <SearchDropDown
+                            {/* <SearchDropDown
                               handleDropDown={handleDropDown}
                               data={[
                                 {
@@ -296,13 +307,13 @@ const OverView = () => {
                                 value: overviewData[0].examSchedule,
                               }}
                               size={"small"}
-                            />
+                            /> */}
                           </div>
                         </TableCell>
                         <TableCell align="right">
                           <div className="flex flex-col items-center gap-2">
                             <h1>Marks Entry</h1>
-                            <SearchDropDown
+                            {/* <SearchDropDown
                               handleDropDown={handleDropDown}
                               data={[
                                 {
@@ -323,7 +334,7 @@ const OverView = () => {
                                 value: overviewData[0].marksEntryStatus,
                               }}
                               size={"small"}
-                            />
+                            /> */}
                           </div>
                         </TableCell>
                         <TableCell align="right">Feedback</TableCell>
@@ -331,7 +342,7 @@ const OverView = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {overviewData?.map((item, index) => (
+                      {returnData()?.map((item, index) => (
                         <TableRow
                           key={index}
                           sx={{

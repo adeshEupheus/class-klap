@@ -16,6 +16,7 @@ const SearchDropDown = ({
   minWidth,
   handleDropDown,
   defaultValue,
+  item,
 }) => {
   const defaultProps = {
     options: data,
@@ -41,7 +42,7 @@ const SearchDropDown = ({
   };
 
   const handleOnChange = (value, type) => {
-    handleDropDown(value, type);
+    handleDropDown(value, type, item);
   };
 
   return (

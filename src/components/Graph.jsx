@@ -1,6 +1,7 @@
 import { Chart as ChartJS ,CategoryScale,LinearScale,BarElement,Title,Tooltip,Legend } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import {faker} from '@faker-js/faker';
+import { useState } from "react";
 
 
 export const Graph=(({data: GraphData})=>{
@@ -10,28 +11,57 @@ ChartJS.register(
 CategoryScale,Legend,LinearScale,BarElement,Title,Tooltip
 );
 
-
     const returnGraphValue = (object) => {
         let array = [];
         
+        const returnAddInfo = () => {
+            let addInfo = []
+            for(let key in object){
+                object[key].map((item) => {
+                    addInfo.push({section: item.sectionName, classTeacher: item.classTeacher, subjectTeacher: item.subjectTeacher, subject: item.subjectDisplayName})
+                })
+            }
+        console.log(addInfo);
+        return addInfo;
+
+        }
+        // console.log(typeof addInfo);
+        // Object.entries(addInfo);
+        // console.log(addInfo);
+
+        // let Info=[];
+        // addInfo.map((item)=>
+        // Info.push(item.subjectTeacher)
+        // )
+        // console.log(Info);
+
         
+        
+
+        //from where sName is coming subjectname
         const returnData = (sName) => {
             let dataArray = []
             for(let key in object){
-                object[key].map((item) => {
+                //accessing key values using object[key]
+                 object[key].map((item) => {
                     if(item.subjectDisplayName === sName){
                         dataArray.push(item.averagePercentage)
                     }
                 })
             }
             return dataArray;
+        
         }
+        
+       
+       
 
         const returnAvg = () => {
             let dataArray = []
             for(let key in object){
                 let num = 0
                 object[key].map((item) => {
+                    // console.log(item);
                     num += item.averagePercentage 
                 })
                 num = num / 2;
@@ -41,10 +71,13 @@ CategoryScale,Legend,LinearScale,BarElement,Title,Tooltip
         }
 
         for(let key in object){
-            array.push({label: "Class Average", data: returnAvg(), backgroundColor:`rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.93)`})
+            
+            array.push({label: "Class Average", data: returnAvg(), backgroundColor:`rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.93)`, addInfo: returnAddInfo()})
 
             object[key].map((item) => {
-                array.push({label: item.subjectDisplayName, data: returnData(item.subjectDisplayName), backgroundColor:`rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.93)`})
+                console.log(item);
+                array.push({label: item.subjectDisplayName, data: returnData(item.subjectDisplayName), backgroundColor:`rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.93)`,addInfo: returnAddInfo()
+            })
             })
 
             break
@@ -53,7 +86,7 @@ CategoryScale,Legend,LinearScale,BarElement,Title,Tooltip
         return array
     }
 
-    returnGraphValue(GraphData.data)
+    // returnGraphValue(GraphData.data)
 
  const options={
     
@@ -68,9 +101,9 @@ CategoryScale,Legend,LinearScale,BarElement,Title,Tooltip
         tooltip: {
             callbacks: {
                 label: function(tooltipItem) {
-                    
-                    console.log(tooltipItem)
-                    return tooltipItem.formattedValue + '%';
+                  
+                     console.log(tooltipItem)
+                    return `${tooltipItem.formattedValue}% - ${tooltipItem.dataset.addInfo} Section-${tooltipItem.dataset.addInfo2}`
                 }
             }
         }
@@ -80,11 +113,10 @@ CategoryScale,Legend,LinearScale,BarElement,Title,Tooltip
 // console.log(faker.datatype.number);
 // console.log(GraphData.data.A[0].averagePercentage);
 
-// GraphData.data
 
 const data1 ={
 
-    labels:Object.keys(GraphData.data),datasets:returnGraphValue(GraphData.data),
+ labels:Object.keys(GraphData.data),datasets:returnGraphValue(GraphData.data),
 };
 
 
@@ -95,10 +127,10 @@ const data1 ={
     
 return (
     // <section className=" !w-full sm:!w-full !bg-slate-400 " >
-<div className=" sm:!w-[90%] !m-1 sm:!m-[5%] bg-slate-100 rounded-md" >
+<div className="!m-1 sm:!m-[5%] bg-slate-100 rounded-md" >
     <div className=" text-base sm:text-2xl font-bold text-slate-400 p-3">Class {GraphData.className.split('')[1]}</div>
 
-<Bar options={options} data={data1} className="sm:!w-[90%]"/>
+<Bar options={options} data={data1} className=""/>
 <div className=" flex justify-center items-center font-bold text-base sm:text-xl text-slate-500">
     Sections
     </div>

@@ -45,7 +45,7 @@ const ScoreBoard = () => {
     queryFn: () => GetScoreBoardData(),
     cacheTime: 0,
     onSuccess: (data) => {
-      console.log(data);   
+      // console.log(data);   
     //   let mainData = [];
     // Object.entries(data.Primary).map((item) => {
     //   mainData.push({className: item[0], data: item[1]})

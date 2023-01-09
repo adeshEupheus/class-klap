@@ -8,6 +8,7 @@ import ExamTimeTable from "./pages/assessment/ExamTimeTable";
 import PRSOverview from "./pages/assessment/PRS";
 import MarksEntryOverview from "./pages/assessment/MarksEntryOverview";
 import ScoreBoard from "./pages/assessment/Scoreboard";
+import SubjectMarksEntry from "./pages/assessment/SubjectMarksEntry";
 
 
 function App() {
@@ -35,6 +36,12 @@ function App() {
               path="/marks_entry_overview"
               element={<MarksEntryOverview />}
             />
+         
+            <Route
+              path="/sub_marks_entry"
+              element={<SubjectMarksEntry/>}
+            />
+            
             <Route path="*" element={<h1>Page Not Found ... 404</h1>} />
           </Routes>
         </BrowserRouter>

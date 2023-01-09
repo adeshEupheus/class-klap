@@ -7,6 +7,8 @@ import ExamSetUp from "./pages/assessment/ExamSetUp";
 import ExamTimeTable from "./pages/assessment/ExamTimeTable";
 import PRSOverview from "./pages/assessment/PRS";
 import MarksEntryOverview from "./pages/assessment/MarksEntryOverview";
+import ScoreBoard from "./pages/assessment/Scoreboard";
+
 
 function App() {
   const client = new QueryClient();
@@ -23,6 +25,10 @@ function App() {
             <Route
               path="/assessment/exam_timetable"
               element={<ExamTimeTable />}
+            />
+            <Route
+              path="/assessment/scoreboard"
+              element={<ScoreBoard />}
             />
             <Route path="/assessment/prs_overview" element={<PRSOverview />} />
             <Route

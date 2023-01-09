@@ -34,6 +34,9 @@ const SearchDropDown = ({
         case "mark_syllabus_difficulty":
           return option.value;
           break;
+          case "scoreboard":
+            return option.value;
+            break;
         default:
           return option.value;
           break;

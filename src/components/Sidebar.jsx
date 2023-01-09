@@ -226,7 +226,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
             </div>
           </Collapse>
         </Link>
-        <Link>
+        <Link to='/assessment/scoreboard'>
           <aside
             className={`px-6 mt-[1rem] py-2 hover:bg-gray-500 flex ${
               highLight === "dashboard" ? "bg-gray-500" : ""

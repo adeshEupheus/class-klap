@@ -9,6 +9,7 @@ import PRSOverview from "./pages/assessment/PRS";
 import MarksEntryOverview from "./pages/assessment/MarksEntryOverview";
 import ScoreBoard from "./pages/assessment/Scoreboard";
 import SubjectMarksEntry from "./pages/assessment/SubjectMarksEntry";
+import ReportDownload from "./pages/assessment/ReportDownload";
 
 
 function App() {
@@ -40,6 +41,10 @@ function App() {
             <Route
               path="/sub_marks_entry"
               element={<SubjectMarksEntry/>}
+            />
+            <Route
+              path="/report_download"
+              element={<ReportDownload/>}
             />
             
             <Route path="*" element={<h1>Page Not Found ... 404</h1>} />

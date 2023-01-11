@@ -23,7 +23,8 @@ import FeedbackCard from "../../components/MarksEntry/MarksEntryCard";
 import {
     timelineOppositeContentClasses,
   } from '@mui/lab/TimelineOppositeContent';
-
+import SearchBar from "../../components/Material/SearchBar";
+import { DownloadReportData } from "../../apis/fectcher/assessment/reportDownload/reportdownload";
  
 
 const ReportDownload = () => {
@@ -31,41 +32,28 @@ const ReportDownload = () => {
   const [sectionId, setSectionId] = useState("117145");
 
   const {
-    data: Overview_TableData,
-    isLoading: OverviewData_Loading,
+    data: ReportDownloadData,
+    isLoading,
     refetch,
+    isRefetching,
   } = useQuery({
-    queryKey: ["prs_tracker", id],
-    queryFn: () => GetMarksEntryOverviewData(id, sectionId),
+    queryKey: ["Report_Download_Data"],
+    queryFn: () => DownloadReportData(),
+    cacheTime: 0,
     onSuccess: (data) => {
       console.log(data);
     },
     refetchOnWindowFocus: false,
   });
 
-  const { data: Exam_Types, isLoading: Exam_Type_Loading } = useQuery({
-    queryKey: ["exam_types"],
-    queryFn: () => GetApplicableExamType(),
-    onSuccess: (data) => {
-      console.log(data);
-    },
-    refetchOnWindowFocus: false,
-  });
+  
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const show = null;
 
   const sidebarRef = useRef();
 
-  const handleDropDown = (value, type) => {
-    console.log(value, type);
-    if (type === "class") {
-      //   updateData(value.value);
-    } else if ((type = "prs")) {
-      //   console.log(value.value.split(" ")[1]);
-      setId(`RSA ${value.value.split(" ")[1]}`);
-    }
-  };
+  
 
   const handleSidebarCollapsed = () => {
     sidebarRef.current.openSidebar();
@@ -134,53 +122,38 @@ const ReportDownload = () => {
                 REPORT DOWNLOADS
               </h1>
               </div>
-              <div className="w-full">
+              
+              <div className="w-full ">
+                
               <Timeline sx={{
         [`& .${timelineOppositeContentClasses.root}`]: {
           flex: 0.2,
         },
       }}>
+
+        {isLoading ? (
+          <h1>loading...</h1>
+        ) :
+
+        ReportDownloadData.map((item) => {
+          return (
         <TimelineItem>
-            <TimelineOppositeContent><div className=''>10 Jan,2023</div><div>01:00 PM</div></TimelineOppositeContent>
+            <TimelineOppositeContent><div className=' !text-xs sm:!text-lg '>{item.triggeredAtDate}</div><div className="text-xs sm:text-lg">{item.triggeredAtTime}</div></TimelineOppositeContent>
             <TimelineSeparator>
                 <TimelineDot/>
                 <TimelineConnector/>
             </TimelineSeparator>
-            <TimelineContent><FeedbackCard/></TimelineContent>
+            <TimelineContent className=" sm:!ml-5"><FeedbackCard data={item}/></TimelineContent>
         </TimelineItem>
-        <TimelineItem>
-            <TimelineOppositeContent>10:30</TimelineOppositeContent>
-            <TimelineSeparator>
-                <TimelineDot/>
-                <TimelineConnector/>
-            </TimelineSeparator>
-            <TimelineContent className="!mt-4"><FeedbackCard/></TimelineContent>
-        </TimelineItem>
-        <TimelineItem>
-            <TimelineOppositeContent>10:30</TimelineOppositeContent>
-            <TimelineSeparator>
-                <TimelineDot/>
-                <TimelineConnector/>
-            </TimelineSeparator>
-            <TimelineContent className="!mt-4"><FeedbackCard/></TimelineContent>
-        </TimelineItem>
-        <TimelineItem>
-            <TimelineOppositeContent>10:30</TimelineOppositeContent>
-            <TimelineSeparator>
-                <TimelineDot/>
-                <TimelineConnector/>
-            </TimelineSeparator>
-            <TimelineContent className="!mt-4"><FeedbackCard/></TimelineContent>
-        </TimelineItem>
-        <TimelineItem>
-            <TimelineOppositeContent>10:30</TimelineOppositeContent>
-            <TimelineSeparator>
-                <TimelineDot/>
-                <TimelineConnector/>
-            </TimelineSeparator>
-            <TimelineContent className="!mt-4"><FeedbackCard/></TimelineContent>
-        </TimelineItem>
+
+          )
+        })
+        }
+        
+
+        
     </Timeline>
+    
               </div>
           </div>
         </div>

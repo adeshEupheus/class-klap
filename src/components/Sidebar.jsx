@@ -205,7 +205,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
                   </h1>
                 </div>
               </Link>
-              <Link to="/sub_marks_entry">
+              <Link to="/marks_entry_subject_marks_entry">
                 <div
                   className={`flex items-center transition-all ease-linear duration-100 mr-8 ml-6 group `}
                 >
@@ -226,7 +226,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
             </div>
           </Collapse>
         </Link>
-        <Link to='/assessment/scoreboard'>
+        <Link to="/assessment/scoreboard">
           <aside
             className={`px-6 mt-[1rem] py-2 hover:bg-gray-500 flex ${
               highLight === "dashboard" ? "bg-gray-500" : ""

@@ -8,8 +8,6 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { faker } from "@faker-js/faker";
-import { useState } from "react";
 
 export const Graph = ({ data: GraphData }) => {
   ChartJS.register(
@@ -36,7 +34,7 @@ export const Graph = ({ data: GraphData }) => {
           });
         });
       }
-    //   console.log(addInfo);
+      //   console.log(addInfo);
       return addInfo;
     };
     // console.log(typeof addInfo);
@@ -130,8 +128,8 @@ export const Graph = ({ data: GraphData }) => {
                   if (!info) {
                     info = "NA";
                   }
-                } else if(!info) {
-                    info = "Class Teacher -" + item.classTeacher
+                } else if (!info) {
+                  info = "Class Teacher -" + item.classTeacher;
                 }
               }
             });
@@ -145,10 +143,9 @@ export const Graph = ({ data: GraphData }) => {
           },
           title: function (tooltipItem) {
             // console.log(tooltipItem);
-            return `Section ${tooltipItem[0].label}`
-          }
+            return `Section ${tooltipItem[0].label}`;
+          },
         },
-
       },
     },
   };
@@ -160,7 +157,7 @@ export const Graph = ({ data: GraphData }) => {
     datasets: returnGraphValue(GraphData.data),
   };
 
-//   console.log(GraphData);
+  //   console.log(GraphData);
 
   const {
     data: { A },
@@ -174,7 +171,7 @@ export const Graph = ({ data: GraphData }) => {
       </div>
 
       <Bar options={options} data={data1} className="" />
-      <div className=" flex justify-center items-center font-bold text-base sm:text-xl text-slate-500">
+      <div className=" flex justify-center items-center font-bold text-sm sm:text-xl text-slate-500">
         Sections
       </div>
     </div>

@@ -1,17 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import { useState } from "react";
 import Sidebar from "../../components/Sidebar";
-
 import SwipeableTemporaryDrawer from "../../components/Material/MaterialSidebar";
-import { Chip, Skeleton, Switch } from "@mui/material";
+
 import { Menu } from "@mui/icons-material";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Breadcrumbs from "../../components/Material/BreadCrumbs";
-import SearchDropDown from "../../components/Material/SearchDropDown";
-import { GetMarksEntryOverviewData } from "../../apis/fectcher/assessment/marksEntry/overview";
-import CircularProgressWithLabel from "../../components/Material/CircleProgress";
-import BasicButton from "../../components/Material/Button";
-import { GetApplicableExamType } from "../../apis/fectcher/assessment/GetApplicableExamType";
+
 import  Timeline  from '@mui/lab/Timeline';
 import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
@@ -23,7 +18,7 @@ import FeedbackCard from "../../components/MarksEntry/MarksEntryCard";
 import {
     timelineOppositeContentClasses,
   } from '@mui/lab/TimelineOppositeContent';
-import SearchBar from "../../components/Material/SearchBar";
+
 import { DownloadReportData } from "../../apis/fectcher/assessment/reportDownload/reportdownload";
  
 
@@ -60,7 +55,7 @@ const ReportDownload = () => {
   };
 
   useEffect(() => {
-    document.title = "Marks Entry Overview - ClassKlap";
+    
     const handleWidth = () => {
       if (window.innerWidth > 1024) {
         setSidebarCollapsed(false);
@@ -125,9 +120,10 @@ const ReportDownload = () => {
               
               <div className="w-full ">
                 
-              <Timeline sx={{
+              <Timeline className="!p-0 sm:px-6" sx={{
         [`& .${timelineOppositeContentClasses.root}`]: {
           flex: 0.2,
+        
         },
       }}>
 
@@ -135,10 +131,10 @@ const ReportDownload = () => {
           <h1>loading...</h1>
         ) :
 
-        ReportDownloadData.map((item) => {
+        ReportDownloadData.map((item, index) => {
           return (
-        <TimelineItem>
-            <TimelineOppositeContent><div className=' !text-xs sm:!text-lg '>{item.triggeredAtDate}</div><div className="text-xs sm:text-lg">{item.triggeredAtTime}</div></TimelineOppositeContent>
+        <TimelineItem key={index}>
+            <TimelineOppositeContent><div className=' !text-xs sm:!text-base '>{item.triggeredAtDate}</div><div className="text-xs sm:text-base">{item.triggeredAtTime}</div></TimelineOppositeContent>
             <TimelineSeparator>
                 <TimelineDot/>
                 <TimelineConnector/>

@@ -162,9 +162,9 @@ const ExamTimeTable = () => {
         setLoading(true);
         const apiBodyData = {
           duration: data.item.duration,
-          examDate: `${data.item.newDate.$y}-${data.item.newDate.$M + 1}-${
-            data.item.newDate.$D
-          }`,
+          examDate: `${data.item.newDate.$y}-${String(
+            data.item.newDate.$M + 1
+          ).padStart(2, "0")}-${String(data.item.newDate.$D).padStart(2, "0")}`,
           examTime: data.item.examTime,
           feedbackRequired: data.item.feedbackRequired,
           qpSetTypeDeliveryMode: data.item.questionPaperDeliveryModeType.name,
@@ -364,6 +364,7 @@ const ExamTimeTable = () => {
     const dateRef = useRef();
 
     const handleDateChange = (value) => {
+      console.log(value);
       row.newDate = value;
       mutation.mutate({ item: row, name: "date" });
     };

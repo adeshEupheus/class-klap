@@ -238,7 +238,7 @@ const SwipeableTemporaryDrawer = React.forwardRef((props, ref) => {
           </div>
         </Collapse>
       </Link>
-      <Link>
+      <Link to="/assessment/scoreboard">
         <aside
           className={`px-6 py-2 hover:bg-gray-500 flex ${
             props.highLight === "dashboard" ? "bg-gray-500" : ""

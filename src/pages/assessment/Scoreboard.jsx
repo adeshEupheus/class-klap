@@ -1,5 +1,5 @@
-import React from 'react';
-import { Graph } from '../../components/Graph';
+import React from "react";
+import { Graph } from "../../components/Graph";
 import { useEffect, useRef } from "react";
 import { useState } from "react";
 import Sidebar from "../../components/Sidebar";
@@ -13,11 +13,10 @@ import SearchDropDown from "../../components/Material/SearchDropDown";
 import Snackbars from "../../components/Material/Snackbar";
 import Loader from "../../components/Material/Loader";
 // import BasicButton from "../../Components/Material/Button";
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import { GetScoreBoardData } from '../../apis/fectcher/assessment/scoreBoard/scoreBoard';
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import { GetScoreBoardData } from "../../apis/fectcher/assessment/scoreBoard/scoreBoard";
 
 const ScoreBoard = () => {
-
   const [id, setId] = useState("FA1");
   const [filter, setFilter] = useState("RSA1");
   const [loading, setLoading] = useState(false);
@@ -45,12 +44,12 @@ const ScoreBoard = () => {
     queryFn: () => GetScoreBoardData(),
     cacheTime: 0,
     onSuccess: (data) => {
-      // console.log(data);   
-    //   let mainData = [];
-    // Object.entries(data.Primary).map((item) => {
-    //   mainData.push({className: item[0], data: item[1]})
-    // })
-    // console.log(mainData); 
+      // console.log(data);
+      //   let mainData = [];
+      // Object.entries(data.Primary).map((item) => {
+      //   mainData.push({className: item[0], data: item[1]})
+      // })
+      // console.log(mainData);
     },
     refetchOnWindowFocus: false,
   });
@@ -58,56 +57,51 @@ const ScoreBoard = () => {
   const returnArray = () => {
     let mainData = [];
     Object.entries(ScoreBoardData.Primary).map((item) => {
-      mainData.push({className: item[0], data: item[1]})
-    })
+      mainData.push({ className: item[0], data: item[1] });
+    });
     return mainData;
-  }
+  };
 
   const handleDropDown = (value, type, item) => {
     setFilter(value.value);
     // setFilter()
   };
 
-   const returnClass = ((data) => {
+  const returnClass = (data) => {
     let mainData = [];
     Object.entries(data).map((item) => {
-      mainData.push({className: item[0], data: item[1]})
-    })
+      mainData.push({ className: item[0], data: item[1] });
+    });
     return mainData;
     // console.log(mainData);
-  })
+  };
 
-  
   const returnData = () => {
-    const newArray =
-      returnArray().filter(
-        (item) => item.className === filter
-      );
+    const newArray = returnArray().filter((item) => item.className === filter);
     return newArray;
   };
 
   // returnClass(returnData()[0].data)
-    
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const show = null;
-//   const returnData = () => {
-//     if (filter === "Select") {
-//       return [];
-//     }
+  //   const returnData = () => {
+  //     if (filter === "Select") {
+  //       return [];
+  //     }
 
-//     let code;
-//     Object.entries(OnlineExamData.applicableExams).forEach(([key, value]) => {
-//       console.log(key, value);
-//       if (filter === value) {
-//         code = key;
-//       }
-//     });
-//     const newArray = OnlineExamData.onlineExamResponses.filter(
-//       (item) => item.examName === code
-//     );
-//     return newArray;
-//   };
+  //     let code;
+  //     Object.entries(OnlineExamData.applicableExams).forEach(([key, value]) => {
+  //       console.log(key, value);
+  //       if (filter === value) {
+  //         code = key;
+  //       }
+  //     });
+  //     const newArray = OnlineExamData.onlineExamResponses.filter(
+  //       (item) => item.examName === code
+  //     );
+  //     return newArray;
+  //   };
 
   const sidebarRef = useRef();
 
@@ -128,12 +122,12 @@ const ScoreBoard = () => {
     handleWidth();
     window.scroll(0, 0);
     return () => {
-        window.removeEventListener("resize", handleWidth);
-      };
-    }, []);
+      window.removeEventListener("resize", handleWidth);
+    };
+  }, []);
   return (
     <>
-    <Snackbars
+      <Snackbars
         ref={snackbarRef}
         message={snackbarMsg}
         snackbarErrStatus={snackbarErr}
@@ -174,9 +168,11 @@ const ScoreBoard = () => {
 
           <div className="relative flex flex-col w-full justify-center items-start gap-4 bg-gray-200">
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4 ">
-              <Breadcrumbs crumbs={["Home", "Assessment","4.ScoreBoard"]} />
-              <h1 className="font-semibold sm:text-2xl text-xl">4.SCOREBOARD</h1>
-             
+              <Breadcrumbs crumbs={["Home", "Assessment", "4.ScoreBoard"]} />
+              <h1 className="font-semibold sm:text-2xl text-xl">
+                4.SCOREBOARD
+              </h1>
+
               {isLoading ? (
                 <Skeleton
                   animation="wave"
@@ -184,27 +180,54 @@ const ScoreBoard = () => {
                   sx={{ fontSize: "2rem", width: "5rem" }}
                 />
               ) : (
-                <div className='flex  flex-col p-3 md:flex-row  justify-between md:p-3 '>
-                <div className="w-[10rem] ">
-                  <SearchDropDown
-                    handleDropDown={handleDropDown}
-                    data={returnArray().map((item) => {
-                      return {value: item.className}
-                    })}
-                    variant={"outlined"}
-                    Name={"scoreboard"}
-                    defaultValue={{ value: filter }}
-                    size={"small"}
-                  />
-                </div>
-                <div className='flex sm:flex-row flex-col gap-3 mt-3 md:mt-0 '>
-                <Button variant= "contained" className='!font-semibold' size='small'> <FileDownloadIcon/>Exam Attendance</Button>
-                <Button variant= "contained" className='!font-semibold' size='small'> <FileDownloadIcon/>Feedback Report</Button>
-                <Button variant= "contained" className='!font-semibold' size='small'> <FileDownloadIcon/>Performance</Button>
-                </div>
+                <div className="flex  flex-col p-3 md:flex-row  justify-between md:p-3 ">
+                  <div className="w-[10rem] ">
+                    <SearchDropDown
+                      handleDropDown={handleDropDown}
+                      data={returnArray().map((item) => {
+                        return { value: item.className };
+                      })}
+                      variant={"outlined"}
+                      Name={"scoreboard"}
+                      defaultValue={{ value: filter }}
+                      size={"small"}
+                    />
+                  </div>
+                  <div className="flex sm:flex-row flex-col gap-3 mt-3 md:mt-0 ">
+                    <Button
+                      disabled
+                      variant="contained"
+                      className="!font-semibold"
+                      size="small"
+                    >
+                      {" "}
+                      <FileDownloadIcon />
+                      Exam Attendance
+                    </Button>
+                    <Button
+                      disabled
+                      variant="contained"
+                      className="!font-semibold"
+                      size="small"
+                    >
+                      {" "}
+                      <FileDownloadIcon />
+                      Feedback Report
+                    </Button>
+                    <Button
+                      disabled
+                      variant="contained"
+                      className="!font-semibold"
+                      size="small"
+                    >
+                      {" "}
+                      <FileDownloadIcon />
+                      Performance
+                    </Button>
+                  </div>
                 </div>
               )}
-              {isLoading? (
+              {isLoading ? (
                 <Skeleton
                   // sx={{ bgcolor: "grey.400" }}
                   animation="wave"
@@ -213,24 +236,24 @@ const ScoreBoard = () => {
                 />
               ) : (
                 <>
-               {/* <div className='sm:w-full'><Graph/></div> */}
-               {/* {returnData()[0].data} */}
-               {returnClass(returnData()[0].data).map((item) => {
-               return <div className='sm:w-full'><Graph data={item} key={item.className}/></div>
-              // console.log(item);
-               })}
-               
-               </>       
-                   )}
+                  {/* <div className='sm:w-full'><Graph/></div> */}
+                  {/* {returnData()[0].data} */}
+                  {returnClass(returnData()[0].data).map((item) => {
+                    return (
+                      <div className="sm:w-full">
+                        <Graph data={item} key={item.className} />
+                      </div>
+                    );
+                    // console.log(item);
+                  })}
+                </>
+              )}
             </div>
           </div>
         </div>
       </div>
+    </>
+  );
+};
 
-   
-</>
-  )
-}
-
-
-export default ScoreBoard
+export default ScoreBoard;

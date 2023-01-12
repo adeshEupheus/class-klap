@@ -6,12 +6,10 @@ import OverView from "./pages/assessment/Overview";
 import ExamSetUp from "./pages/assessment/ExamSetUp";
 import ExamTimeTable from "./pages/assessment/ExamTimeTable";
 import PRSOverview from "./pages/assessment/PRS";
-import MarksEntryOverview from "./pages/assessment/MarksEntryOverview";
+import MarksEntryOverview from "./pages/assessment/marksEntry/MarksEntryOverview";
 import ScoreBoard from "./pages/assessment/Scoreboard";
-
 import ReportDownload from "./pages/assessment/ReportDownload";
-
-
+import SubjectMarksEntry from "./pages/assessment/marksEntry/SubjectMarksEntry";
 
 
 function App() {
@@ -30,15 +28,13 @@ function App() {
               path="/assessment/exam_timetable"
               element={<ExamTimeTable />}
             />
-            <Route
-              path="/assessment/scoreboard"
-              element={<ScoreBoard />}
-            />
+            <Route path="/assessment/scoreboard" element={<ScoreBoard />} />
             <Route path="/assessment/prs_overview" element={<PRSOverview />} />
             <Route
               path="/marks_entry_overview"
               element={<MarksEntryOverview />}
             />
+
          
            
             <Route
@@ -47,6 +43,12 @@ function App() {
             />
            
             
+
+            <Route
+              path="/marks_entry_subject_marks_entry"
+              element={<SubjectMarksEntry />}
+            />
+
             <Route path="*" element={<h1>Page Not Found ... 404</h1>} />
           </Routes>
         </BrowserRouter>

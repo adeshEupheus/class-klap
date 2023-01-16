@@ -8,7 +8,9 @@ import ExamTimeTable from "./pages/assessment/ExamTimeTable";
 import PRSOverview from "./pages/assessment/PRS";
 import MarksEntryOverview from "./pages/assessment/marksEntry/MarksEntryOverview";
 import ScoreBoard from "./pages/assessment/Scoreboard";
+import ReportDownload from "./pages/assessment/ReportDownload";
 import SubjectMarksEntry from "./pages/assessment/marksEntry/SubjectMarksEntry";
+
 
 function App() {
   const client = new QueryClient();
@@ -32,10 +34,21 @@ function App() {
               path="/marks_entry_overview"
               element={<MarksEntryOverview />}
             />
+
+         
+           
+            <Route
+              path="/report_download"
+              element={<ReportDownload/>}
+            />
+           
+            
+
             <Route
               path="/marks_entry_subject_marks_entry"
               element={<SubjectMarksEntry />}
             />
+
             <Route path="*" element={<h1>Page Not Found ... 404</h1>} />
           </Routes>
         </BrowserRouter>

@@ -157,7 +157,7 @@ export const Graph = ({ data: GraphData }) => {
     datasets: returnGraphValue(GraphData.data),
   };
 
-  //   console.log(GraphData);
+
 
   const {
     data: { A },

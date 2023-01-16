@@ -21,7 +21,7 @@ export default function Breadcrumb({ crumbs }) {
           //   href="/"
           onClick={handleClick}
         >
-          <h1 className="font-semibold">{crumb}</h1>
+          <h1 className="font-semibold text-xs sm:text-base">{crumb}</h1>
         </Link>
       );
     }),

@@ -14,7 +14,12 @@ import Snackbars from "../../components/Material/Snackbar";
 import Loader from "../../components/Material/Loader";
 // import BasicButton from "../../Components/Material/Button";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
-import { GetScoreBoardData } from "../../apis/fectcher/assessment/scoreBoard/scoreBoard";
+import {
+  DownloadFeedback,
+  DownloadPerformance,
+  GetScoreBoardData,
+} from "../../apis/fectcher/assessment/scoreBoard/scoreBoard";
+import DialogSlide from "../../components/Material/scoreboard/Dialog";
 
 const ScoreBoard = () => {
   const [id, setId] = useState("FA1");
@@ -104,9 +109,19 @@ const ScoreBoard = () => {
   //   };
 
   const sidebarRef = useRef();
+  const dialogRef = useRef();
 
   const handleSidebarCollapsed = () => {
     sidebarRef.current.openSidebar();
+  };
+
+  const openDialog = async (type) => {
+    if (type === "feedback") {
+      await DownloadFeedback(id);
+    } else {
+      await DownloadPerformance(id);
+    }
+    dialogRef.current.openDialog();
   };
 
   useEffect(() => {
@@ -139,6 +154,7 @@ const ScoreBoard = () => {
           show={show}
         />
         <Loader loading={loading} />
+        <DialogSlide ref={dialogRef} />
 
         <div>
           <SwipeableTemporaryDrawer
@@ -195,19 +211,18 @@ const ScoreBoard = () => {
                   </div>
                   <div className="flex sm:flex-row flex-col gap-3 mt-3 md:mt-0 ">
                     <Button
-                      disabled
                       variant="contained"
                       className="!font-semibold"
                       size="small"
                     >
-                      {" "}
                       <FileDownloadIcon />
                       Exam Attendance
                     </Button>
+
                     <Button
-                      disabled
                       variant="contained"
                       className="!font-semibold"
+                      onClick={() => openDialog("feedback")}
                       size="small"
                     >
                       {" "}
@@ -215,9 +230,9 @@ const ScoreBoard = () => {
                       Feedback Report
                     </Button>
                     <Button
-                      disabled
                       variant="contained"
                       className="!font-semibold"
+                      onClick={() => openDialog("performance")}
                       size="small"
                     >
                       {" "}

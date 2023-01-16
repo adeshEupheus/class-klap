@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, memo } from "react";
 import { useState } from "react";
 import Sidebar from "../../../components/Sidebar";
 import Table from "@mui/material/Table";
@@ -9,35 +9,230 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import SwipeableTemporaryDrawer from "../../../components/Material/MaterialSidebar";
-import { Chip, Skeleton, Switch } from "@mui/material";
-import { Menu } from "@mui/icons-material";
-import { useQuery } from "@tanstack/react-query";
+import {
+  Chip,
+  Collapse,
+  IconButton,
+  Skeleton,
+  Switch,
+  TablePagination,
+} from "@mui/material";
+import { KeyboardArrowDown, KeyboardArrowUp, Menu } from "@mui/icons-material";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import Breadcrumbs from "../../../components/Material/BreadCrumbs";
 import SearchDropDown from "../../../components/Material/SearchDropDown";
-import { GetMarksEntryOverviewData } from "../../../apis/fectcher/assessment/marksEntry/overview";
-import CircularProgressWithLabel from "../../../components/Material/CircleProgress";
 import BasicButton from "../../../components/Material/Button";
-// import { GetApplicableExamType } from "../../apis/fectcher/assessment/GetApplicableExamType";
 import { GetExamConfig } from "../../../apis/fectcher/assessment/marksEntry/examConfig";
 import SwitchLabels from "../../../components/Material/Switch";
 import { GetSubjectMarksEntry } from "../../../apis/fectcher/assessment/marksEntry/subjectMarksEntry";
+import {
+  EditMarks,
+  ToggleMarksEntry,
+  UpdateAttendance,
+} from "../../../apis/mutation/marksEntry";
+import SelectMUI from "../../../components/Material/marksEntry/Select";
+import AttendanceSelect from "../../../components/Material/marksEntry/AttendanceSelect";
+import Loader from "../../../components/Material/Loader";
+// import { data, data } from "autoprefixer";
 
 const SubjectMarksEntry = () => {
   const [id, setId] = useState("FA1");
   const [sectionId, setSectionId] = useState("112424");
   const [subjectId, setSubjectId] = useState("EVS");
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [editButtons, setEditButtons] = useState({
+    attendance: false,
+    marks: false,
+  });
+
+  console.log("parent called");
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
+  const handleSelectAction = async (data) => {
+    // console.log(data);
+    switch (data.name) {
+      case "attendance":
+        let AttendanceData = {
+          examinationType: id,
+          sectionId,
+          studentAttendanceDataList: [
+            { studentPresent: data.value, questionPaperAttemptId: data.QpaId },
+          ],
+          subject: subjectId,
+        };
+        await UpdateAttendance(AttendanceData);
+        // refetch();
+        break;
+      case "marks":
+        let bodyFormData = new FormData();
+        bodyFormData.append("examType", id);
+        bodyFormData.append("sectionId", sectionId);
+        bodyFormData.append("subject", subjectId);
+        bodyFormData.append("marks", data.value);
+        bodyFormData.append("questionAttemptId", data.questionAttemptId);
+        await EditMarks(bodyFormData);
+        // refetch();
+        break;
+
+      default:
+        break;
+    }
+  };
 
   const {
     data: SubjectMarksEntryData,
     isLoading: SubjectMarksEntryDataLoading,
     refetch,
+    isRefetching,
   } = useQuery({
     queryKey: ["subject_marks_entry", id, sectionId, subjectId],
     queryFn: () => GetSubjectMarksEntry(id, sectionId, subjectId),
     onSuccess: (data) => {
       console.log(data);
+      setDisableEdit(data.locked);
     },
     refetchOnWindowFocus: false,
+  });
+  const [disableEdit, setDisableEdit] = useState(true);
+
+  const handleButtonAction = (type) => {
+    switch (type) {
+      case "attendance":
+        if (editButtons.attendance) {
+          refetch();
+        }
+        setEditButtons((prev) => {
+          return { ...editButtons, attendance: !prev.attendance };
+        });
+        break;
+      case "marks":
+        if (editButtons.marks) {
+          refetch();
+        }
+        setEditButtons((prev) => {
+          return { ...editButtons, marks: !prev.marks };
+        });
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const Row = (props) => {
+    const { row, key } = props;
+    //   console.log(props.no);
+    const [open, setOpen] = React.useState(false);
+    let obtainedMarks = 0;
+    let totalMarks = 0;
+    row.studentQuestionAttemptResponses.map((item) => {
+      obtainedMarks += item.marks;
+      totalMarks += item.maxMarks;
+    });
+    return (
+      <React.Fragment>
+        <TableRow
+          key={key}
+          sx={{
+            "&:last-child td, &:last-child th": { border: 0 },
+          }}
+        >
+          <TableCell component="th" scope="row" align="center">
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={() => setOpen(!open)}
+            >
+              {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+            </IconButton>
+            {row.rollNo}
+          </TableCell>
+          <TableCell align="center">
+            <h1 className="font-bold">{row.studentName}</h1>
+          </TableCell>
+          <TableCell align="center">
+            <h1 className="font-bold">{row.uuid}</h1>
+          </TableCell>
+          <TableCell align="center">
+            <AttendanceSelect
+              handleSelectAction={handleSelectAction}
+              disable={!editButtons.attendance}
+              data={row.studentPresent}
+              QpaId={row.questionPaperAttemptId}
+            />
+          </TableCell>
+          <TableCell align="center">
+            <h1 className="font-semibold">
+              {obtainedMarks}/{totalMarks}
+            </h1>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              {/* <Box sx={{ margin: 1, flexDirection: "row", flex: "none" }}> */}
+              <div className="w-full grid grid-cols-4 gap-4 place-content-center place-items-center py-4">
+                {row.studentQuestionAttemptResponses.map((item, index) => {
+                  let data = {};
+                  SubjectMarksEntryData.questions.map((item2) => {
+                    if (item2.questionId === item.questionId) {
+                      data = item2;
+                    }
+                  });
+                  item.qNo = data.questionNo;
+                  item.maxMarks = data.maxMarks;
+                  return (
+                    <h1
+                      key={item.qNo}
+                      className="font-semibold text-sm flex items-center sm:w-auto w-full"
+                    >
+                      Q.{item.qNo}
+                      <SelectMUI
+                        disable={!editButtons.marks}
+                        handleSelectAction={handleSelectAction}
+                        size={"small"}
+                        data={item}
+                      />
+                    </h1>
+                  );
+                })}
+              </div>
+              {/* </Box> */}
+            </Collapse>
+          </TableCell>
+        </TableRow>
+      </React.Fragment>
+    );
+  };
+
+  const mutation = useMutation({
+    mutationFn: async (data) => {
+      if (data.name === "toggleLock_marksEntry") {
+        let bodyFormData = new FormData();
+        bodyFormData.append("examType", id);
+        bodyFormData.append("classSection", sectionId);
+        bodyFormData.append("subject", subjectId);
+
+        const res = await ToggleMarksEntry(
+          !data.status ? "unLock" : "lock",
+          bodyFormData
+        );
+        // console.log(res);
+        if (res.status === 200) {
+          switchRef.current.toggle();
+          setDisableEdit((prev) => !prev);
+        }
+      }
+    },
   });
 
   const { data: examConfigData, isLoading: examConfigDataLoading } = useQuery({
@@ -69,13 +264,15 @@ const SubjectMarksEntry = () => {
   const show = null;
 
   const sidebarRef = useRef();
-
+  const switchRef = useRef();
   const handleDropDown = (value, type) => {
     console.log(value, type);
     switch (type) {
       case "grade":
-        console.log(value, type);
         setSectionId(value.sectionId);
+        break;
+      case "subject":
+        setSubjectId(value.name);
         break;
       case "exam":
         setId(value.value);
@@ -83,6 +280,13 @@ const SubjectMarksEntry = () => {
 
       default:
         break;
+    }
+  };
+
+  const handleSwitchChange = (name, status, item) => {
+    if (name === "toggleLock_marksEntry") {
+      mutation.mutate({ name, status });
+      //   console.log(name, status, item);
     }
   };
 
@@ -115,6 +319,7 @@ const SubjectMarksEntry = () => {
           sidebarCollapsed={sidebarCollapsed}
           show={show}
         />
+        <Loader loading={isRefetching} />
 
         <div>
           <SwipeableTemporaryDrawer
@@ -197,7 +402,7 @@ const SubjectMarksEntry = () => {
                         return { value: item.displayName, name: item.name };
                       })}
                       variant={"outlined"}
-                      Name={"grade"}
+                      Name={"subject"}
                       defaultValue={{
                         value: returnSubData()[0].value[0].displayName,
                       }}
@@ -207,21 +412,51 @@ const SubjectMarksEntry = () => {
                 )}
               </div>
 
-              <div className="w-full flex justify-between items-center">
-                <div>
-                  <BasicButton
-                    size={"small"}
-                    disable={true}
-                    text={"View Answer Key"}
-                  />
-                </div>
+              <div className="w-full flex sm:flex-row flex-col-reverse gap-4 sm:gap-0 justify-between items-center">
+                <a
+                  href={`https://schoolsbel.xamcheck.com/app/schoolApp/configuration/previewAnswerKey/${sectionId}/${id}/${subjectId}`}
+                  target="_blank"
+                >
+                  <BasicButton size={"small"} text={"View Answer Key"} />
+                </a>
+
                 <div className="flex gap-2 flex-col">
-                  <div className="text-gray-600 text-sm font-semibold">
-                    Lock Marks Entry for this Subject? {<SwitchLabels />}
-                  </div>
+                  {SubjectMarksEntryDataLoading ? (
+                    <Skeleton
+                      animation="wave"
+                      variant="text"
+                      sx={{ fontSize: "1rem", width: "15rem" }}
+                    />
+                  ) : (
+                    <div className="text-gray-600 text-xs sm:text-sm font-semibold">
+                      Lock Marks Entry for this Subject?{" "}
+                      {
+                        <SwitchLabels
+                          checked={SubjectMarksEntryData?.locked}
+                          ref={switchRef}
+                          handleSwitchChange={handleSwitchChange}
+                          name={"toggleLock_marksEntry"}
+                        />
+                      }
+                    </div>
+                  )}
                   <div className="flex gap-1">
-                    <BasicButton size={"small"} text={"Edit Attendance"} />
-                    <BasicButton size={"small"} text={"Edit Marks"} />
+                    <BasicButton
+                      size={"small"}
+                      name={"attendance"}
+                      disable={disableEdit}
+                      handleButtonAction={handleButtonAction}
+                      text={`${
+                        editButtons.attendance ? "Done" : "Edit Attendance"
+                      }`}
+                    />
+                    <BasicButton
+                      size={"small"}
+                      disable={disableEdit}
+                      handleButtonAction={handleButtonAction}
+                      name={"marks"}
+                      text={`${editButtons.marks ? "Done" : "Edit Marks"}`}
+                    />
                   </div>
                 </div>
               </div>
@@ -229,93 +464,80 @@ const SubjectMarksEntry = () => {
               {SubjectMarksEntryDataLoading ? (
                 <Skeleton animation="wave" variant="rectangular" height={300} />
               ) : (
-                <TableContainer
-                  className="sm:!w-full !overflow-auto max-h-[70vh] "
-                  component={Paper}
-                >
-                  <Table className="!w-full" aria-label="simple table">
-                    <TableHead className="w-full">
-                      <TableRow className="w-full">
-                        <TableCell align="right" className="w-[10%]">
-                          <div className="flex flex-col items-center gap-2">
-                            <h1 className="font-bold">Roll No</h1>
-                          </div>
-                        </TableCell>
-                        <TableCell align="right" className="w-[20%]">
-                          <div className="flex flex-col items-center gap-2">
-                            <h1 className="font-bold">Students</h1>
-                          </div>
-                        </TableCell>
-                        <TableCell align="right" className="w-[15%]">
-                          <div className="flex flex-col items-center gap-2">
-                            <h1 className="font-bold">UUID</h1>
-                          </div>
-                        </TableCell>
-                        <TableCell align="right" className="w-[15%]">
-                          <div className="flex flex-col items-center gap-2">
-                            <h1 className="font-semibold">Attendance</h1>
-                          </div>
-                        </TableCell>
-                        <TableCell align="right" className="w-[15%]">
-                          <div className="flex flex-col items-center gap-2">
-                            <h1 className="font-semibold">Total</h1>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {/* {Overview_TableData.length < 1 && (
-                        <TableRow>
-                          <TableCell colSpan={8} align="center">
-                            <h1 className="sm:text-lg text-base font-semibold text-gray-600">
-                              Exam is not conducted
-                            </h1>
+                <div>
+                  <TableContainer
+                    className="sm:!w-full !overflow-auto max-h-[70vh] "
+                    component={Paper}
+                  >
+                    <Table
+                      stickyHeader
+                      className="!w-full"
+                      aria-label="simple table"
+                    >
+                      <TableHead className="w-full">
+                        <TableRow className="w-full">
+                          <TableCell align="right" className="w-[10%]">
+                            <div className="flex flex-col items-center gap-2">
+                              <h1 className="font-bold">Roll No</h1>
+                            </div>
+                          </TableCell>
+                          <TableCell align="right" className="w-[20%]">
+                            <div className="flex flex-col items-center gap-2">
+                              <h1 className="font-bold">Students</h1>
+                            </div>
+                          </TableCell>
+                          <TableCell align="right" className="w-[15%]">
+                            <div className="flex flex-col items-center gap-2">
+                              <h1 className="font-bold">UUID</h1>
+                            </div>
+                          </TableCell>
+                          <TableCell align="right" className="w-[15%]">
+                            <div className="flex flex-col items-center gap-2">
+                              <h1 className="font-semibold">Attendance</h1>
+                            </div>
+                          </TableCell>
+                          <TableCell align="right" className="w-[15%]">
+                            <div className="flex flex-col items-center gap-2">
+                              <h1 className="font-semibold">Total</h1>
+                            </div>
                           </TableCell>
                         </TableRow>
-                      )} */}
-                      {/* {Overview_TableData?.map((itemm, index) => (
-                        <TableRow
-                          key={index}
-                          sx={{
-                            "&:last-child td, &:last-child th": { border: 0 },
-                          }}
-                        >
-                          <TableCell component="th" scope="row" align="center">
-                            <h1 className="font-bold">
-                              {item.subject.displayName}
-                            </h1>
-                          </TableCell>
-                          <TableCell align="center">
-                            <h1 className="font-bold text-blue-500">
-                              {item.marksEntryStatus}
-                            </h1>
-                          </TableCell>
-                          <TableCell align="center">
-                            <Chip
-                              variant="outlined"
-                              label={item.lockStatus.displayName}
-                              color="error"
-                              size="small"
-                            />
-                          </TableCell>
-                          <TableCell align="center">
-                            <h1 className="font-semibold">{item.lockedBy}</h1>
-                          </TableCell>
-                          <TableCell align="center">
-                            <h1 className="font-semibold">
-                              {item.lockedByUserRole.displayName}
-                            </h1>
-                          </TableCell>
-                          <TableCell align="center">
-                            <CircularProgressWithLabel
-                              value={item.completionPercentage}
-                            />
-                          </TableCell>
-                        </TableRow>
-                      ))} */}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                      </TableHead>
+                      <TableBody>
+                        {SubjectMarksEntryData
+                          .studentQuestionPaperAttemptResponses.length < 1 && (
+                          <TableRow>
+                            <TableCell colSpan={8} align="center">
+                              <h1 className="sm:text-lg text-base font-semibold text-gray-600">
+                                No students available
+                              </h1>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                        {SubjectMarksEntryData?.studentQuestionPaperAttemptResponses
+                          ?.slice(
+                            page * rowsPerPage,
+                            page * rowsPerPage + rowsPerPage
+                          )
+                          .map((item, index) => (
+                            <Row row={item} key={index} />
+                          ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                  <TablePagination
+                    component={Paper}
+                    rowsPerPageOptions={[10, 25, 100]}
+                    count={
+                      SubjectMarksEntryData
+                        ?.studentQuestionPaperAttemptResponses.length
+                    }
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                  />
+                </div>
               )}
             </div>
           </div>

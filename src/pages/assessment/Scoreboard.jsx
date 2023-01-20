@@ -3,7 +3,6 @@ import { Graph } from '../../components/Graph';
 import { useEffect, useRef } from "react";
 import { useState } from "react";
 import Sidebar from "../../components/Sidebar";
-
 import SwipeableTemporaryDrawer from "../../components/Material/MaterialSidebar";
 import { Button, Skeleton, Switch } from "@mui/material";
 import { Menu } from "@mui/icons-material";
@@ -45,18 +44,26 @@ const ScoreBoard = () => {
     queryFn: () => GetScoreBoardData(),
     cacheTime: 0,
     onSuccess: (data) => {
-      // console.log(data);   
-    //   let mainData = [];
-    // Object.entries(data.Primary).map((item) => {
-    //   mainData.push({className: item[0], data: item[1]})
+      console.log(data.Primary.RSA1);   
+      console.log(Object.entries(data.Primary.RSA1));
+    // let arr=[];
+    // Object.entries(data.Primary.RSA1).map((item)=>{
+    // arr.push({className:item[0],data:item[1]})
     // })
-    // console.log(mainData); 
+    // console.log(arr);
+    
+    // arr.map((item)=>{
+    //   console.log("Hi", arr);
+    // })
+    
     },
+    
     refetchOnWindowFocus: false,
   });
-
+  
+  
   const returnArray = () => {
-    let mainData = [];
+   let mainData = [];
     Object.entries(ScoreBoardData.Primary).map((item) => {
       mainData.push({className: item[0], data: item[1]})
     })
@@ -69,6 +76,7 @@ const ScoreBoard = () => {
   };
 
    const returnClass = ((data) => {
+    console.log( data);
     let mainData = [];
     Object.entries(data).map((item) => {
       mainData.push({className: item[0], data: item[1]})
@@ -86,28 +94,10 @@ const ScoreBoard = () => {
     return newArray;
   };
 
-  // returnClass(returnData()[0].data)
     
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const show = null;
-//   const returnData = () => {
-//     if (filter === "Select") {
-//       return [];
-//     }
-
-//     let code;
-//     Object.entries(OnlineExamData.applicableExams).forEach(([key, value]) => {
-//       console.log(key, value);
-//       if (filter === value) {
-//         code = key;
-//       }
-//     });
-//     const newArray = OnlineExamData.onlineExamResponses.filter(
-//       (item) => item.examName === code
-//     );
-//     return newArray;
-//   };
 
   const sidebarRef = useRef();
 
@@ -216,6 +206,7 @@ const ScoreBoard = () => {
                {/* <div className='sm:w-full'><Graph/></div> */}
                {/* {returnData()[0].data} */}
                {returnClass(returnData()[0].data).map((item) => {
+                console.log(item.className);
                return <div className='sm:w-full'><Graph data={item} key={item.className}/></div>
               // console.log(item);
                })}

@@ -8,7 +8,6 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { faker } from "@faker-js/faker";
 import { useState } from "react";
 
 export const Graph = ({ data: GraphData }) => {
@@ -20,14 +19,17 @@ export const Graph = ({ data: GraphData }) => {
     Title,
     Tooltip
   );
-
+// console.log(GraphData);
   const returnGraphValue = (object) => {
     let array = [];
 
     const returnAddInfo = () => {
       let addInfo = [];
+  
       for (let key in object) {
+       
         object[key].map((item) => {
+          
           addInfo.push({
             section: item.sectionName,
             classTeacher: item.classTeacher,
@@ -36,20 +38,11 @@ export const Graph = ({ data: GraphData }) => {
           });
         });
       }
-    //   console.log(addInfo);
+    
       return addInfo;
     };
-    // console.log(typeof addInfo);
-    // Object.entries(addInfo);
-    // console.log(addInfo);
+    
 
-    // let Info=[];
-    // addInfo.map((item)=>
-    // Info.push(item.subjectTeacher)
-    // )
-    // console.log(Info);
-
-    //from where sName is coming subjectname
     const returnData = (sName) => {
       let dataArray = [];
       for (let key in object) {
@@ -68,7 +61,7 @@ export const Graph = ({ data: GraphData }) => {
       for (let key in object) {
         let num = 0;
         object[key].map((item) => {
-          // console.log(item);
+         
           num += item.averagePercentage;
         });
         num = num / 2;
@@ -88,7 +81,7 @@ export const Graph = ({ data: GraphData }) => {
       });
 
       object[key].map((item) => {
-        // console.log(item);
+        
         array.push({
           label: item.subjectDisplayName,
           data: returnData(item.subjectDisplayName),
@@ -103,7 +96,7 @@ export const Graph = ({ data: GraphData }) => {
 
       break;
     }
-    // console.log(array);
+   
     return array;
   };
 
@@ -122,7 +115,7 @@ export const Graph = ({ data: GraphData }) => {
         callbacks: {
           label: function (tooltipItem) {
             let info = "";
-
+console.log(tooltipItem);
             tooltipItem.dataset.addInfo.map((item) => {
               if (item.section === tooltipItem.label) {
                 if (item.subject === tooltipItem.dataset.label) {
@@ -160,7 +153,7 @@ export const Graph = ({ data: GraphData }) => {
     datasets: returnGraphValue(GraphData.data),
   };
 
-  console.log(GraphData);
+
 
   const {
     data: { A },

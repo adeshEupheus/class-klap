@@ -8,9 +8,8 @@ import ExamTimeTable from "./pages/assessment/ExamTimeTable";
 import PRSOverview from "./pages/assessment/PRS";
 import MarksEntryOverview from "./pages/assessment/MarksEntryOverview";
 import ScoreBoard from "./pages/assessment/Scoreboard";
-
 import ReportDownload from "./pages/assessment/ReportDownload";
-
+import SelectSchool from "./pages/SelectSchool";
 
 
 
@@ -32,7 +31,7 @@ function App() {
             />
             <Route
               path="/assessment/scoreboard"
-              element={<ScoreBoard />}
+              element={<ScoreBoard/>}
             />
             <Route path="/assessment/prs_overview" element={<PRSOverview />} />
             <Route
@@ -44,6 +43,10 @@ function App() {
             <Route
               path="/report_download"
               element={<ReportDownload/>}
+            />
+            <Route
+              path="/select_school"
+              element={<SelectSchool/>}
             />
            
             

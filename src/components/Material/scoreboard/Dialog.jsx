@@ -5,6 +5,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
+import { useNavigate } from "react-router-dom";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -12,7 +13,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const DialogSlide = React.forwardRef((props, ref) => {
   const [open, setOpen] = React.useState(false);
-
+  const navigate = useNavigate();
   React.useImperativeHandle(ref, () => ({
     openDialog() {
       setOpen(true);
@@ -38,7 +39,10 @@ const DialogSlide = React.forwardRef((props, ref) => {
             className="!text-gray-600 !font-semibold !sm:text-base !text-sm"
           >
             Reports can be downloaded in few minutes from{" "}
-            <span className="font-semibold cursor-pointer text-blue-500">
+            <span
+              onClick={() => navigate("/report_download")}
+              className="font-semibold cursor-pointer text-blue-500"
+            >
               here.
             </span>
           </DialogContentText>

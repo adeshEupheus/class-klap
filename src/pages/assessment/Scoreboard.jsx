@@ -69,7 +69,6 @@ const ScoreBoard = () => {
 
   const handleDropDown = (value, type, item) => {
     setFilter(value.value);
-    // setFilter()
   };
 
   const returnClass = (data) => {
@@ -78,7 +77,6 @@ const ScoreBoard = () => {
       mainData.push({ className: item[0], data: item[1] });
     });
     return mainData;
-    // console.log(mainData);
   };
 
   const returnData = () => {
@@ -86,27 +84,8 @@ const ScoreBoard = () => {
     return newArray;
   };
 
-  // returnClass(returnData()[0].data)
-
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const show = null;
-  //   const returnData = () => {
-  //     if (filter === "Select") {
-  //       return [];
-  //     }
-
-  //     let code;
-  //     Object.entries(OnlineExamData.applicableExams).forEach(([key, value]) => {
-  //       console.log(key, value);
-  //       if (filter === value) {
-  //         code = key;
-  //       }
-  //     });
-  //     const newArray = OnlineExamData.onlineExamResponses.filter(
-  //       (item) => item.examName === code
-  //     );
-  //     return newArray;
-  //   };
 
   const sidebarRef = useRef();
   const dialogRef = useRef();
@@ -153,7 +132,7 @@ const ScoreBoard = () => {
           sidebarCollapsed={sidebarCollapsed}
           show={show}
         />
-        <Loader loading={loading} />
+        {/* <Loader loading={loading} /> */}
         <DialogSlide ref={dialogRef} />
 
         <div>
@@ -243,23 +222,15 @@ const ScoreBoard = () => {
                 </div>
               )}
               {isLoading ? (
-                <Skeleton
-                  // sx={{ bgcolor: "grey.400" }}
-                  animation="wave"
-                  variant="rectangular"
-                  height={300}
-                />
+                <Skeleton animation="wave" variant="rectangular" height={300} />
               ) : (
                 <>
-                  {/* <div className='sm:w-full'><Graph/></div> */}
-                  {/* {returnData()[0].data} */}
-                  {returnClass(returnData()[0].data).map((item) => {
+                  {returnClass(returnData()[0].data).map((item, i) => {
                     return (
-                      <div className="sm:w-full">
+                      <div className="sm:w-full" key={i}>
                         <Graph data={item} key={item.className} />
                       </div>
                     );
-                    // console.log(item);
                   })}
                 </>
               )}

@@ -7,20 +7,18 @@ import { Menu } from "@mui/icons-material";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Breadcrumbs from "../../components/Material/BreadCrumbs";
 
-import  Timeline  from '@mui/lab/Timeline';
-import TimelineConnector from '@mui/lab/TimelineConnector';
-import TimelineContent from '@mui/lab/TimelineContent';
-import TimelineDot from '@mui/lab/TimelineDot';
-import TimelineItem from '@mui/lab/TimelineItem';
-import TimelineSeparator from '@mui/lab/TimelineSeparator';
-import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
+import Timeline from "@mui/lab/Timeline";
+import TimelineConnector from "@mui/lab/TimelineConnector";
+import TimelineContent from "@mui/lab/TimelineContent";
+import TimelineDot from "@mui/lab/TimelineDot";
+import TimelineItem from "@mui/lab/TimelineItem";
+import TimelineSeparator from "@mui/lab/TimelineSeparator";
+import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 import FeedbackCard from "../../components/MarksEntry/MarksEntryCard";
-import {
-    timelineOppositeContentClasses,
-  } from '@mui/lab/TimelineOppositeContent';
+import { timelineOppositeContentClasses } from "@mui/lab/TimelineOppositeContent";
 
 import { DownloadReportData } from "../../apis/fectcher/assessment/reportDownload/reportdownload";
- 
+import { Skeleton } from "@mui/material";
 
 const ReportDownload = () => {
   const [id, setId] = useState("SA1");
@@ -41,21 +39,17 @@ const ReportDownload = () => {
     refetchOnWindowFocus: false,
   });
 
-  
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const show = null;
 
   const sidebarRef = useRef();
 
-  
-
   const handleSidebarCollapsed = () => {
     sidebarRef.current.openSidebar();
   };
 
   useEffect(() => {
-    
     const handleWidth = () => {
       if (window.innerWidth > 1024) {
         setSidebarCollapsed(false);
@@ -106,51 +100,69 @@ const ReportDownload = () => {
             </div>
           </div>
 
-          
-
           <div className="relative flex flex-col w-full justify-center items-start gap-4 bg-gray-200">
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4">
-              <Breadcrumbs
-                crumbs={["Home", "Report Downloads(144)"]}
-              />
+              <Breadcrumbs crumbs={["Home", "Report Downloads(144)"]} />
               <h1 className="font-bold sm:text-2xl text-base">
                 REPORT DOWNLOADS
               </h1>
-              </div>
-              
-              <div className="w-full ">
-                
-              <Timeline className="!p-0 sm:px-6" sx={{
-        [`& .${timelineOppositeContentClasses.root}`]: {
-          flex: 0.2,
-        
-        },
-      }}>
+            </div>
 
-        {isLoading ? (
-          <h1>loading...</h1>
-        ) :
-
-        ReportDownloadData.map((item, index) => {
-          return (
-        <TimelineItem key={index}>
-            <TimelineOppositeContent><div className=' !text-xs sm:!text-base '>{item.triggeredAtDate}</div><div className="text-xs sm:text-base">{item.triggeredAtTime}</div></TimelineOppositeContent>
-            <TimelineSeparator>
-                <TimelineDot/>
-                <TimelineConnector/>
-            </TimelineSeparator>
-            <TimelineContent className=" sm:!ml-5"><FeedbackCard data={item}/></TimelineContent>
-        </TimelineItem>
-
-          )
-        })
-        }
-        
-
-        
-    </Timeline>
-    
-              </div>
+            <div className="w-full ">
+              <Timeline
+                className="!p-0 sm:px-6"
+                sx={{
+                  [`& .${timelineOppositeContentClasses.root}`]: {
+                    flex: 0.2,
+                  },
+                }}
+              >
+                {isLoading ? (
+                  <div className="flex flex-col gap-2">
+                    <Skeleton
+                      // sx={{ bgcolor: "grey.400" }}
+                      animation="wave"
+                      variant="rectangular"
+                      height={150}
+                    />
+                    <Skeleton
+                      // sx={{ bgcolor: "grey.400" }}
+                      animation="wave"
+                      variant="rectangular"
+                      height={150}
+                    />
+                    <Skeleton
+                      // sx={{ bgcolor: "grey.400" }}
+                      animation="wave"
+                      variant="rectangular"
+                      height={150}
+                    />
+                  </div>
+                ) : (
+                  ReportDownloadData.map((item, index) => {
+                    return (
+                      <TimelineItem key={index}>
+                        <TimelineOppositeContent>
+                          <div className=" !text-xs sm:!text-base ">
+                            {item.triggeredAtDate}
+                          </div>
+                          <div className="text-xs sm:text-base">
+                            {item.triggeredAtTime}
+                          </div>
+                        </TimelineOppositeContent>
+                        <TimelineSeparator>
+                          <TimelineDot />
+                          <TimelineConnector />
+                        </TimelineSeparator>
+                        <TimelineContent className=" sm:!ml-5">
+                          <FeedbackCard data={item} />
+                        </TimelineContent>
+                      </TimelineItem>
+                    );
+                  })
+                )}
+              </Timeline>
+            </div>
           </div>
         </div>
       </div>

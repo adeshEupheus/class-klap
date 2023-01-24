@@ -10,7 +10,7 @@ import MarksEntryOverview from "./pages/assessment/marksEntry/MarksEntryOverview
 import ScoreBoard from "./pages/assessment/Scoreboard";
 import ReportDownload from "./pages/assessment/ReportDownload";
 import SubjectMarksEntry from "./pages/assessment/marksEntry/SubjectMarksEntry";
-
+import SelectSchool from "./pages/SelectSchool";
 
 function App() {
   const client = new QueryClient();
@@ -24,6 +24,7 @@ function App() {
             {/* assessment */}
             <Route path="/assessment/overview" element={<OverView />} />
             <Route path="/assessment/exam_set_up" element={<ExamSetUp />} />
+            <Route path="/select_school" element={<SelectSchool />} />
             <Route
               path="/assessment/exam_timetable"
               element={<ExamTimeTable />}
@@ -35,14 +36,7 @@ function App() {
               element={<MarksEntryOverview />}
             />
 
-         
-           
-            <Route
-              path="/report_download"
-              element={<ReportDownload/>}
-            />
-           
-            
+            <Route path="/report_download" element={<ReportDownload />} />
 
             <Route
               path="/marks_entry_subject_marks_entry"

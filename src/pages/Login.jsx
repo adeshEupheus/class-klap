@@ -9,6 +9,10 @@ import Slider from "../components/Slider";
 import { Link } from "react-router-dom";
 import { useLayoutEffect } from "react";
 import axios from "axios";
+import { TriggerOtp } from "../apis/mutation/Login/trigger";
+import { ValidateOtp } from "../apis/mutation/Login/validate";
+import Cookies from "js-cookie";
+import { setSchoolId } from "../apis/fectcher/SetSchoolId";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -19,20 +23,23 @@ const Login = () => {
     setOtp(e);
   };
 
-  useLayoutEffect(() => {
-    const setAcademic = async () => {
-      await axios.get(
-        "https://schoolsbcontent.imaxprogram.com/app/schoolApp/selectedSchool/?schoolAcademicYearId=8188"
-      );
-    };
-    const ValidateOtp = async () => {
-      await axios.post(
-        "https://schoolsbcontent.imaxprogram.com/app/schoolApp/login/otp/validate"
-      );
-    };
-    setAcademic();
-    ValidateOtp();
-  }, []);
+  const handleOtpTrigger = async () => {
+    console.log(email);
+    let bodyFormData = new FormData();
+    bodyFormData.append("emailPhone", email);
+    await TriggerOtp(bodyFormData)
+  }
+
+  const validateOtp = async () => {
+    let bodyFormData = new FormData();
+    bodyFormData.append("emailPhone", email);
+    bodyFormData.append("otp", otp);
+   const token = await ValidateOtp(bodyFormData)
+   Cookies.set('token', token)
+   await setSchoolId()
+  }
+
+  
 
   return (
     <div className="min-h-[100vh] bg-gray-200 flex flex-col gap-4">
@@ -69,7 +76,7 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <div className="w-full flex justify-end mt-2">
+              <div className="w-full flex justify-end mt-2" onClick={handleOtpTrigger}>
                 <Tooltip title="Send OTP">
                   <span className="text-sm font-semibold mr-2 cursor-pointer text-cyan-800">
                     Send OTP
@@ -100,7 +107,7 @@ const Login = () => {
                 separator={<span>-</span>}
               />
             </div>
-            <Link to="/assessment/overview">
+            <Link onClick={validateOtp}>
               <Stack className="!shadow-xl" direction="row" spacing={2}>
                 <LoadingButton
                   loading={loading}

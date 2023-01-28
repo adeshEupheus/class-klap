@@ -1,15 +1,18 @@
-// import axios from 'axios'
+import axios from 'axios'
 import Cookies from 'js-cookie'
 import instance from '../../instance'
+import { GetSchoolDetails } from './assessment/GetSchoolDetails'
 
-export const setSchoolId = async (id) => {
-  // console.log(Cookies.get('token'))
+export const GetSchoolList = async () => {
   const res = await instance({
-    url: `schoolApp/selectedSchool/?schoolAcademicYearId=${id}`,
+    url: 'schoolApp/schoolList',
     method: 'GET',
     headers: {
       Authorization: `Bearer ${Cookies.get('token')}`,
     },
   }).catch((err) => console.log(err))
-  return res.data
+
+  // console.log(res.headers)
+
+  return res.data.SchoolAcademicYearId
 }

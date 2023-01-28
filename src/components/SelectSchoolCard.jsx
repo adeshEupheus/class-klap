@@ -8,7 +8,7 @@ const SelectSchoolCard = ({ details }) => {
   const handleSelectSchool = async (data) => {
     // console.log(data.schoolAcademicYearId)
     const token = await setSchoolId(data.schoolAcademicYearId)
-    console.log(token.token)
+    // console.log(token.token)
     Cookies.set('token', token.token)
     navigate('/assessment/overview')
   }

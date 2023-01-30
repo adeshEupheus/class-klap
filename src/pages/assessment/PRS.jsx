@@ -14,30 +14,40 @@ import { Menu } from "@mui/icons-material";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Breadcrumbs from "../../components/Material/BreadCrumbs";
 import SearchDropDown from "../../components/Material/SearchDropDown";
-import BasicTextFields from "../../components/Material/TextField";
-import SwitchLabels from "../../components/Material/Switch";
 import HorizontalStepper from "../../components/Material/Stepper";
 import { GetPrsTrackerData } from "../../apis/fectcher/assessment/prsOverview/TrackerData";
 import { GetPrsTableData } from "../../apis/fectcher/assessment/prsOverview/TableData";
-import { GetSchoolDetails } from "../../apis/fectcher/assessment/GetSchoolDetails";
+import {
+  GetSchoolDetails,
+  GetSchoolDetailsWithoutHeader,
+} from "../../apis/fectcher/assessment/GetSchoolDetails";
 import Cookies from "js-cookie";
 import SchoolInfo from "../../components/SchoolInfo";
+import { useSearchParams } from "react-router-dom";
+import { useLayoutEffect } from "react";
 
 const PRSOverview = () => {
   const [id, setId] = useState("RSA1");
+  const [isUrlToken, setIsUrlToken] = useState(false);
 
   //   const [mainData, setMainData] = useState([]);
+  const [queryParameters] = useSearchParams();
+  const returnToken = () => {
+    return queryParameters.get("auth");
+  };
+
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
     queryKey: ["school_info"],
-    queryFn: () => GetSchoolDetails(Cookies.get('id')),
+    queryFn: () => GetSchoolDetailsWithoutHeader(returnToken()),
   });
+
   const {
     data: PRS_Tracker,
     isLoading: Tracker_Loading,
     refetch,
   } = useQuery({
     queryKey: ["prs_tracker", id],
-    queryFn: () => GetPrsTrackerData(id),
+    queryFn: () => GetPrsTrackerData(id, returnToken()),
     onSuccess: (data) => {
       console.log(data);
       //   setMainData(data);
@@ -48,7 +58,7 @@ const PRSOverview = () => {
 
   const { data: PRS_Table, isLoading: PRS_Table_Loading } = useQuery({
     queryKey: ["prs_table", id],
-    queryFn: () => GetPrsTableData(id),
+    queryFn: () => GetPrsTableData(id, returnToken()),
     onSuccess: (data) => {
       console.log(data);
       //   setMainData(data);
@@ -56,24 +66,18 @@ const PRSOverview = () => {
     // enabled: false,
     refetchOnWindowFocus: false,
   });
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const show = null;
 
-  // const queryClient = useQueryClient();
-
-  //   const updateData = (class_name) => {
-  //     if (class_name != "All") {
-  //       const newArray = Exam_setUpData.filter(
-  //         (item) => item.grade.displayName === class_name
-  //       );
-  //       setMainData(newArray);
-  //     } else {
-  //       setMainData(Exam_setUpData);
-  //     }
-  //   };
-
   const sidebarRef = useRef();
+
+  useLayoutEffect(() => {
+    if (queryParameters.get("auth")) {
+      setIsUrlToken(queryParameters.get("auth"));
+    }
+  }, []);
 
   const handleDropDown = (value, type) => {
     console.log(value, type);
@@ -92,6 +96,7 @@ const PRSOverview = () => {
   useEffect(() => {
     document.title = "PRS Overview - ClassKlap";
     // setMainData(Exam_setUpData);
+
     const handleWidth = () => {
       if (window.innerWidth > 1024) {
         setSidebarCollapsed(false);
@@ -135,8 +140,10 @@ const PRSOverview = () => {
           >
             <Menu className={"text-[#67748e]"} />
           </div>
-          <SchoolInfo SchoolInfoLoading={SchoolInfoLoading} schoolInfo={schoolInfo}/>
-          
+          <SchoolInfo
+            SchoolInfoLoading={SchoolInfoLoading}
+            schoolInfo={schoolInfo}
+          />
 
           <div className="relative flex flex-col w-full py-2 justify-center items-start gap-4 bg-gray-200">
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4">

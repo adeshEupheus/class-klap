@@ -17,12 +17,23 @@ import Paper from "@mui/material/Paper";
 import BasicButton from "../../components/Material/Button";
 import { GetOverviewData } from "../../apis/fectcher/assessment/overview/overviewData";
 import Loader from "../../components/Material/Loader";
-import { GetSchoolDetails } from "../../apis/fectcher/assessment/GetSchoolDetails";
+import { GetSchoolDetailsWithoutHeader } from "../../apis/fectcher/assessment/GetSchoolDetails";
 import Cookies from "js-cookie";
 import SchoolInfo from "../../components/SchoolInfo";
+import { useLayoutEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 const OverView = () => {
   const [id, setId] = useState("FA1");
   const [filter, setFilter] = useState("All");
+  const [isUrlToken, setIsUrlToken] = useState(false);
+
+  const [queryParameters] = useSearchParams();
+
+  useLayoutEffect(() => {
+    if (queryParameters.get("auth")) {
+      setIsUrlToken(queryParameters.get("auth"));
+    }
+  }, []);
 
   const { data: overviewData, isLoading } = useQuery({
     queryKey: ["overview_data", id],
@@ -30,16 +41,13 @@ const OverView = () => {
   });
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
     queryKey: ["school_info"],
-    queryFn: () => GetSchoolDetails(Cookies.get('id')),
-    
+    queryFn: () => GetSchoolDetailsWithoutHeader(isUrlToken),
   });
-
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleDropDown = (value, type) => {
-  
     console.log(value, type);
 
     switch (type) {
@@ -160,10 +168,11 @@ const OverView = () => {
           >
             <Menu className={"text-[#67748e]"} />
           </div>
-           
-            <SchoolInfo SchoolInfoLoading={SchoolInfoLoading} schoolInfo={schoolInfo}/>
 
-         
+          <SchoolInfo
+            SchoolInfoLoading={SchoolInfoLoading}
+            schoolInfo={schoolInfo}
+          />
 
           <div className="relative flex flex-col w-full justify-center items-start py-2 gap-4 bg-gray-200">
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4">

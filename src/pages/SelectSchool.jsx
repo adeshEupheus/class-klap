@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import React, { useEffect } from 'react'
 import { useState } from 'react'
 import { GetSchoolDetails } from '../apis/fectcher/assessment/GetSchoolDetails'
@@ -9,30 +10,58 @@ const SelectSchool = () => {
   const [schoolList, setSchoolList] = useState({})
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const getList = async () => {
-      const schoolIdList = await GetSchoolList()
+  const { data: SchoolListData, isLoading } = useQuery({
+    queryKey: ["school_list"],
+    queryFn: () => GetSchoolList(),
+    onSuccess: async (data) => {
       const list = await Promise.all(
-        schoolIdList.map(async (id) => {
+        data.map(async (id) => {
           return await GetSchoolDetails(id)
         })
       )
-      const newArr = list.reduce((group, school) => {
+      let newArr = list.reduce((group, school) => {
         const { academicYearDisplayName } = school
         group[academicYearDisplayName] = group[academicYearDisplayName] ?? []
         group[academicYearDisplayName].push(school)
         return group
       }, {})
-      console.log(newArr)
-      setSchoolList(newArr)
-      setLoading(false)
+      let newArr2 = {} 
+      Object.keys(newArr).sort().reverse().map((item) => {
+       newArr2[item] = newArr[item]
+      })
+       setSchoolList(newArr2)
     }
-    getList()
-  }, [])
+  });
+
+
+  // useEffect(() => {
+  //   const getList = async () => {
+  //     const schoolIdList = await GetSchoolList()
+  //     const list = await Promise.all(
+  //       schoolIdList.map(async (id) => {
+  //         return await GetSchoolDetails(id)
+  //       })
+  //     )
+  //     let newArr = list.reduce((group, school) => {
+  //       const { academicYearDisplayName } = school
+  //       group[academicYearDisplayName] = group[academicYearDisplayName] ?? []
+  //       group[academicYearDisplayName].push(school)
+  //       return group
+  //     }, {})
+  //     // console.log(newArr)
+  //    let newArr2 = {} 
+  //    Object.keys(newArr).sort().reverse().map((item) => {
+  //     newArr2[item] = newArr[item]
+  //    })
+  //     setSchoolList(newArr2)
+  //     setLoading(false)
+  //   }
+  //   getList()
+  // }, [])
 
   return (
     <div className='flex flex-col items-center justify-center'>
-      <Loader loading={loading} />
+      <Loader loading={isLoading} />
       <div className=' p-5 mb-4 text-xl lg:text-2xl font-bold text-slate-600'>
         Select School for Login
       </div>

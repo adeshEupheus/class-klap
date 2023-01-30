@@ -19,11 +19,18 @@ import SwitchLabels from "../../components/Material/Switch";
 import HorizontalStepper from "../../components/Material/Stepper";
 import { GetPrsTrackerData } from "../../apis/fectcher/assessment/prsOverview/TrackerData";
 import { GetPrsTableData } from "../../apis/fectcher/assessment/prsOverview/TableData";
+import { GetSchoolDetails } from "../../apis/fectcher/assessment/GetSchoolDetails";
+import Cookies from "js-cookie";
+import SchoolInfo from "../../components/SchoolInfo";
 
 const PRSOverview = () => {
   const [id, setId] = useState("RSA1");
 
   //   const [mainData, setMainData] = useState([]);
+  const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
+    queryKey: ["school_info"],
+    queryFn: () => GetSchoolDetails(Cookies.get('id')),
+  });
   const {
     data: PRS_Tracker,
     isLoading: Tracker_Loading,
@@ -128,18 +135,10 @@ const PRSOverview = () => {
           >
             <Menu className={"text-[#67748e]"} />
           </div>
-          <div className="w-full flex text-sm font-semibold bg-gray-200 text-gray-600 justify-end">
-            <div className="flex flex-col px-4 cursor-pointer py-4 items-end gap-[1px]">
-              <span>Vidyanidhi Public School</span>
-              <span>KA2015 [2022-2023]</span>
-            </div>
-          </div>
+          <SchoolInfo SchoolInfoLoading={SchoolInfoLoading} schoolInfo={schoolInfo}/>
+          
 
-          <div className="w-full flex text-sm items-center font-semibold px-4 py-2 bg-gray-200 text-gray-600 justify-end">
-            Enable Student Mode <Switch />
-          </div>
-
-          <div className="relative flex flex-col w-full justify-center items-start gap-4 bg-gray-200">
+          <div className="relative flex flex-col w-full py-2 justify-center items-start gap-4 bg-gray-200">
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4">
               <Breadcrumbs
                 crumbs={["Home", "Assessment", "Personal Revision Sheet"]}

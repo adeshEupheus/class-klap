@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -14,33 +15,38 @@ import SelectSchool from "./pages/SelectSchool";
 
 function App() {
   const client = new QueryClient();
+  const user = useSelector((state) => state.auth.user)
+  const Id = useSelector((state) => state.auth.id)
+  const isAuth = user ? Id ? true : false : false
+  // const navigate = useNavigate()
+  console.log(user);
   return (
     <div className="font-Roboto">
       <QueryClientProvider client={client}>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/dashboard" element={<Home />} />
+            <Route path="/" element={isAuth ? <OverView/> : <Login />} />
+            {/* <Route path="/dashboard" element={<Home />} /> */}
             {/* assessment */}
-            <Route path="/assessment/overview" element={<OverView />} />
-            <Route path="/assessment/exam_set_up" element={<ExamSetUp />} />
-            <Route path="/select_school" element={<SelectSchool />} />
+            <Route path="/assessment/overview" element={isAuth ? <OverView /> : <Login/>} />
+            <Route path="/assessment/exam_set_up" element={isAuth ? <ExamSetUp /> : <Login/>} />
+            <Route path="/select_school" element={user ? <SelectSchool /> : <Login/>} />
             <Route
               path="/assessment/exam_timetable"
-              element={<ExamTimeTable />}
+              element={isAuth ? <ExamTimeTable /> : <Login/>}
             />
-            <Route path="/assessment/scoreboard" element={<ScoreBoard />} />
-            <Route path="/assessment/prs_overview" element={<PRSOverview />} />
+            <Route path="/assessment/scoreboard" element={isAuth ? <ScoreBoard /> : <Login/>} />
+            <Route path="/assessment/prs_overview" element={isAuth ? <PRSOverview /> : <Login/>} />
             <Route
               path="/marks_entry_overview"
-              element={<MarksEntryOverview />}
+              element={isAuth ? <MarksEntryOverview /> : <Login/>}
             />
 
-            <Route path="/report_download" element={<ReportDownload />} />
+            <Route path="/report_download" element={isAuth ? <ReportDownload /> : <Login />} />
 
             <Route
               path="/marks_entry_subject_marks_entry"
-              element={<SubjectMarksEntry />}
+              element={isAuth ? <SubjectMarksEntry /> : <Login/>}
             />
 
             <Route path="*" element={<h1>Page Not Found ... 404</h1>} />

@@ -33,6 +33,9 @@ import {
 import SelectMUI from "../../../components/Material/marksEntry/Select";
 import AttendanceSelect from "../../../components/Material/marksEntry/AttendanceSelect";
 import Loader from "../../../components/Material/Loader";
+import { GetSchoolDetails } from "../../../apis/fectcher/assessment/GetSchoolDetails";
+import Cookies from "js-cookie";
+import SchoolInfo from "../../../components/SchoolInfo";
 // import { data, data } from "autoprefixer";
 
 const SubjectMarksEntry = () => {
@@ -46,7 +49,11 @@ const SubjectMarksEntry = () => {
     marks: false,
   });
 
-  console.log("parent called");
+  // console.log("parent called");
+  const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
+    queryKey: ["school_info"],
+    queryFn: () => GetSchoolDetails(Cookies.get('id')),
+  });
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -340,16 +347,8 @@ const SubjectMarksEntry = () => {
           >
             <Menu className={"text-[#67748e]"} />
           </div>
-          <div className="w-full flex text-sm font-semibold bg-gray-200 text-gray-600 justify-end">
-            <div className="flex flex-col px-4 cursor-pointer py-4 items-end gap-[1px]">
-              <span>Vidyanidhi Public School</span>
-              <span>KA2015 [2022-2023]</span>
-            </div>
-          </div>
-
-          <div className="w-full flex text-sm items-center font-semibold px-4 py-2 bg-gray-200 text-gray-600 justify-end">
-            Enable Student Mode <Switch />
-          </div>
+          <SchoolInfo SchoolInfoLoading={SchoolInfoLoading} schoolInfo={schoolInfo}/>
+         
 
           <div className="relative flex flex-col w-full justify-center items-start gap-4 bg-gray-200">
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4">

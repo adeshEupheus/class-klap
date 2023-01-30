@@ -19,6 +19,9 @@ import { timelineOppositeContentClasses } from "@mui/lab/TimelineOppositeContent
 
 import { DownloadReportData } from "../../apis/fectcher/assessment/reportDownload/reportdownload";
 import { Skeleton } from "@mui/material";
+import { GetSchoolDetails } from "../../apis/fectcher/assessment/GetSchoolDetails";
+import Cookies from "js-cookie";
+import SchoolInfo from "../../components/SchoolInfo";
 
 const ReportDownload = () => {
   const [id, setId] = useState("SA1");
@@ -40,6 +43,11 @@ const ReportDownload = () => {
   });
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
+    queryKey: ["school_info"],
+    queryFn: () => GetSchoolDetails(Cookies.get('id')),
+  });
 
   const show = null;
 
@@ -93,14 +101,10 @@ const ReportDownload = () => {
           >
             <Menu className={"text-[#67748e]"} />
           </div>
-          <div className="w-full flex text-sm font-semibold bg-gray-200 text-gray-600 justify-end">
-            <div className="flex flex-col px-4 cursor-pointer py-4 items-end gap-[1px]">
-              <span>Vidyanidhi Public School</span>
-              <span>KA2015 [2022-2023]</span>
-            </div>
-          </div>
+          <SchoolInfo SchoolInfoLoading={SchoolInfoLoading} schoolInfo={schoolInfo}/>
+         
 
-          <div className="relative flex flex-col w-full justify-center items-start gap-4 bg-gray-200">
+          <div className="relative flex py-2 flex-col w-full justify-center items-start gap-4 bg-gray-200">
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4">
               <Breadcrumbs crumbs={["Home", "Report Downloads(144)"]} />
               <h1 className="font-bold sm:text-2xl text-base">

@@ -19,6 +19,9 @@ import CircularProgressWithLabel from "../../../components/Material/CircleProgre
 import BasicButton from "../../../components/Material/Button";
 // import { GetApplicableExamType } from "../../apis/fectcher/assessment/GetApplicableExamType";
 import { GetExamConfig } from "../../../apis/fectcher/assessment/marksEntry/examConfig";
+import { GetSchoolDetails } from "../../../apis/fectcher/assessment/GetSchoolDetails";
+import Cookies from "js-cookie";
+import SchoolInfo from "../../../components/SchoolInfo";
 
 const MarksEntryOverview = () => {
   const [id, setId] = useState("FA1");
@@ -36,6 +39,11 @@ const MarksEntryOverview = () => {
       console.log(data);
     },
     refetchOnWindowFocus: false,
+  });
+
+  const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
+    queryKey: ["school_info"],
+    queryFn: () => GetSchoolDetails(Cookies.get('id')),
   });
 
   const { data: examConfigData, isLoading: examConfigDataLoading } = useQuery({
@@ -120,16 +128,8 @@ const MarksEntryOverview = () => {
           >
             <Menu className={"text-[#67748e]"} />
           </div>
-          <div className="w-full flex text-sm font-semibold bg-gray-200 text-gray-600 justify-end">
-            <div className="flex flex-col px-4 cursor-pointer py-4 items-end gap-[1px]">
-              <span>Vidyanidhi Public School</span>
-              <span>KA2015 [2022-2023]</span>
-            </div>
-          </div>
-
-          <div className="w-full flex text-sm items-center font-semibold px-4 py-2 bg-gray-200 text-gray-600 justify-end">
-            Enable Student Mode <Switch />
-          </div>
+          <SchoolInfo SchoolInfoLoading={SchoolInfoLoading} schoolInfo={schoolInfo}/>
+         
 
           <div className="relative flex flex-col w-full justify-center items-start gap-4 bg-gray-200">
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4">

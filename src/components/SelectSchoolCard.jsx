@@ -1,15 +1,20 @@
 import Cookies from 'js-cookie'
 import React from 'react'
+import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { setSchoolId } from '../apis/fectcher/SetSchoolId'
+import { authActions } from '../Store/auth'
 
 const SelectSchoolCard = ({ details }) => {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const handleSelectSchool = async (data) => {
     // console.log(data.schoolAcademicYearId)
     const token = await setSchoolId(data.schoolAcademicYearId)
     // console.log(token.token)
     Cookies.set('token', token.token)
+    Cookies.set('id', details.schoolAcademicYearId)
+    dispatch(authActions.setSchoolId())
     navigate('/assessment/overview')
   }
   return (

@@ -43,6 +43,9 @@ import {
 import DialogSlide from "../../components/Material/Dialog";
 import Snackbars from "../../components/Material/Snackbar";
 import Loader from "../../components/Material/Loader";
+import { GetSchoolDetails } from "../../apis/fectcher/assessment/GetSchoolDetails";
+import Cookies from "js-cookie";
+import SchoolInfo from "../../components/SchoolInfo";
 const ExamTimeTable = () => {
   const [examId, setExamId] = useState("FA1");
   const [gradeId, setGradeId] = useState("NUR");
@@ -53,6 +56,10 @@ const ExamTimeTable = () => {
 
   const examReqrefs = useRef([]);
   examReqrefs.current = [];
+  const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
+    queryKey: ["school_info"],
+    queryFn: () => GetSchoolDetails(Cookies.get('id')),
+  });
 
   const addToExamReqRef = (el) => {
     if (el && !examReqrefs.current.includes(el)) {
@@ -615,18 +622,11 @@ const ExamTimeTable = () => {
           >
             <Menu className={"text-[#67748e]"} />
           </div>
-          <div className="w-full flex text-sm font-semibold bg-gray-200 text-gray-600 justify-end">
-            <div className="flex flex-col px-4 cursor-pointer py-4 items-end gap-[1px]">
-              <span>Vidyanidhi Public School</span>
-              <span>KA2015 [2022-2023]</span>
-            </div>
-          </div>
+          <SchoolInfo SchoolInfoLoading={SchoolInfoLoading} schoolInfo={schoolInfo}/>
 
-          <div className="w-full flex text-sm items-center font-semibold px-4 py-2 bg-gray-200 text-gray-600 justify-end">
-            Enable Student Mode <Switch />
-          </div>
+         
 
-          <div className="relative flex flex-col w-full justify-center items-start gap-4 bg-gray-200">
+          <div className="relative flex flex-col w-full justify-center py-2 items-start gap-4 bg-gray-200">
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4">
               <Breadcrumbs crumbs={["Home", "Assessment", "Exam Timetable"]} />
               <h1 className="font-bold sm:text-2xl text-xl">Exam Timetable</h1>

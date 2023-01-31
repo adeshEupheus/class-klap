@@ -4,7 +4,7 @@ import Sidebar from "../../components/Sidebar";
 import SwipeableTemporaryDrawer from "../../components/Material/MaterialSidebar";
 
 import { Menu } from "@mui/icons-material";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import Breadcrumbs from "../../components/Material/BreadCrumbs";
 
 import Timeline from "@mui/lab/Timeline";
@@ -19,13 +19,15 @@ import { timelineOppositeContentClasses } from "@mui/lab/TimelineOppositeContent
 
 import { DownloadReportData } from "../../apis/fectcher/assessment/reportDownload/reportdownload";
 import { Skeleton } from "@mui/material";
-import { GetSchoolDetails } from "../../apis/fectcher/assessment/GetSchoolDetails";
-import Cookies from "js-cookie";
+import { GetSchoolDetailsWithoutHeader } from "../../apis/fectcher/assessment/GetSchoolDetails";
 import SchoolInfo from "../../components/SchoolInfo";
+import { useSearchParams } from "react-router-dom";
 
 const ReportDownload = () => {
-  const [id, setId] = useState("SA1");
-  const [sectionId, setSectionId] = useState("117145");
+  const [queryParameters] = useSearchParams();
+  const returnToken = () => {
+    return queryParameters.get("auth");
+  };
 
   const {
     data: ReportDownloadData,
@@ -34,7 +36,7 @@ const ReportDownload = () => {
     isRefetching,
   } = useQuery({
     queryKey: ["Report_Download_Data"],
-    queryFn: () => DownloadReportData(),
+    queryFn: () => DownloadReportData(returnToken()),
     cacheTime: 0,
     onSuccess: (data) => {
       console.log(data);
@@ -46,7 +48,7 @@ const ReportDownload = () => {
 
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
     queryKey: ["school_info"],
-    queryFn: () => GetSchoolDetails(Cookies.get('id')),
+    queryFn: () => GetSchoolDetailsWithoutHeader(returnToken()),
   });
 
   const show = null;
@@ -101,8 +103,10 @@ const ReportDownload = () => {
           >
             <Menu className={"text-[#67748e]"} />
           </div>
-          <SchoolInfo SchoolInfoLoading={SchoolInfoLoading} schoolInfo={schoolInfo}/>
-         
+          <SchoolInfo
+            SchoolInfoLoading={SchoolInfoLoading}
+            schoolInfo={schoolInfo}
+          />
 
           <div className="relative flex py-2 flex-col w-full justify-center items-start gap-4 bg-gray-200">
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4">

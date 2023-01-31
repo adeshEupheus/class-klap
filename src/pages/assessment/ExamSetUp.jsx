@@ -20,9 +20,10 @@ import { GetExamSetUpData } from "../../apis/fectcher/assessment/examSetUp/examS
 import { LockExamSetup, UnLockExamSetup } from "../../apis/mutation/examSetUp";
 import Snackbars from "../../components/Material/Snackbar";
 import Loader from "../../components/Material/Loader";
-import { GetSchoolDetails } from "../../apis/fectcher/assessment/GetSchoolDetails";
+import { GetSchoolDetailsWithoutHeader } from "../../apis/fectcher/assessment/GetSchoolDetails";
 import Cookies from "js-cookie";
 import SchoolInfo from "../../components/SchoolInfo";
+import { useSearchParams } from "react-router-dom";
 const ExamSetUp = () => {
   const [id, setId] = useState("FA1");
   const [filter, setFilter] = useState("All");
@@ -30,9 +31,14 @@ const ExamSetUp = () => {
   const [snackbarMsg, setSnackbarMsg] = useState("");
   const [snackbarErr, setSnackbarErr] = useState(false);
 
+  const [queryParameters] = useSearchParams();
+  const returnToken = () => {
+    return queryParameters.get("auth");
+  };
+
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
     queryKey: ["school_info"],
-    queryFn: () => GetSchoolDetails(Cookies.get('id')),
+    queryFn: () => GetSchoolDetailsWithoutHeader(returnToken()),
   });
 
   const snackbarRef = useRef();
@@ -53,7 +59,7 @@ const ExamSetUp = () => {
     isRefetching,
   } = useQuery({
     queryKey: ["exam_setup_data", id],
-    queryFn: () => GetExamSetUpData(id),
+    queryFn: () => GetExamSetUpData(id, returnToken()),
     cacheTime: 0,
     onSuccess: (data) => {
       console.log(data);
@@ -70,12 +76,26 @@ const ExamSetUp = () => {
       let index;
       if (data.item) {
         if (!data.item.locked) {
-          res = await LockExamSetup(data.examType, data.gradeId, data.data);
+          res = await LockExamSetup(
+            data.examType,
+            data.gradeId,
+            data.data,
+            returnToken()
+          );
         } else {
-          res = await UnLockExamSetup(data.examType, data.gradeId);
+          res = await UnLockExamSetup(
+            data.examType,
+            data.gradeId,
+            returnToken()
+          );
         }
       } else {
-        res = await LockExamSetup(data.examType, data.gradeId, data.data);
+        res = await LockExamSetup(
+          data.examType,
+          data.gradeId,
+          data.data,
+          returnToken()
+        );
       }
       if (res.success) {
         refetch();
@@ -290,8 +310,10 @@ const ExamSetUp = () => {
           >
             <Menu className={"text-[#67748e]"} />
           </div>
-          <SchoolInfo SchoolInfoLoading={SchoolInfoLoading} schoolInfo={schoolInfo}/>
-         
+          <SchoolInfo
+            SchoolInfoLoading={SchoolInfoLoading}
+            schoolInfo={schoolInfo}
+          />
 
           <div className="relative flex flex-col w-full justify-center items-start py-2 gap-4 bg-gray-200">
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4">

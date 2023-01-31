@@ -19,14 +19,18 @@ import CircularProgressWithLabel from "../../../components/Material/CircleProgre
 import BasicButton from "../../../components/Material/Button";
 // import { GetApplicableExamType } from "../../apis/fectcher/assessment/GetApplicableExamType";
 import { GetExamConfig } from "../../../apis/fectcher/assessment/marksEntry/examConfig";
-import { GetSchoolDetails } from "../../../apis/fectcher/assessment/GetSchoolDetails";
-import Cookies from "js-cookie";
+import { GetSchoolDetailsWithoutHeader } from "../../../apis/fectcher/assessment/GetSchoolDetails";
 import SchoolInfo from "../../../components/SchoolInfo";
+import { useSearchParams } from "react-router-dom";
 
 const MarksEntryOverview = () => {
   const [id, setId] = useState("FA1");
   const [sectionId, setSectionId] = useState("112424");
   const [displayName, setDisplayName] = useState("");
+  const [queryParameters] = useSearchParams();
+  const returnToken = () => {
+    return queryParameters.get("auth");
+  };
 
   const {
     data: Overview_TableData,
@@ -34,7 +38,7 @@ const MarksEntryOverview = () => {
     refetch,
   } = useQuery({
     queryKey: ["marks_entryOverview", id, sectionId],
-    queryFn: () => GetMarksEntryOverviewData(id, sectionId),
+    queryFn: () => GetMarksEntryOverviewData(id, sectionId, returnToken()),
     onSuccess: (data) => {
       console.log(data);
     },
@@ -43,12 +47,12 @@ const MarksEntryOverview = () => {
 
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
     queryKey: ["school_info"],
-    queryFn: () => GetSchoolDetails(Cookies.get('id')),
+    queryFn: () => GetSchoolDetailsWithoutHeader(returnToken()),
   });
 
   const { data: examConfigData, isLoading: examConfigDataLoading } = useQuery({
     queryKey: ["exam_config"],
-    queryFn: () => GetExamConfig(),
+    queryFn: () => GetExamConfig(returnToken()),
     onSuccess: (data) => {
       console.log(data);
       setDisplayName(examConfigData.exams[0].displayName);
@@ -128,8 +132,10 @@ const MarksEntryOverview = () => {
           >
             <Menu className={"text-[#67748e]"} />
           </div>
-          <SchoolInfo SchoolInfoLoading={SchoolInfoLoading} schoolInfo={schoolInfo}/>
-         
+          <SchoolInfo
+            SchoolInfoLoading={SchoolInfoLoading}
+            schoolInfo={schoolInfo}
+          />
 
           <div className="relative flex flex-col w-full justify-center items-start gap-4 bg-gray-200">
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4">

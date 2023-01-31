@@ -43,9 +43,10 @@ import {
 import DialogSlide from "../../components/Material/Dialog";
 import Snackbars from "../../components/Material/Snackbar";
 import Loader from "../../components/Material/Loader";
-import { GetSchoolDetails } from "../../apis/fectcher/assessment/GetSchoolDetails";
+import { GetSchoolDetailsWithoutHeader } from "../../apis/fectcher/assessment/GetSchoolDetails";
 import Cookies from "js-cookie";
 import SchoolInfo from "../../components/SchoolInfo";
+import { useSearchParams } from "react-router-dom";
 const ExamTimeTable = () => {
   const [examId, setExamId] = useState("FA1");
   const [gradeId, setGradeId] = useState("NUR");
@@ -53,12 +54,16 @@ const ExamTimeTable = () => {
   const [loading, setLoading] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState("");
   const [snackbarErr, setSnackbarErr] = useState(false);
+  const [queryParameters] = useSearchParams();
+  const returnToken = () => {
+    return queryParameters.get("auth");
+  };
 
   const examReqrefs = useRef([]);
   examReqrefs.current = [];
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
     queryKey: ["school_info"],
-    queryFn: () => GetSchoolDetails(Cookies.get('id')),
+    queryFn: () => GetSchoolDetailsWithoutHeader(returnToken()),
   });
 
   const addToExamReqRef = (el) => {
@@ -84,7 +89,7 @@ const ExamTimeTable = () => {
     isRefetching,
   } = useQuery({
     queryKey: ["exam_timetable_data", examId, gradeId],
-    queryFn: () => GetExamTimetableData(examId, gradeId),
+    queryFn: () => GetExamTimetableData(examId, gradeId, returnToken()),
     cacheTime: 0,
     onSuccess: (data) => {
       console.log(data);
@@ -100,7 +105,8 @@ const ExamTimeTable = () => {
       let index;
       if (!data) {
         res = await ToggleNotification(
-          ExamTimetableData.examNotificationEnabled ? "disable" : "enable"
+          ExamTimetableData.examNotificationEnabled ? "disable" : "enable",
+          returnToken()
         );
         if (res.success) {
           refetch();
@@ -112,7 +118,12 @@ const ExamTimeTable = () => {
       }
       if (data.name === "exam_req_status") {
         setLoading(true);
-        res = await ToggleExamRequired(examId, gradeId, data.item.subject.name);
+        res = await ToggleExamRequired(
+          examId,
+          gradeId,
+          data.item.subject.name,
+          returnToken()
+        );
         if (res.success) {
           refetch();
           setSnackbarErr(false);
@@ -145,7 +156,8 @@ const ExamTimeTable = () => {
           examId,
           gradeId,
           data.item.subject.name,
-          apiBodyData
+          apiBodyData,
+          returnToken()
         );
         if (res.success) {
           refetch();
@@ -181,7 +193,8 @@ const ExamTimeTable = () => {
           examId,
           gradeId,
           data.item.subject.name,
-          apiBodyData
+          apiBodyData,
+          returnToken()
         );
         if (res.success) {
           refetch();
@@ -211,7 +224,8 @@ const ExamTimeTable = () => {
           examId,
           gradeId,
           data.item.subject.name,
-          apiBodyData
+          apiBodyData,
+          returnToken()
         );
         if (res.success) {
           refetch();
@@ -241,7 +255,8 @@ const ExamTimeTable = () => {
           examId,
           gradeId,
           data.item.subject.name,
-          apiBodyData
+          apiBodyData,
+          returnToken()
         );
         if (res.success) {
           refetch();
@@ -258,7 +273,7 @@ const ExamTimeTable = () => {
       }
       if (data.name === "conductExam") {
         setLoading(true);
-        res = await ConductExam(gradeId, examId).catch((err) => {
+        res = await ConductExam(gradeId, examId, returnToken()).catch((err) => {
           // console.log(err.response.data.message)
           setSnackbarErr(true);
           setSnackbarMsg(err.response.data.message);
@@ -280,7 +295,7 @@ const ExamTimeTable = () => {
       }
       if (data.name === "QpGenerate") {
         setLoading(true);
-        res = await QpGenerate(gradeId, examId).catch((err) => {
+        res = await QpGenerate(gradeId, examId, returnToken()).catch((err) => {
           setSnackbarErr(true);
           setSnackbarMsg(err.response.data.message);
           snackbarRef.current.openSnackbar();
@@ -622,9 +637,10 @@ const ExamTimeTable = () => {
           >
             <Menu className={"text-[#67748e]"} />
           </div>
-          <SchoolInfo SchoolInfoLoading={SchoolInfoLoading} schoolInfo={schoolInfo}/>
-
-         
+          <SchoolInfo
+            SchoolInfoLoading={SchoolInfoLoading}
+            schoolInfo={schoolInfo}
+          />
 
           <div className="relative flex flex-col w-full justify-center py-2 items-start gap-4 bg-gray-200">
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4">

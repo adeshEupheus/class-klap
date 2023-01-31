@@ -1,10 +1,4 @@
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
 // import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -26,7 +20,6 @@ function App() {
   const Id = useSelector((state) => state.auth.id);
   const isAuth = user ? (Id ? true : false) : false;
   const queryParameters = new URLSearchParams(window.location.search);
-  console.log(queryParameters.get("auth"));
   return (
     <div className="font-Roboto">
       <QueryClientProvider client={client}>
@@ -37,11 +30,27 @@ function App() {
             {/* assessment */}
             <Route
               path="/assessment/overview"
-              element={isAuth ? <OverView /> : <Login />}
+              element={
+                queryParameters.get("auth") ? (
+                  <OverView />
+                ) : isAuth ? (
+                  <OverView />
+                ) : (
+                  <Login />
+                )
+              }
             />
             <Route
               path="/assessment/exam_set_up"
-              element={isAuth ? <ExamSetUp /> : <Login />}
+              element={
+                queryParameters.get("auth") ? (
+                  <ExamSetUp />
+                ) : isAuth ? (
+                  <ExamSetUp />
+                ) : (
+                  <Login />
+                )
+              }
             />
             <Route
               path="/select_school"
@@ -49,11 +58,27 @@ function App() {
             />
             <Route
               path="/assessment/exam_timetable"
-              element={isAuth ? <ExamTimeTable /> : <Login />}
+              element={
+                queryParameters.get("auth") ? (
+                  <ExamTimeTable />
+                ) : isAuth ? (
+                  <ExamTimeTable />
+                ) : (
+                  <Login />
+                )
+              }
             />
             <Route
               path="/assessment/scoreboard"
-              element={isAuth ? <ScoreBoard /> : <Login />}
+              element={
+                queryParameters.get("auth") ? (
+                  <ScoreBoard />
+                ) : isAuth ? (
+                  <ScoreBoard />
+                ) : (
+                  <Login />
+                )
+              }
             />
             <Route
               path="/assessment/prs_overview"
@@ -69,18 +94,42 @@ function App() {
             />
             <Route
               path="/marks_entry_overview"
-              element={isAuth ? <MarksEntryOverview /> : <Login />}
+              element={
+                queryParameters.get("auth") ? (
+                  <MarksEntryOverview />
+                ) : isAuth ? (
+                  <MarksEntryOverview />
+                ) : (
+                  <Login />
+                )
+              }
             />
 
             <Route
               path="/report_download"
-              element={isAuth ? <ReportDownload /> : <Login />}
+              element={
+                queryParameters.get("auth") ? (
+                  <ReportDownload />
+                ) : isAuth ? (
+                  <ReportDownload />
+                ) : (
+                  <Login />
+                )
+              }
             />
-            <Route path="/verify" element={<VerfiyToken />} />
+            {/* <Route path="/verify" element={<VerfiyToken />} /> */}
 
             <Route
               path="/marks_entry_subject_marks_entry"
-              element={isAuth ? <SubjectMarksEntry /> : <Login />}
+              element={
+                queryParameters.get("auth") ? (
+                  <SubjectMarksEntry />
+                ) : isAuth ? (
+                  <SubjectMarksEntry />
+                ) : (
+                  <Login />
+                )
+              }
             />
 
             <Route path="*" element={<h1>Page Not Found ... 404</h1>} />

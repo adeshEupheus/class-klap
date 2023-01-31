@@ -28,7 +28,7 @@ import { useLayoutEffect } from "react";
 
 const PRSOverview = () => {
   const [id, setId] = useState("RSA1");
-  const [isUrlToken, setIsUrlToken] = useState(false);
+  // const [isUrlToken, setIsUrlToken] = useState(false);
 
   //   const [mainData, setMainData] = useState([]);
   const [queryParameters] = useSearchParams();
@@ -61,9 +61,7 @@ const PRSOverview = () => {
     queryFn: () => GetPrsTableData(id, returnToken()),
     onSuccess: (data) => {
       console.log(data);
-      //   setMainData(data);
     },
-    // enabled: false,
     refetchOnWindowFocus: false,
   });
 
@@ -73,11 +71,11 @@ const PRSOverview = () => {
 
   const sidebarRef = useRef();
 
-  useLayoutEffect(() => {
-    if (queryParameters.get("auth")) {
-      setIsUrlToken(queryParameters.get("auth"));
-    }
-  }, []);
+  // useLayoutEffect(() => {
+  //   if (queryParameters.get("auth")) {
+  //     setIsUrlToken(queryParameters.get("auth"));
+  //   }
+  // }, []);
 
   const handleDropDown = (value, type) => {
     console.log(value, type);

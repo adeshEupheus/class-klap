@@ -33,14 +33,15 @@ import {
 import SelectMUI from "../../../components/Material/marksEntry/Select";
 import AttendanceSelect from "../../../components/Material/marksEntry/AttendanceSelect";
 import Loader from "../../../components/Material/Loader";
-import { GetSchoolDetails } from "../../../apis/fectcher/assessment/GetSchoolDetails";
+import { GetSchoolDetailsWithoutHeader } from "../../../apis/fectcher/assessment/GetSchoolDetails";
 import Cookies from "js-cookie";
 import SchoolInfo from "../../../components/SchoolInfo";
+import { useSearchParams } from "react-router-dom";
 // import { data, data } from "autoprefixer";
 
 const SubjectMarksEntry = () => {
   const [id, setId] = useState("FA1");
-  const [sectionId, setSectionId] = useState("112424");
+  const [sectionId, setSectionId] = useState("112476");
   const [subjectId, setSubjectId] = useState("EVS");
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -49,10 +50,15 @@ const SubjectMarksEntry = () => {
     marks: false,
   });
 
+  const [queryParameters] = useSearchParams();
+  const returnToken = () => {
+    return queryParameters.get("auth");
+  };
+
   // console.log("parent called");
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
     queryKey: ["school_info"],
-    queryFn: () => GetSchoolDetails(Cookies.get('id')),
+    queryFn: () => GetSchoolDetailsWithoutHeader(returnToken()),
   });
 
   const handleChangePage = (event, newPage) => {
@@ -76,7 +82,7 @@ const SubjectMarksEntry = () => {
           ],
           subject: subjectId,
         };
-        await UpdateAttendance(AttendanceData);
+        await UpdateAttendance(AttendanceData, returnToken());
         // refetch();
         break;
       case "marks":
@@ -86,7 +92,7 @@ const SubjectMarksEntry = () => {
         bodyFormData.append("subject", subjectId);
         bodyFormData.append("marks", data.value);
         bodyFormData.append("questionAttemptId", data.questionAttemptId);
-        await EditMarks(bodyFormData);
+        await EditMarks(bodyFormData, returnToken());
         // refetch();
         break;
 
@@ -102,7 +108,8 @@ const SubjectMarksEntry = () => {
     isRefetching,
   } = useQuery({
     queryKey: ["subject_marks_entry", id, sectionId, subjectId],
-    queryFn: () => GetSubjectMarksEntry(id, sectionId, subjectId),
+    queryFn: () =>
+      GetSubjectMarksEntry(id, sectionId, subjectId, returnToken()),
     onSuccess: (data) => {
       console.log(data);
       setDisableEdit(data.locked);
@@ -231,7 +238,8 @@ const SubjectMarksEntry = () => {
 
         const res = await ToggleMarksEntry(
           !data.status ? "unLock" : "lock",
-          bodyFormData
+          bodyFormData,
+          returnToken()
         );
         // console.log(res);
         if (res.status === 200) {
@@ -244,7 +252,7 @@ const SubjectMarksEntry = () => {
 
   const { data: examConfigData, isLoading: examConfigDataLoading } = useQuery({
     queryKey: ["exam_config"],
-    queryFn: () => GetExamConfig(),
+    queryFn: () => GetExamConfig(returnToken()),
     onSuccess: (data) => {
       console.log(data);
     },
@@ -253,6 +261,7 @@ const SubjectMarksEntry = () => {
 
   const returnSubData = () => {
     let newArray = [];
+
     Object.entries(examConfigData.sectionSubjectMap)
       .map((item) => {
         return { name: item[0], value: item[1] };
@@ -347,8 +356,10 @@ const SubjectMarksEntry = () => {
           >
             <Menu className={"text-[#67748e]"} />
           </div>
-          <SchoolInfo SchoolInfoLoading={SchoolInfoLoading} schoolInfo={schoolInfo}/>
-         
+          <SchoolInfo
+            SchoolInfoLoading={SchoolInfoLoading}
+            schoolInfo={schoolInfo}
+          />
 
           <div className="relative flex flex-col w-full justify-center items-start gap-4 bg-gray-200">
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4">

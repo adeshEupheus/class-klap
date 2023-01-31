@@ -20,9 +20,10 @@ import {
   GetScoreBoardData,
 } from "../../apis/fectcher/assessment/scoreBoard/scoreBoard";
 import DialogSlide from "../../components/Material/scoreboard/Dialog";
-import { GetSchoolDetails } from "../../apis/fectcher/assessment/GetSchoolDetails";
+import { GetSchoolDetailsWithoutHeader } from "../../apis/fectcher/assessment/GetSchoolDetails";
 import Cookies from "js-cookie";
 import SchoolInfo from "../../components/SchoolInfo";
+import { useSearchParams } from "react-router-dom";
 
 const ScoreBoard = () => {
   const [id, setId] = useState("FA1");
@@ -35,9 +36,14 @@ const ScoreBoard = () => {
   const switchRefs = useRef([]);
   switchRefs.current = [];
 
+  const [queryParameters] = useSearchParams();
+  const returnToken = () => {
+    return queryParameters.get("auth");
+  };
+
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
     queryKey: ["school_info"],
-    queryFn: () => GetSchoolDetails(Cookies.get('id')),
+    queryFn: () => GetSchoolDetailsWithoutHeader(returnToken()),
   });
 
   const addToRef = (el) => {
@@ -54,7 +60,7 @@ const ScoreBoard = () => {
     isRefetching,
   } = useQuery({
     queryKey: ["Score_Board_Data"],
-    queryFn: () => GetScoreBoardData(),
+    queryFn: () => GetScoreBoardData(returnToken()),
     cacheTime: 0,
     onSuccess: (data) => {
       // console.log(data);
@@ -104,9 +110,9 @@ const ScoreBoard = () => {
 
   const openDialog = async (type) => {
     if (type === "feedback") {
-      await DownloadFeedback(id);
+      await DownloadFeedback(id, returnToken());
     } else {
-      await DownloadPerformance(id);
+      await DownloadPerformance(id, returnToken());
     }
     dialogRef.current.openDialog();
   };
@@ -162,9 +168,10 @@ const ScoreBoard = () => {
           >
             <Menu className={"text-[#67748e]"} />
           </div>
-          <SchoolInfo SchoolInfoLoading={SchoolInfoLoading} schoolInfo={schoolInfo}/>
-
-         
+          <SchoolInfo
+            SchoolInfoLoading={SchoolInfoLoading}
+            schoolInfo={schoolInfo}
+          />
 
           <div className="relative flex flex-col w-full justify-center py-2 items-start gap-4 bg-gray-200">
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4 ">

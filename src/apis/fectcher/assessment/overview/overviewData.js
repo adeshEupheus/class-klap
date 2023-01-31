@@ -1,16 +1,16 @@
 // import axios from "axios";
-import Cookies from 'js-cookie'
-import instance from '../../../../instance'
+import Cookies from "js-cookie";
+import instance from "../../../../instance";
 
-export const GetOverviewData = async (id) => {
+export const GetOverviewData = async (id, Token) => {
   const res = await instance({
     url: `schoolApp/configuration/overviewData/${id}`,
-    method: 'GET',
+    method: "GET",
     headers: {
-      Authorization: `Bearer ${Cookies.get('token')}`,
+      Authorization: `Bearer ${Token ? Token : Cookies.get("token")}`,
     },
-  }).catch((err) => console.log(err))
+  }).catch((err) => console.log(err));
 
-  const result = res.data.examOverviewData
-  return result
-}
+  const result = res.data.examOverviewData;
+  return result;
+};

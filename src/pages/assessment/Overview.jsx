@@ -20,28 +20,23 @@ import Loader from "../../components/Material/Loader";
 import { GetSchoolDetailsWithoutHeader } from "../../apis/fectcher/assessment/GetSchoolDetails";
 import Cookies from "js-cookie";
 import SchoolInfo from "../../components/SchoolInfo";
-import { useLayoutEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 const OverView = () => {
   const [id, setId] = useState("FA1");
   const [filter, setFilter] = useState("All");
-  const [isUrlToken, setIsUrlToken] = useState(false);
 
   const [queryParameters] = useSearchParams();
-
-  useLayoutEffect(() => {
-    if (queryParameters.get("auth")) {
-      setIsUrlToken(queryParameters.get("auth"));
-    }
-  }, []);
+  const returnToken = () => {
+    return queryParameters.get("auth");
+  };
 
   const { data: overviewData, isLoading } = useQuery({
     queryKey: ["overview_data", id],
-    queryFn: () => GetOverviewData(id),
+    queryFn: () => GetOverviewData(id, returnToken()),
   });
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
     queryKey: ["school_info"],
-    queryFn: () => GetSchoolDetailsWithoutHeader(isUrlToken),
+    queryFn: () => GetSchoolDetailsWithoutHeader(returnToken()),
   });
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);

@@ -37,6 +37,7 @@ import { GetSchoolDetailsWithoutHeader } from "../../../apis/fectcher/assessment
 import Cookies from "js-cookie";
 import SchoolInfo from "../../../components/SchoolInfo";
 import { useSearchParams } from "react-router-dom";
+import { useLayoutEffect } from "react";
 // import { data, data } from "autoprefixer";
 
 const SubjectMarksEntry = () => {
@@ -54,6 +55,12 @@ const SubjectMarksEntry = () => {
   const returnToken = () => {
     return queryParameters.get("auth");
   };
+
+  useLayoutEffect(() => {
+    if (queryParameters.get("auth")) {
+      Cookies.set("token", queryParameters.get("auth"));
+    }
+  }, []);
 
   // console.log("parent called");
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({

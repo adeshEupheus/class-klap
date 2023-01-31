@@ -21,6 +21,7 @@ import { GetSchoolDetailsWithoutHeader } from "../../apis/fectcher/assessment/Ge
 import Cookies from "js-cookie";
 import SchoolInfo from "../../components/SchoolInfo";
 import { useSearchParams } from "react-router-dom";
+import { useLayoutEffect } from "react";
 const OverView = () => {
   const [id, setId] = useState("FA1");
   const [filter, setFilter] = useState("All");
@@ -29,6 +30,11 @@ const OverView = () => {
   const returnToken = () => {
     return queryParameters.get("auth");
   };
+  useLayoutEffect(() => {
+    if (queryParameters.get("auth")) {
+      Cookies.set("token", queryParameters.get("auth"));
+    }
+  }, []);
 
   const { data: overviewData, isLoading } = useQuery({
     queryKey: ["overview_data", id],

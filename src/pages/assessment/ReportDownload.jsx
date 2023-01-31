@@ -22,12 +22,20 @@ import { Skeleton } from "@mui/material";
 import { GetSchoolDetailsWithoutHeader } from "../../apis/fectcher/assessment/GetSchoolDetails";
 import SchoolInfo from "../../components/SchoolInfo";
 import { useSearchParams } from "react-router-dom";
+import { useLayoutEffect } from "react";
+import Cookies from "js-cookie";
 
 const ReportDownload = () => {
   const [queryParameters] = useSearchParams();
   const returnToken = () => {
     return queryParameters.get("auth");
   };
+
+  useLayoutEffect(() => {
+    if (queryParameters.get("auth")) {
+      Cookies.set("token", queryParameters.get("auth"));
+    }
+  }, []);
 
   const {
     data: ReportDownloadData,

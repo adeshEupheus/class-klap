@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { useState } from "react";
 import Sidebar from "../../../components/Sidebar";
 import Table from "@mui/material/Table";
@@ -22,15 +22,22 @@ import { GetExamConfig } from "../../../apis/fectcher/assessment/marksEntry/exam
 import { GetSchoolDetailsWithoutHeader } from "../../../apis/fectcher/assessment/GetSchoolDetails";
 import SchoolInfo from "../../../components/SchoolInfo";
 import { useSearchParams } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const MarksEntryOverview = () => {
   const [id, setId] = useState("FA1");
   const [sectionId, setSectionId] = useState("112424");
   const [displayName, setDisplayName] = useState("");
   const [queryParameters] = useSearchParams();
+
   const returnToken = () => {
     return queryParameters.get("auth");
   };
+  useLayoutEffect(() => {
+    if (queryParameters.get("auth")) {
+      Cookies.set("token", queryParameters.get("auth"));
+    }
+  }, []);
 
   const {
     data: Overview_TableData,

@@ -24,6 +24,7 @@ import { GetSchoolDetailsWithoutHeader } from "../../apis/fectcher/assessment/Ge
 import Cookies from "js-cookie";
 import SchoolInfo from "../../components/SchoolInfo";
 import { useSearchParams } from "react-router-dom";
+import { useLayoutEffect } from "react";
 const ExamSetUp = () => {
   const [id, setId] = useState("FA1");
   const [filter, setFilter] = useState("All");
@@ -35,6 +36,12 @@ const ExamSetUp = () => {
   const returnToken = () => {
     return queryParameters.get("auth");
   };
+
+  useLayoutEffect(() => {
+    if (queryParameters.get("auth")) {
+      Cookies.set("token", queryParameters.get("auth"));
+    }
+  }, []);
 
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
     queryKey: ["school_info"],

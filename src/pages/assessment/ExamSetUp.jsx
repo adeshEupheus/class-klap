@@ -69,7 +69,7 @@ const ExamSetUp = () => {
     queryFn: () => GetExamSetUpData(id, returnToken()),
     cacheTime: 0,
     onSuccess: (data) => {
-      console.log(data);
+      // console.log(data);
     },
     refetchOnWindowFocus: false,
   });
@@ -77,7 +77,7 @@ const ExamSetUp = () => {
 
   const lockMutation = useMutation({
     mutationFn: async (data) => {
-      console.log(data);
+      // console.log(data);
       setLoading(true);
       let res;
       let index;
@@ -215,9 +215,16 @@ const ExamSetUp = () => {
         });
         break;
       case "mark_syllabus_difficulty":
-        test = item.applicableMarksSyllabus.SUBJECTIVE.filter(
-          (item) => item.displayName === value.value
-        );
+        let type = Object.keys(item.applicableMarksSyllabus);
+        if (type[0] === "SUBJECTIVE") {
+          test = item.applicableMarksSyllabus.SUBJECTIVE.filter(
+            (item) => item.displayName === value.value
+          );
+        } else {
+          test = item.applicableMarksSyllabus.OBJECTIVE.filter(
+            (item) => item.displayName === value.value
+          );
+        }
         // console.log(test[0].name);
         apiDataBody = {
           grade: item.grade.name,

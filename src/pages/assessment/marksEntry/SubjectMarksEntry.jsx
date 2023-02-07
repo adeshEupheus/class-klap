@@ -415,8 +415,8 @@ const SubjectMarksEntry = () => {
                     />
                     <SearchDropDown
                       handleDropDown={handleDropDown}
-                      data={returnSubData()[0].value.map((item) => {
-                        return { value: item.displayName, name: item.name };
+                      data={returnSubData()[0]?.value?.map((item) => {
+                        return { value: item?.displayName, name: item?.name };
                       })}
                       variant={"outlined"}
                       Name={"subject"}

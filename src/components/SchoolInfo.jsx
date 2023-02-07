@@ -34,6 +34,7 @@ const SchoolInfo = ({ SchoolInfoLoading, schoolInfo }) => {
   const { data: SchoolListData, isLoading } = useQuery({
     queryKey: ["school_list"],
     queryFn: () => GetSchoolList(),
+    refetchOnWindowFocus: false,
     onSuccess: async (data) => {
       const list = await Promise.all(
         data.map(async (id) => {

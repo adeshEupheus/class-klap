@@ -27,7 +27,7 @@ import { useSearchParams } from "react-router-dom";
 import { useLayoutEffect } from "react";
 
 const ScoreBoard = () => {
-  const [id, setId] = useState("FA1");
+  const [id, setId] = useState("RSA1");
   const [filter, setFilter] = useState("RSA1");
   const [loading, setLoading] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState("");
@@ -117,9 +117,9 @@ const ScoreBoard = () => {
 
   const openDialog = async (type) => {
     if (type === "feedback") {
-      await DownloadFeedback(id, returnToken());
+      await DownloadFeedback(filter, returnToken());
     } else {
-      await DownloadPerformance(id, returnToken());
+      await DownloadPerformance(filter, returnToken());
     }
     dialogRef.current.openDialog();
   };

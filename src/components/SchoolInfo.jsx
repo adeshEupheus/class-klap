@@ -65,7 +65,7 @@ const SchoolInfo = ({ SchoolInfoLoading, schoolInfo }) => {
           <Skeleton animation="wave" variant="text" width={200} />
         </div>
       ) : (
-        <div className="w-full flex flex-col text-sm font-semibold bg-gray-200 text-gray-600 justify-end items-end">
+        <div className="w-full flex flex-col text-sm font-semibold bg-gray-200 text-gray-600 justify-end items-end ">
           <Loader loading={loading} />
           <div
             className="flex flex-col px-4 cursor-pointer pt-4 pb-2 items-end gap-[1px]"

@@ -279,6 +279,7 @@ const SubjectMarksEntry = () => {
           newArray.push(item);
         }
       });
+    console.log(newArray);
     return newArray;
   };
 
@@ -413,29 +414,40 @@ const SubjectMarksEntry = () => {
                       defaultValue={{ value: examConfigData.sections[0][1] }}
                       size={"small"}
                     />
-                    <SearchDropDown
-                      handleDropDown={handleDropDown}
-                      data={returnSubData()[0]?.value?.map((item) => {
-                        return { value: item?.displayName, name: item?.name };
-                      })}
-                      variant={"outlined"}
-                      Name={"subject"}
-                      defaultValue={{
-                        value: returnSubData()[0].value[0].displayName,
-                      }}
-                      size={"small"}
-                    />
+                    {returnSubData.length > 0 ? (
+                      <SearchDropDown
+                        handleDropDown={handleDropDown}
+                        data={returnSubData()[0]?.value?.map((item) => {
+                          return { value: item?.displayName, name: item?.name };
+                        })}
+                        variant={"outlined"}
+                        Name={"subject"}
+                        defaultValue={{
+                          value: returnSubData()[0]?.value[0]?.displayName,
+                        }}
+                        size={"small"}
+                      />
+                    ) : null}
                   </div>
                 )}
               </div>
 
               <div className="w-full flex sm:flex-row flex-col-reverse gap-4 sm:gap-0 justify-between items-center">
-                <a
-                  href={`https://schoolsbel.xamcheck.com/app/schoolApp/configuration/previewAnswerKey/${sectionId}/${id}/${subjectId}`}
-                  target="_blank"
-                >
-                  <BasicButton size={"small"} text={"View Answer Key"} />
-                </a>
+                {SubjectMarksEntryData?.studentQuestionPaperAttemptResponses
+                  .length < 1 ? (
+                  <BasicButton
+                    disable={true}
+                    size={"small"}
+                    text={"View Answer Key"}
+                  />
+                ) : (
+                  <a
+                    href={`https://schoolsbel.xamcheck.com/app/schoolApp/configuration/previewAnswerKey/${sectionId}/${id}/${subjectId}`}
+                    target="_blank"
+                  >
+                    <BasicButton size={"small"} text={"View Answer Key"} />
+                  </a>
+                )}
 
                 <div className="flex gap-2 flex-col">
                   {SubjectMarksEntryDataLoading ? (
@@ -526,7 +538,7 @@ const SubjectMarksEntry = () => {
                           <TableRow>
                             <TableCell colSpan={8} align="center">
                               <h1 className="sm:text-lg text-base font-semibold text-gray-600">
-                                No students available
+                                Exam is not conducted
                               </h1>
                             </TableCell>
                           </TableRow>

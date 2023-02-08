@@ -27,9 +27,9 @@ import { useSearchParams } from "react-router-dom";
 import { useLayoutEffect } from "react";
 
 const ScoreBoard = () => {
-  const [id, setId] = useState("RSA1");
-  const [filter, setFilter] = useState("RSA1");
-  const [loading, setLoading] = useState(false);
+  // const [id, setId] = useState("RSA1");
+
+  const [loading, setLoading] = useState(true);
   const [snackbarMsg, setSnackbarMsg] = useState("");
   const [snackbarErr, setSnackbarErr] = useState(false);
 
@@ -76,9 +76,14 @@ const ScoreBoard = () => {
       //   mainData.push({className: item[0], data: item[1]})
       // })
       // console.log(mainData);
+      // console.log( );
+      setFilter(Object.keys(data?.Primary)[0]);
+      setLoading(false);
+      // setFilter();
     },
     refetchOnWindowFocus: false,
   });
+  const [filter, setFilter] = useState();
 
   const returnArray = () => {
     let mainData = [];
@@ -187,7 +192,7 @@ const ScoreBoard = () => {
                 4.SCOREBOARD
               </h1>
 
-              {isLoading ? (
+              {isLoading || loading ? (
                 <Skeleton
                   animation="wave"
                   variant="text"
@@ -240,7 +245,7 @@ const ScoreBoard = () => {
                   </div>
                 </div>
               )}
-              {isLoading ? (
+              {isLoading || loading ? (
                 <Skeleton animation="wave" variant="rectangular" height={300} />
               ) : (
                 <>

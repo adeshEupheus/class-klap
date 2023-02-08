@@ -4,7 +4,7 @@ import Sidebar from "../../components/Sidebar";
 import SwipeableTemporaryDrawer from "../../components/Material/MaterialSidebar";
 import { Skeleton, Switch } from "@mui/material";
 import { Menu } from "@mui/icons-material";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import Breadcrumbs from "../../components/Material/BreadCrumbs";
 import SearchDropDown from "../../components/Material/SearchDropDown";
 import Table from "@mui/material/Table";
@@ -22,9 +22,14 @@ import Cookies from "js-cookie";
 import SchoolInfo from "../../components/SchoolInfo";
 import { useSearchParams } from "react-router-dom";
 import { useLayoutEffect } from "react";
+import { GenerateFeedback, AnnounceResult } from "../../apis/mutation/overview";
+import Snackbars from "../../components/Material/Snackbar";
 const OverView = () => {
   const [id, setId] = useState("FA1");
   const [filter, setFilter] = useState("All");
+  const [snackbarMsg, setSnackbarMsg] = useState("");
+  const [snackbarErr, setSnackbarErr] = useState(false);
+  const snackbarRef = useRef();
 
   const [queryParameters] = useSearchParams();
   const returnToken = () => {
@@ -43,6 +48,44 @@ const OverView = () => {
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
     queryKey: ["school_info"],
     queryFn: () => GetSchoolDetailsWithoutHeader(returnToken()),
+  });
+
+  const mutation = useMutation({
+    mutationFn: async (data) => {
+      if (
+        data.type === "feedback" &&
+        data.data.feedbackStatus !== "CANNOT_GENERATE"
+      ) {
+        let bodyFormData = new FormData();
+        bodyFormData.append("grade", data.data.grade);
+        bodyFormData.append("examType", id);
+        setLoading(true);
+        const res = await GenerateFeedback(bodyFormData, returnToken());
+        setLoading(false);
+        console.log(res);
+        if (res.data.success === true) {
+          setSnackbarErr(false);
+          setSnackbarMsg(res.data.message);
+          snackbarRef.current.openSnackbar();
+        }
+      } else if (
+        data.type === "result" &&
+        data.data.resultAnnouncementStatus !== "CANNOT_ANNOUNCE"
+      ) {
+        let bodyFormData = new FormData();
+        bodyFormData.append("grade", data.data.grade);
+        bodyFormData.append("examType", id);
+        setLoading(true);
+        const res = await AnnounceResult(bodyFormData, returnToken());
+        setLoading(false);
+        console.log(res);
+        if (res.data.success === true) {
+          setSnackbarErr(false);
+          setSnackbarMsg(res.data.message);
+          snackbarRef.current.openSnackbar();
+        }
+      }
+    },
   });
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -142,6 +185,11 @@ const OverView = () => {
 
   return (
     <>
+      <Snackbars
+        ref={snackbarRef}
+        message={snackbarMsg}
+        snackbarErrStatus={snackbarErr}
+      />
       <div className="flex w-[100%] min-h-[100vh]">
         <Loader loading={loading} />
         <Sidebar
@@ -380,32 +428,65 @@ const OverView = () => {
                             </h1>
                           </TableCell>
                           <TableCell align="center">
-                            <div className="w-full flex justify-end">
-                              <BasicButton
-                                text={"Generate"}
-                                size={"small"}
-                                disable={
-                                  item.feedbackStatus === "CANNOT_GENERATE"
-                                    ? true
-                                    : false
+                            <div className="w-full flex flex-col items-end justify-center">
+                              <button
+                                onClick={() =>
+                                  mutation.mutate({
+                                    type: "feedback",
+                                    data: item,
+                                  })
                                 }
-                              />
-                              {/* <h1>{item.feedbackStatus}</h1> */}
+                              >
+                                <BasicButton
+                                  text={`${
+                                    item.feedbackStatus === "CANNOT_GENERATE"
+                                      ? "Generate"
+                                      : "Regenerate"
+                                  }`}
+                                  size={"small"}
+                                  disable={
+                                    item.feedbackStatus === "CANNOT_GENERATE"
+                                      ? true
+                                      : false
+                                  }
+                                />
+                              </button>
+
+                              <h1 className="font-semibold italic text-xs">
+                                {item?.feedbackGenerationDate?.replace(
+                                  "&nbsp;",
+                                  ""
+                                )}
+                              </h1>
                             </div>
                           </TableCell>
-                          <TableCell align="right">
-                            <div className="w-full flex justify-end">
-                              <BasicButton
-                                text={"Announce"}
-                                size={"small"}
-                                disable={
-                                  item.resultAnnouncementStatus ===
-                                  "CANNOT_ANNOUNCE"
-                                    ? true
-                                    : false
+                          <TableCell align="center">
+                            <div className="w-full flex flex-col items-end justify-center">
+                              <button
+                                onClick={() =>
+                                  mutation.mutate({
+                                    type: "result",
+                                    data: item,
+                                  })
                                 }
-                              />
-                              {/* <h1>{item.resultAnnouncementStatus}</h1> */}
+                              >
+                                <BasicButton
+                                  text={"Announce"}
+                                  size={"small"}
+                                  disable={
+                                    item.resultAnnouncementStatus ===
+                                    "CANNOT_ANNOUNCE"
+                                      ? true
+                                      : false
+                                  }
+                                />
+                              </button>
+                              <h1 className="font-semibold italic text-xs">
+                                {item?.resultAnnouncementDate?.replace(
+                                  "&nbsp;",
+                                  ""
+                                )}
+                              </h1>
                             </div>
                           </TableCell>
                         </TableRow>

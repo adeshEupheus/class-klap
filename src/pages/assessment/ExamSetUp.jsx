@@ -83,6 +83,7 @@ const ExamSetUp = () => {
       let index;
       if (data.item) {
         if (!data.item.locked) {
+          console.log("1");
           res = await LockExamSetup(
             data.examType,
             data.gradeId,
@@ -90,6 +91,8 @@ const ExamSetUp = () => {
             returnToken()
           );
         } else {
+          console.log("2");
+
           res = await UnLockExamSetup(
             data.examType,
             data.gradeId,
@@ -198,14 +201,18 @@ const ExamSetUp = () => {
         test = item.applicableQuestionPaperDeliveryModeTypes.filter(
           (item) => item.displayName === value.value
         );
-        // console.log(test[0].name);
+
         apiDataBody = {
           grade: item.grade.name,
           exam: id,
           examName: item.examName.name,
-          duration: item.duration,
+          duration: item.duration ? item.duration : 50,
           locked: false,
-          marksSyllabus: item.selectedMarksSyllabus.name,
+          marksSyllabus: item.selectedMarksSyllabus.name
+            ? item.selectedMarksSyllabus.name
+            : item.applicableMarksSyllabus[
+                Object.keys(item.applicableMarksSyllabus)[0]
+              ][0].name,
           questionPaperTypeDeliveryFormat: test[0].name,
         };
         lockMutation.mutate({
@@ -230,11 +237,13 @@ const ExamSetUp = () => {
           grade: item.grade.name,
           exam: id,
           examName: item.examName.name,
-          duration: item.duration,
+          duration: item.duration ? item.duration : 50,
           locked: false,
           marksSyllabus: test[0].name,
-          questionPaperTypeDeliveryFormat:
-            item.questionPaperDeliveryModeType.name,
+          questionPaperTypeDeliveryFormat: item.questionPaperDeliveryModeType
+            .name
+            ? item.questionPaperDeliveryModeType.name
+            : item.applicableQuestionPaperDeliveryModeTypes[0].name,
         };
         // console.log(apiDataBody);
 
@@ -489,7 +498,13 @@ const ExamSetUp = () => {
                               <SearchDropDown
                                 minWidth={"12rem"}
                                 handleDropDown={handleDropDown}
-                                disable={item.locked}
+                                disable={
+                                  item.locked ||
+                                  item.questionPaperDeliveryModeType
+                                    .displayName === null
+                                    ? true
+                                    : false
+                                }
                                 item={item}
                                 data={[
                                   ...item?.applicableMarksSyllabus?.SUBJECTIVE?.map(
@@ -509,7 +524,13 @@ const ExamSetUp = () => {
                               <SearchDropDown
                                 minWidth={"12rem"}
                                 handleDropDown={handleDropDown}
-                                disable={item.locked}
+                                disable={
+                                  item.locked ||
+                                  item.questionPaperDeliveryModeType
+                                    .displayName === null
+                                    ? true
+                                    : false
+                                }
                                 item={item}
                                 data={[
                                   ...item?.applicableMarksSyllabus?.OBJECTIVE?.map(
@@ -532,7 +553,13 @@ const ExamSetUp = () => {
                               variant={"standard"}
                               item={item}
                               defaultValue={item.duration}
-                              disable={item.locked}
+                              disable={
+                                item.locked ||
+                                item.questionPaperDeliveryModeType
+                                  .displayName === null
+                                  ? true
+                                  : false
+                              }
                               handleOnBlur={handleOnBlur}
                               lable={"Time"}
                               type={"number"}

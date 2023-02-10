@@ -28,13 +28,18 @@ import Breadcrumbs from "../../components/Material/BreadCrumbs";
 import SearchDropDown from "../../components/Material/SearchDropDown";
 import BasicTextFields from "../../components/Material/TextField";
 import SwitchLabels from "../../components/Material/Switch";
-import { GetExamTimetableData } from "../../apis/fectcher/assessment/examTimetable/examTimetable";
+import {
+  DownloadPersonalizedQP,
+  GetExamTimetableData,
+  QPGenerationStatus,
+} from "../../apis/fectcher/assessment/examTimetable/examTimetable";
 import BasicButton from "../../components/Material/Button";
 import ResponsiveTimePickers from "../../components/Material/TimePicker";
 import ResponsiveDatePickers from "../../components/Material/DatePicker";
 import { Box } from "@mui/system";
 import {
   ConductExam,
+  PersonalizedQpGenerate,
   QpGenerate,
   ToggleExamRequired,
   ToggleNotification,
@@ -97,6 +102,36 @@ const ExamTimeTable = () => {
   } = useQuery({
     queryKey: ["exam_timetable_data", examId, gradeId],
     queryFn: () => GetExamTimetableData(examId, gradeId, returnToken()),
+    cacheTime: 0,
+    onSuccess: (data) => {
+      console.log(data);
+    },
+    refetchOnWindowFocus: false,
+  });
+
+  const {
+    data: PersonalizedQPData,
+    isLoading: personalizedQPDataLoading,
+    // refetch,
+    // isRefetching,
+  } = useQuery({
+    queryKey: ["personalizedQPData", examId, gradeId],
+    queryFn: () => DownloadPersonalizedQP(examId, gradeId, returnToken()),
+    cacheTime: 0,
+    onSuccess: (data) => {
+      // console.log(data);
+    },
+    refetchOnWindowFocus: false,
+  });
+
+  const {
+    data: QPGenerateStatus,
+    isLoading: QPGenerateStatusLoading,
+    // refetch,
+    // isRefetching,
+  } = useQuery({
+    queryKey: ["QPGenerateStatus", examId, gradeId],
+    queryFn: () => QPGenerationStatus(examId, gradeId, returnToken()),
     cacheTime: 0,
     onSuccess: (data) => {
       console.log(data);
@@ -314,6 +349,31 @@ const ExamTimeTable = () => {
           setSnackbarMsg(
             "QP generation initiated. please check back in some time"
           );
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        } else {
+          setSnackbarErr(true);
+          setSnackbarMsg(res.message);
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        }
+      }
+      if (data.name === "PersonalizedQpGenerate") {
+        setLoading(true);
+        res = await PersonalizedQpGenerate(
+          gradeId,
+          examId,
+          returnToken()
+        ).catch((err) => {
+          setSnackbarErr(true);
+          setSnackbarMsg(err.response.data.message);
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        });
+        if (res.success) {
+          refetch();
+          setSnackbarErr(false);
+          setSnackbarMsg(res.message);
           snackbarRef.current.openSnackbar();
           setLoading(false);
         } else {
@@ -755,11 +815,31 @@ const ExamTimeTable = () => {
                       Question papers for all subjects
                     </h1>
                     <div
+                      className="flex flex-col items-center"
                       onClick={() =>
                         mutation.mutate({ item: {}, name: "QpGenerate" })
                       }
                     >
-                      <BasicButton size={"small"} text={"Generate"} />
+                      <BasicButton
+                        size={"small"}
+                        text={
+                          QPGenerateStatus?.qpGenerationDate
+                            ? "Regenerate"
+                            : "Generate"
+                        }
+                      />
+                      <h1 className="italic text-xs font-semibold">
+                        {QPGenerateStatus?.qpGenerationDate
+                          ? "Generated On: " +
+                            new Date(QPGenerateStatus?.qpGenerationDate)
+                              .toString()
+                              .split(" ")[2] +
+                            " " +
+                            new Date(QPGenerateStatus?.qpGenerationDate)
+                              .toString()
+                              .split(" ")[1]
+                          : null}
+                      </h1>
                     </div>
                     <a href={ExamTimetableData?.questionPaperLink}>
                       <Download className="!text-gray-600 !cursor-pointer" />
@@ -769,8 +849,33 @@ const ExamTimeTable = () => {
                     <h1 className="text-gray-600 font-semibold text-sm">
                       Personalized question paper for each student
                     </h1>
-                    <BasicButton size={"small"} text={"Generate"} />
-                    <Download className="!text-gray-600 !cursor-pointer" />
+                    <div
+                      className="flex flex-col items-center"
+                      onClick={() =>
+                        mutation.mutate({
+                          item: {},
+                          name: "PersonalizedQpGenerate",
+                        })
+                      }
+                    >
+                      <BasicButton
+                        size={"small"}
+                        text={
+                          PersonalizedQPData?.generationDate
+                            ? "Regenerate"
+                            : "Generate"
+                        }
+                      />
+                      <h1 className="italic text-xs font-semibold">
+                        {PersonalizedQPData?.generationDate
+                          ? "Generated On: " +
+                            PersonalizedQPData?.generationDate
+                          : null}
+                      </h1>
+                    </div>
+                    <a href={PersonalizedQPData?.qpUrl}>
+                      <Download className="!text-gray-600 !cursor-pointer" />
+                    </a>
                   </div>
                 </div>
               </div>

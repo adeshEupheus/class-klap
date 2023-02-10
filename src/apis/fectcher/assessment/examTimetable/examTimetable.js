@@ -14,3 +14,27 @@ export const GetExamTimetableData = async (examId, gradeId, token) => {
   const result = res.data;
   return result;
 };
+
+export const DownloadPersonalizedQP = async (examId, gradeId, token) => {
+  const res = await instance({
+    url: `schoolApp/configuration/downloadPersonalizedQP/${examId}/${gradeId}`,
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token ? token : Cookies.get("token")}`,
+    },
+  }).catch((err) => console.log(err));
+
+  return res.data;
+};
+
+export const QPGenerationStatus = async (examId, gradeId, token) => {
+  const res = await instance({
+    url: `schoolApp/configuration/${gradeId}/${examId}/qpGenerationStatus`,
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token ? token : Cookies.get("token")}`,
+    },
+  }).catch((err) => console.log(err));
+
+  return res.data;
+};

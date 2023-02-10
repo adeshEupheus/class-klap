@@ -14,3 +14,15 @@ export const GetOverviewData = async (id, Token) => {
   const result = res.data.examOverviewData;
   return result;
 };
+
+export const GetOverViewTrackerData = async (id, Token) => {
+  const res = await instance({
+    url: `schoolApp/configuration/printedExam/${id}`,
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${Token ? Token : Cookies.get("token")}`,
+    },
+  }).catch((err) => console.log(err));
+
+  return res.data;
+};

@@ -41,11 +41,12 @@ import { useLayoutEffect } from "react";
 // import { data, data } from "autoprefixer";
 
 const SubjectMarksEntry = () => {
-  const [id, setId] = useState("FA1");
-  const [sectionId, setSectionId] = useState("112476");
-  const [subjectId, setSubjectId] = useState("EVS");
+  const [id, setId] = useState("");
+  const [sectionId, setSectionId] = useState("");
+  const [subjectId, setSubjectId] = useState("");
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [loading, setLoading] = useState(false);
   const [editButtons, setEditButtons] = useState({
     attendance: false,
     marks: false,
@@ -115,6 +116,7 @@ const SubjectMarksEntry = () => {
     isRefetching,
   } = useQuery({
     queryKey: ["subject_marks_entry", id, sectionId, subjectId],
+    enabled: !!id && !!sectionId && !!subjectId,
     queryFn: () =>
       GetSubjectMarksEntry(id, sectionId, subjectId, returnToken()),
     onSuccess: (data) => {
@@ -262,6 +264,20 @@ const SubjectMarksEntry = () => {
     queryFn: () => GetExamConfig(returnToken()),
     onSuccess: (data) => {
       console.log(data);
+      setId(data.exams[0].name);
+      setSectionId(data.sections[0][0]);
+      // let sub = "";
+      Object.entries(data.sectionSubjectMap)
+        .map((item) => {
+          return { name: item[0], value: item[1] };
+        })
+        .map((item) => {
+          if (item.name === data.sections[0][0]) {
+            // console.log();
+            // sub = item.value[0].name;
+            setSubjectId(item.value[0].name);
+          }
+        });
     },
     refetchOnWindowFocus: false,
   });
@@ -275,11 +291,11 @@ const SubjectMarksEntry = () => {
       })
       .map((item) => {
         if (item.name === sectionId) {
-          console.log(item);
+          // console.log(item);
           newArray.push(item);
         }
       });
-    console.log(newArray);
+    // console.log(newArray);
     return newArray;
   };
 
@@ -343,7 +359,7 @@ const SubjectMarksEntry = () => {
           sidebarCollapsed={sidebarCollapsed}
           show={show}
         />
-        <Loader loading={isRefetching} />
+        <Loader loading={isRefetching || loading} />
 
         <div>
           <SwipeableTemporaryDrawer
@@ -414,7 +430,7 @@ const SubjectMarksEntry = () => {
                       defaultValue={{ value: examConfigData.sections[0][1] }}
                       size={"small"}
                     />
-                    {returnSubData.length > 0 ? (
+                    {returnSubData().length > 0 ? (
                       <SearchDropDown
                         handleDropDown={handleDropDown}
                         data={returnSubData()[0]?.value?.map((item) => {
@@ -424,6 +440,7 @@ const SubjectMarksEntry = () => {
                         Name={"subject"}
                         defaultValue={{
                           value: returnSubData()[0]?.value[0]?.displayName,
+                          name: returnSubData()[0]?.value[0]?.name,
                         }}
                         size={"small"}
                       />

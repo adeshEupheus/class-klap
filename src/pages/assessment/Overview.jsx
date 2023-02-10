@@ -15,7 +15,10 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import BasicButton from "../../components/Material/Button";
-import { GetOverviewData } from "../../apis/fectcher/assessment/overview/overviewData";
+import {
+  GetOverviewData,
+  GetOverViewTrackerData,
+} from "../../apis/fectcher/assessment/overview/overviewData";
 import Loader from "../../components/Material/Loader";
 import { GetSchoolDetailsWithoutHeader } from "../../apis/fectcher/assessment/GetSchoolDetails";
 import Cookies from "js-cookie";
@@ -24,6 +27,7 @@ import { useSearchParams } from "react-router-dom";
 import { useLayoutEffect } from "react";
 import { GenerateFeedback, AnnounceResult } from "../../apis/mutation/overview";
 import Snackbars from "../../components/Material/Snackbar";
+import OverviewStepper from "../../components/OverviewTracker";
 const OverView = () => {
   const [id, setId] = useState("FA1");
   const [filter, setFilter] = useState("All");
@@ -48,6 +52,14 @@ const OverView = () => {
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
     queryKey: ["school_info"],
     queryFn: () => GetSchoolDetailsWithoutHeader(returnToken()),
+  });
+
+  const { data: TrackerData, isLoading: TrackerLoading } = useQuery({
+    queryKey: ["tracker_data", id],
+    queryFn: () => GetOverViewTrackerData(id, returnToken()),
+    onSuccess: (data) => {
+      console.log(data);
+    },
   });
 
   const mutation = useMutation({
@@ -248,6 +260,18 @@ const OverView = () => {
                   size={"small"}
                 />
               </div>
+              {TrackerLoading ? (
+                <Skeleton
+                  // sx={{ bgcolor: "grey.400" }}
+                  animation="wave"
+                  variant="rectangular"
+                  height={100}
+                />
+              ) : TrackerData.status === "NOT APPLICABLE" ? null : (
+                <div className="w-full flex justify-center bg-gray-100 shadow-2xl rounded-lg overflow-auto py-[2rem]">
+                  <OverviewStepper data={TrackerData} examId={id} />
+                </div>
+              )}
 
               {isLoading ? (
                 <Skeleton

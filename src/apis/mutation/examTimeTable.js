@@ -74,3 +74,16 @@ export const QpGenerate = async (gradeId, examId, token) => {
   console.log(res.data);
   return res.data;
 };
+
+export const PersonalizedQpGenerate = async (gradeId, examId, token) => {
+  const res = await instance({
+    url: `schoolApp/configuration/generatePersonalizedQP/${examId}/${gradeId}`,
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token ? token : Cookies.get("token")}`,
+    },
+  });
+
+  // console.log(res.data);
+  return res.data;
+};

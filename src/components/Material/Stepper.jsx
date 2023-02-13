@@ -29,7 +29,7 @@ export default function HorizontalStepper({ data }) {
               color={"default"}
             />
             <h1 className="text-xs font-semibold italic">
-              {data.prsDeliveryDate}
+              {data?.prsDeliveryDate}
             </h1>
           </>
         );
@@ -38,13 +38,13 @@ export default function HorizontalStepper({ data }) {
 
       case "Download PRS Soft Copy":
         return (
-          <a href={data.prsDownloadLink ? data.prsDownloadLink : null}>
+          <a href={data?.prsDownloadLink ? data?.prsDownloadLink : null}>
             <Chip
               variant="filled"
               className="!cursor-pointer"
               label={label}
               size="small"
-              color={data.downloadPRSActive ? "info" : "default"}
+              color={data?.downloadPRSActive ? "info" : "default"}
             />
           </a>
         );
@@ -56,7 +56,7 @@ export default function HorizontalStepper({ data }) {
             className="!cursor-pointer"
             label={label}
             size="small"
-            color={data.trackPerformanceActive ? "info" : "default"}
+            color={data?.trackPerformanceActive ? "info" : "default"}
           />
         );
         break;
@@ -79,7 +79,7 @@ export default function HorizontalStepper({ data }) {
             className="!cursor-pointer"
             label={label}
             size="small"
-            color="info"
+            color="default"
           />
         );
         break;
@@ -94,21 +94,7 @@ export default function HorizontalStepper({ data }) {
         {steps.map((label) => (
           <Step key={label}>
             <StepLabel className="!min-w-[6rem]">
-              {/* <BasicButton text={label} size="small" /> */}
-              {/* <button className="py-1 px-4 bg-blue-500 shadow-xl rounded-md">
-                <h1 className="font-semibold text-gray-100 ">{label}</h1>
-              </button> */}
-              {/* <h1 className="font-semibold cursor-pointer text-blue-500">
-                {label}
-              </h1> */}
               {returnStep(label, data)}
-              {/* <Chip
-                variant="filled"
-                className="!cursor-pointer"
-                label={label}
-                size="small"
-              /> */}
-              {/* {label} */}
             </StepLabel>
           </Step>
         ))}

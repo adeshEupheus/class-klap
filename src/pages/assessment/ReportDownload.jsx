@@ -124,12 +124,12 @@ const ReportDownload = () => {
               </h1>
             </div>
 
-            <div className="w-full ">
+            <div className="w-full">
               <Timeline
                 className="!p-0 sm:px-6"
                 sx={{
                   [`& .${timelineOppositeContentClasses.root}`]: {
-                    flex: 0.2,
+                    flex: 0.1,
                   },
                 }}
               >

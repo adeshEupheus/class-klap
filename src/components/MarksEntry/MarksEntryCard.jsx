@@ -18,7 +18,7 @@ const FeedbackCard = ({ data }) => {
         </div>
 
         {/* <div className='!flex !flex-row!w-full ml-2'> */}
-        <h1 className="text-slate-700 font-bold ml-2 flex sm:ml-0 sm:!text-lg mt-[1px] text-xs">
+        <h1 className="text-slate-700 font-bold ml-2 flex sm:ml-0 sm:!text-lg mt-[1px] pr-8 text-xs">
           Triggered by : {data.triggeredBy}
         </h1>
         {/* </div> */}
@@ -30,7 +30,7 @@ const FeedbackCard = ({ data }) => {
           }}
           className="flex flex-row  mx-0  text-xs sm:text-lg sm:mx-3 font-semibold text-slate-500 "
         ></div>
-        <div className="!flex !flex-row  !justify-end  ">
+        <div className="!flex !flex-row pr-8  !justify-end  ">
           <a href={data.documentUrl}>
             <div className="px-1 py-1 rounded-md bg-blue-500 my-5 ">
               <Download className="text-white sm:m-1 sm:!text-lg !text-base" />

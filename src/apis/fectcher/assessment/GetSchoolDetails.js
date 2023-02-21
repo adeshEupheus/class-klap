@@ -1,5 +1,8 @@
 import Cookies from "js-cookie";
+// import { useDispatch } from "react-redux";
+// import { useNavigate } from "react-router-dom";
 import instance from "../../../instance";
+// import { authActions } from "../../../Store/auth";
 
 export const GetSchoolDetails = async (id) => {
   const res = await instance({
@@ -19,6 +22,8 @@ export const GetSchoolDetailsWithoutHeader = async (token) => {
     headers: {
       Authorization: `Bearer ${token ? token : Cookies.get("token")}`,
     },
-  }).catch((err) => console.log(err));
+  }).catch((err) => {
+    console.log(err);
+  });
   return res.data;
 };

@@ -250,23 +250,21 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
             </div>
           </aside>
         </Link>
-        <Link>
+        <Link to={"/additional_exam_setUp"}>
           <aside
             className={`px-6 mt-[1rem] py-2 hover:bg-gray-500 flex ${
-              highLight === "dashboard" ? "bg-gray-500" : ""
+              highLight === "add_exam" ? "bg-gray-500" : ""
             } rounded-md gap-4 cursor-pointer group`}
           >
             <div className="flex gap-4">
               <Monitor
                 className={`${
-                  highLight === "dashboard"
-                    ? "!text-gray-100"
-                    : "!text-gray-400"
+                  highLight === "add_exam" ? "!text-gray-100" : "!text-gray-400"
                 } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
               />
               <span
                 className={`${
-                  highLight === "dashboard" ? "text-gray-200" : "text-gray-600"
+                  highLight === "add_exam" ? "text-gray-200" : "text-gray-600"
                 } group-hover:!text-gray-100 transition-all duration-150 font-semibold ease-linear`}
               >
                 Add Exam Setup

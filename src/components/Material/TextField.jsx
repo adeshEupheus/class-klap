@@ -11,6 +11,7 @@ export default function BasicTextFields({
   defaultValue,
   handleOnBlur,
   disable,
+  size,
 }) {
   const onBlur = (e) => {
     handleOnBlur(e.target.value, item);
@@ -24,6 +25,7 @@ export default function BasicTextFields({
       disabled={disable}
       type={type}
       defaultValue={defaultValue}
+      size={size ? size : "medium"}
       onBlur={onBlur}
       // value={value}
       variant={variant}

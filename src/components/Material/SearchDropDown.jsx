@@ -17,6 +17,7 @@ const SearchDropDown = ({
   handleDropDown,
   defaultValue,
   item,
+  multiline,
 }) => {
   const defaultProps = {
     options: data,
@@ -34,9 +35,9 @@ const SearchDropDown = ({
         case "mark_syllabus_difficulty":
           return option.value;
           break;
-          case "scoreboard":
-            return option.value;
-            break;
+        case "scoreboard":
+          return option.value;
+          break;
         default:
           return option.value;
           break;
@@ -57,6 +58,7 @@ const SearchDropDown = ({
         <Autocomplete
           {...defaultProps}
           size={size}
+          multiple={multiline}
           disabled={disable}
           disableClearable
           // sx={{ width: "fit-content" }}

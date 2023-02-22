@@ -28,8 +28,9 @@ import { useLayoutEffect } from "react";
 import { GenerateFeedback, AnnounceResult } from "../../apis/mutation/overview";
 import Snackbars from "../../components/Material/Snackbar";
 import OverviewStepper from "../../components/OverviewTracker";
+import { GetApplicableExamType } from "../../apis/fectcher/assessment/GetApplicableExamType";
 const OverView = () => {
-  const [id, setId] = useState("FA1");
+  const [id, setId] = useState("");
   const [filter, setFilter] = useState("All");
   const [snackbarMsg, setSnackbarMsg] = useState("");
   const [snackbarErr, setSnackbarErr] = useState(false);
@@ -45,8 +46,18 @@ const OverView = () => {
     }
   }, []);
 
+  const { data: ApplicableExamTypes, isLoading: examTypeLoading } = useQuery({
+    queryKey: ["applicable_examtype"],
+    queryFn: () => GetApplicableExamType(returnToken()),
+    onSuccess: (data) => {
+      setId(data?.exams?.[0]);
+      // console.log(data);
+    },
+  });
+
   const { data: overviewData, isLoading } = useQuery({
     queryKey: ["overview_data", id],
+    enabled: !!id,
     queryFn: () => GetOverviewData(id, returnToken()),
   });
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
@@ -56,6 +67,7 @@ const OverView = () => {
 
   const { data: TrackerData, isLoading: TrackerLoading } = useQuery({
     queryKey: ["tracker_data", id],
+    enabled: !!id,
     queryFn: () => GetOverViewTrackerData(id, returnToken()),
     onSuccess: (data) => {
       console.log(data);
@@ -239,27 +251,23 @@ const OverView = () => {
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4">
               <Breadcrumbs crumbs={["Home", "Assessment", "Overview"]} />
               <h1 className="font-bold text-2xl">Overview</h1>
-              <div className="w-[5rem]">
-                <SearchDropDown
-                  handleDropDown={handleDropDown}
-                  data={[
-                    { value: "FA1" },
-                    { value: "FA2" },
-                    { value: "FA3" },
-                    { value: "FA4" },
-                    { value: "RSA1" },
-                    { value: "RSA2" },
-                    { value: "RSA3" },
-                    { value: "SA1" },
-                    { value: "SA2" },
-                    { value: "SA3" },
-                  ]}
-                  variant={"outlined"}
-                  Name={"Overview"}
-                  defaultValue={{ value: "FA1" }}
-                  size={"small"}
-                />
-              </div>
+              {examTypeLoading ? null : (
+                <div className="w-[5rem]">
+                  <SearchDropDown
+                    handleDropDown={handleDropDown}
+                    data={[
+                      ...ApplicableExamTypes?.exams.map((item) => {
+                        return { value: item };
+                      }),
+                    ]}
+                    variant={"outlined"}
+                    Name={"Overview"}
+                    defaultValue={{ value: ApplicableExamTypes?.exams[0] }}
+                    size={"small"}
+                  />
+                </div>
+              )}
+
               {TrackerLoading ? (
                 <Skeleton
                   // sx={{ bgcolor: "grey.400" }}

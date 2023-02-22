@@ -53,9 +53,10 @@ import Cookies from "js-cookie";
 import SchoolInfo from "../../components/SchoolInfo";
 import { useSearchParams } from "react-router-dom";
 import { useLayoutEffect } from "react";
+import { GetApplicableExamType } from "../../apis/fectcher/assessment/GetApplicableExamType";
 const ExamTimeTable = () => {
-  const [examId, setExamId] = useState("FA1");
-  const [gradeId, setGradeId] = useState("NUR");
+  const [examId, setExamId] = useState("");
+  const [gradeId, setGradeId] = useState("");
   const [filter, setFilter] = useState("All");
   const [loading, setLoading] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState("");
@@ -73,6 +74,16 @@ const ExamTimeTable = () => {
 
   const examReqrefs = useRef([]);
   examReqrefs.current = [];
+
+  const { data: ApplicableExamTypes, isLoading: examTypeLoading } = useQuery({
+    queryKey: ["applicable_examtype"],
+    queryFn: () => GetApplicableExamType(returnToken()),
+    onSuccess: (data) => {
+      setExamId(data?.exams[0]);
+      setGradeId(data?.grades[0].name);
+    },
+  });
+
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
     queryKey: ["school_info"],
     queryFn: () => GetSchoolDetailsWithoutHeader(returnToken()),
@@ -101,6 +112,7 @@ const ExamTimeTable = () => {
     isRefetching,
   } = useQuery({
     queryKey: ["exam_timetable_data", examId, gradeId],
+    enabled: !!examId && !!gradeId,
     queryFn: () => GetExamTimetableData(examId, gradeId, returnToken()),
     cacheTime: 0,
     onSuccess: (data) => {
@@ -116,6 +128,7 @@ const ExamTimeTable = () => {
     // isRefetching,
   } = useQuery({
     queryKey: ["personalizedQPData", examId, gradeId],
+    enabled: !!examId && !!gradeId,
     queryFn: () => DownloadPersonalizedQP(examId, gradeId, returnToken()),
     cacheTime: 0,
     onSuccess: (data) => {
@@ -131,6 +144,7 @@ const ExamTimeTable = () => {
     // isRefetching,
   } = useQuery({
     queryKey: ["QPGenerateStatus", examId, gradeId],
+    enabled: !!examId && !!gradeId,
     queryFn: () => QPGenerationStatus(examId, gradeId, returnToken()),
     cacheTime: 0,
     onSuccess: (data) => {
@@ -713,44 +727,37 @@ const ExamTimeTable = () => {
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4">
               <Breadcrumbs crumbs={["Home", "Assessment", "Exam Timetable"]} />
               <h1 className="font-bold sm:text-2xl text-xl">Exam Timetable</h1>
-              <div className="w-[15rem] flex gap-2">
-                <SearchDropDown
-                  handleDropDown={handleDropDown}
-                  data={[
-                    { value: "FA1" },
-                    { value: "FA2" },
-                    { value: "FA3" },
-                    { value: "FA4" },
-                    { value: "RSA1" },
-                    { value: "RSA2" },
-                    { value: "RSA3" },
-                    { value: "SA1" },
-                    { value: "SA2" },
-                    { value: "SA3" },
-                  ]}
-                  variant={"outlined"}
-                  Name={"exam"}
-                  defaultValue={{ value: "FA1" }}
-                  size={"small"}
-                />
-                <SearchDropDown
-                  handleDropDown={handleDropDown}
-                  data={[
-                    { value: "Nursery", name: "NUR" },
-                    { value: "LKG", name: "LKG" },
-                    { value: "UKG", name: "UKG" },
-                    { value: "1", name: "GRADE_1" },
-                    { value: "2", name: "GRADE_2" },
-                    { value: "3", name: "GRADE_3" },
-                    { value: "4", name: "GRADE_4" },
-                    { value: "5", name: "GRADE_5" },
-                  ]}
-                  variant={"outlined"}
-                  Name={"grade"}
-                  defaultValue={{ value: "Nursery" }}
-                  size={"small"}
-                />
-              </div>
+              {examTypeLoading ? null : (
+                <div className="w-[15rem] flex gap-2">
+                  <SearchDropDown
+                    handleDropDown={handleDropDown}
+                    data={[
+                      ...ApplicableExamTypes?.exams?.map((item) => {
+                        return { value: item };
+                      }),
+                    ]}
+                    variant={"outlined"}
+                    Name={"exam"}
+                    defaultValue={{ value: ApplicableExamTypes?.exams[0] }}
+                    size={"small"}
+                  />
+                  <SearchDropDown
+                    handleDropDown={handleDropDown}
+                    data={[
+                      ...ApplicableExamTypes?.grades?.map((item) => {
+                        return { value: item.displayName, name: item.name };
+                      }),
+                    ]}
+                    variant={"outlined"}
+                    Name={"grade"}
+                    defaultValue={{
+                      value: ApplicableExamTypes?.grades[0].displayName,
+                    }}
+                    size={"small"}
+                  />
+                </div>
+              )}
+
               <div className="w-full flex items-center flex-col gap-1">
                 <h1 className="text-xl font-semibold text-gray-600">
                   {isLoading ? (

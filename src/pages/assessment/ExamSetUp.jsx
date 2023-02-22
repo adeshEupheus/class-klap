@@ -25,8 +25,9 @@ import Cookies from "js-cookie";
 import SchoolInfo from "../../components/SchoolInfo";
 import { useSearchParams } from "react-router-dom";
 import { useLayoutEffect } from "react";
+import { GetApplicableExamType } from "../../apis/fectcher/assessment/GetApplicableExamType";
 const ExamSetUp = () => {
-  const [id, setId] = useState("FA1");
+  const [id, setId] = useState("");
   const [filter, setFilter] = useState("All");
   const [loading, setLoading] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState("");
@@ -42,6 +43,14 @@ const ExamSetUp = () => {
       Cookies.set("token", queryParameters.get("auth"));
     }
   }, []);
+
+  const { data: ApplicableExamTypes, isLoading: examTypeLoading } = useQuery({
+    queryKey: ["applicable_examtype"],
+    queryFn: () => GetApplicableExamType(returnToken()),
+    onSuccess: (data) => {
+      setId(data?.exams[0]);
+    },
+  });
 
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
     queryKey: ["school_info"],
@@ -66,6 +75,7 @@ const ExamSetUp = () => {
     isRefetching,
   } = useQuery({
     queryKey: ["exam_setup_data", id],
+    enabled: !!id,
     queryFn: () => GetExamSetUpData(id, returnToken()),
     cacheTime: 0,
     onSuccess: (data) => {
@@ -342,27 +352,23 @@ const ExamSetUp = () => {
             <div className="sm:px-8 px-4 w-full flex flex-col gap-4 mb-4">
               <Breadcrumbs crumbs={["Home", "Assessment", "Exam Set Up"]} />
               <h1 className="font-bold sm:text-2xl text-xl">Exam Set Up</h1>
-              <div className="w-[5rem]">
-                <SearchDropDown
-                  handleDropDown={handleDropDown}
-                  data={[
-                    { value: "FA1" },
-                    { value: "FA2" },
-                    { value: "FA3" },
-                    { value: "FA4" },
-                    { value: "RSA1" },
-                    { value: "RSA2" },
-                    { value: "RSA3" },
-                    { value: "SA1" },
-                    { value: "SA2" },
-                    { value: "SA3" },
-                  ]}
-                  variant={"outlined"}
-                  Name={"exam_setup"}
-                  defaultValue={{ value: "FA1" }}
-                  size={"small"}
-                />
-              </div>
+              {examTypeLoading ? null : (
+                <div className="w-[5rem]">
+                  <SearchDropDown
+                    handleDropDown={handleDropDown}
+                    data={[
+                      ...ApplicableExamTypes?.exams?.map((item) => {
+                        return { value: item };
+                      }),
+                    ]}
+                    variant={"outlined"}
+                    Name={"exam_setup"}
+                    defaultValue={{ value: ApplicableExamTypes?.exams[0] }}
+                    size={"small"}
+                  />
+                </div>
+              )}
+
               {isLoading ? (
                 <Skeleton
                   // sx={{ bgcolor: "grey.400" }}

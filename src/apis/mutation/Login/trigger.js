@@ -6,6 +6,6 @@ export const TriggerOtp = async (data) => {
     method: "POST",
     data,
   });
-  console.log(res.data);
-  return res.data;
+  // console.log(res.data);
+  return res.status;
 };

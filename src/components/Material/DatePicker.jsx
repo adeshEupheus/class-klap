@@ -11,8 +11,12 @@ import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 
 const ResponsiveDatePickers = React.forwardRef((props, ref) => {
   const { date, handleDateChange } = props;
-  const [value, setValue] = React.useState(dayjs(date));
-  // console.log(date);
+  const dateArr = date?.split("-");
+  const [value, setValue] = React.useState(
+    `${dateArr?.[0]}-${dateArr?.[1]}-${dateArr?.[2]}`
+  );
+  // console.log(value);
+
   React.useImperativeHandle(ref, () => ({
     changeValue(newValue) {
       setValue(newValue);
@@ -23,13 +27,12 @@ const ResponsiveDatePickers = React.forwardRef((props, ref) => {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Stack spacing={3}>
         <MobileDatePicker
-          // disableFuture
+          views={["day", "month", "year"]}
+          inputFormat="DD/MM/YYYY"
           disablePast
           value={value}
           label={date ? null : "dd-mm-yyyy"}
           onChange={(newValue) => {
-            // console.log(`${newValue.$y}-${newValue.$M + 1}-${newValue.$D}`);
-            // setValue(newValue);
             handleDateChange(newValue);
           }}
           renderInput={(params) => (

@@ -5,6 +5,10 @@ import { useState } from "react";
 const SwitchLabels = React.forwardRef((props, ref) => {
   const [value, setValue] = useState(props.checked);
 
+  React.useEffect(() => {
+    setValue(props.checked);
+  }, [props.checked]);
+
   React.useImperativeHandle(ref, () => ({
     setTrue() {
       setValue(true);

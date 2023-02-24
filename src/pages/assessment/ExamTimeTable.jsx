@@ -82,11 +82,13 @@ const ExamTimeTable = () => {
       setExamId(data?.exams[0]);
       setGradeId(data?.grades[0].name);
     },
+    refetchOnWindowFocus: false,
   });
 
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
     queryKey: ["school_info"],
     queryFn: () => GetSchoolDetailsWithoutHeader(returnToken()),
+    refetchOnWindowFocus: false,
   });
 
   const addToExamReqRef = (el) => {

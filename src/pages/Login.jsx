@@ -32,31 +32,46 @@ const Login = () => {
   };
 
   const handleOtpTrigger = async () => {
-    setLoading(true);
-    console.log(email);
-    let bodyFormData = new FormData();
-    bodyFormData.append("emailPhone", email);
-    const res = await TriggerOtp(bodyFormData);
-    if (res === 200) {
-      setOtpDisable(false);
-      setSnackbarErr(false);
-      setSnackbarMsg("Opt Sent Successfully");
-      snackbarRef.current.openSnackbar();
-      setLoading(false);
+    if (email && email.includes("@")) {
+      setLoading(true);
+      console.log(email);
+      let bodyFormData = new FormData();
+      bodyFormData.append("emailPhone", email);
+      const res = await TriggerOtp(bodyFormData).catch((err) => {
+        setSnackbarErr(true);
+        setSnackbarMsg("User does not exist");
+        snackbarRef.current.openSnackbar();
+        setLoading(false);
+      });
+      if (res === 200) {
+        setOtpDisable(false);
+        setSnackbarErr(false);
+        setSnackbarMsg("Opt Sent Successfully");
+        snackbarRef.current.openSnackbar();
+        setLoading(false);
+      }
     }
   };
 
   const validateOtp = async () => {
-    setLoading(true);
-    let bodyFormData = new FormData();
-    bodyFormData.append("emailPhone", email);
-    bodyFormData.append("otp", otp);
-    const token = await ValidateOtp(bodyFormData);
-    Cookies.set("token", token);
-    dispatch(authActions.login());
-    setLoading(false);
-
-    navigate("/select_school");
+    if (otp && otp.length === 6) {
+      setLoading(true);
+      let bodyFormData = new FormData();
+      bodyFormData.append("emailPhone", email);
+      bodyFormData.append("otp", otp);
+      const token = await ValidateOtp(bodyFormData).catch((err) => {
+        setSnackbarErr(true);
+        setSnackbarMsg("Wrong OTP");
+        snackbarRef.current.openSnackbar();
+        setLoading(false);
+      });
+      if (token) {
+        Cookies.set("token", token);
+        dispatch(authActions.login());
+        setLoading(false);
+        navigate("/select_school");
+      }
+    }
   };
 
   const snackbarRef = useRef();

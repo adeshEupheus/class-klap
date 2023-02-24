@@ -50,6 +50,7 @@ const ExamSetUp = () => {
     onSuccess: (data) => {
       setId(data?.exams[0]);
     },
+    refetchOnWindowFocus: false,
   });
 
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
@@ -161,12 +162,14 @@ const ExamSetUp = () => {
 
   const returnData = () => {
     if (filter === "All") {
+      console.log(Exam_setUpData);
       return Exam_setUpData;
     }
 
     const newArray = Exam_setUpData.filter(
       (item) => item.grade.displayName === filter
     );
+    console.log(newArray);
     return newArray;
   };
 

@@ -32,7 +32,7 @@ const Login = () => {
   };
 
   const handleOtpTrigger = async () => {
-    if (email && email.includes("@")) {
+    if (email) {
       setLoading(true);
       console.log(email);
       let bodyFormData = new FormData();

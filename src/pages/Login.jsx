@@ -46,7 +46,7 @@ const Login = () => {
       if (res === 200) {
         setOtpDisable(false);
         setSnackbarErr(false);
-        setSnackbarMsg("Opt Sent Successfully");
+        setSnackbarMsg("OTP Sent Successfully");
         snackbarRef.current.openSnackbar();
         setLoading(false);
       }

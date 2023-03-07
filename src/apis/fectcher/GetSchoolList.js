@@ -9,8 +9,10 @@ export const GetSchoolList = async () => {
     method: "GET",
     headers: {
       Authorization: `Bearer ${Cookies.get("token")}`,
+      // BEAMAPP: true,
     },
   }).catch((err) => {
+    console.log(err);
     if (err.response.status === 401) {
       console.log(401);
       Cookies.remove("token");

@@ -94,7 +94,7 @@ const ExamSetUp = () => {
       let index;
       if (data.item) {
         if (!data.item.locked) {
-          console.log("1");
+          // console.log("1");
           res = await LockExamSetup(
             data.examType,
             data.gradeId,
@@ -102,7 +102,7 @@ const ExamSetUp = () => {
             returnToken()
           );
         } else {
-          console.log("2");
+          // console.log("2");
 
           res = await UnLockExamSetup(
             data.examType,
@@ -162,21 +162,21 @@ const ExamSetUp = () => {
 
   const returnData = () => {
     if (filter === "All") {
-      console.log(Exam_setUpData);
+      // console.log(Exam_setUpData);
       return Exam_setUpData;
     }
 
     const newArray = Exam_setUpData.filter(
       (item) => item.grade.displayName === filter
     );
-    console.log(newArray);
+    // console.log(newArray);
     return newArray;
   };
 
   const sidebarRef = useRef();
 
   const handleDropDown = (value, type, item) => {
-    console.log(value, type, item);
+    // console.log(value, type, item);
     let test;
     let apiDataBody;
     switch (type) {

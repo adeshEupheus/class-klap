@@ -53,6 +53,7 @@ const OverView = () => {
       setId(data?.exams?.[0]);
       // console.log(data);
     },
+    refetchOnWindowFocus: false,
   });
 
   const { data: overviewData, isLoading } = useQuery({
@@ -70,7 +71,7 @@ const OverView = () => {
     enabled: !!id,
     queryFn: () => GetOverViewTrackerData(id, returnToken()),
     onSuccess: (data) => {
-      console.log(data);
+      // console.log(data);
     },
   });
 
@@ -86,7 +87,7 @@ const OverView = () => {
         setLoading(true);
         const res = await GenerateFeedback(bodyFormData, returnToken());
         setLoading(false);
-        console.log(res);
+        // console.log(res);
         if (res.data.success === true) {
           setSnackbarErr(false);
           setSnackbarMsg(res.data.message);
@@ -102,7 +103,7 @@ const OverView = () => {
         setLoading(true);
         const res = await AnnounceResult(bodyFormData, returnToken());
         setLoading(false);
-        console.log(res);
+        // console.log(res);
         if (res.data.success === true) {
           setSnackbarErr(false);
           setSnackbarMsg(res.data.message);
@@ -116,7 +117,7 @@ const OverView = () => {
   const [loading, setLoading] = useState(false);
 
   const handleDropDown = (value, type) => {
-    console.log(value, type);
+    // console.log(value, type);
 
     switch (type) {
       case "Overview":

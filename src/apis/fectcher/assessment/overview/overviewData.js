@@ -8,6 +8,7 @@ export const GetOverviewData = async (id, Token) => {
     method: "GET",
     headers: {
       Authorization: `Bearer ${Token ? Token : Cookies.get("token")}`,
+      // BEAMAPP: true,
     },
   }).catch((err) => console.log(err));
 
@@ -21,6 +22,7 @@ export const GetOverViewTrackerData = async (id, Token) => {
     method: "GET",
     headers: {
       Authorization: `Bearer ${Token ? Token : Cookies.get("token")}`,
+      // BEAMAPP: true,
     },
   }).catch((err) => console.log(err));
 

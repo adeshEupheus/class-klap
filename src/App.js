@@ -3,32 +3,20 @@ import { lazy, Suspense } from "react";
 import { useSelector } from "react-redux";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Loader from "./components/Material/Loader";
-// import Home from "./pages/Home";
-// import Login from "./pages/Login";
 const Login = lazy(() => import("./pages/Login"));
-// import OverView from "./pages/assessment/Overview";
 const OverView = lazy(() => import("./pages/assessment/Overview"));
-// import ExamSetUp from "./pages/assessment/ExamSetUp";
 const ExamSetUp = lazy(() => import("./pages/assessment/ExamSetUp"));
-// import ExamTimeTable from "./pages/assessment/ExamTimeTable";
 const ExamTimeTable = lazy(() => import("./pages/assessment/ExamTimeTable"));
-// import PRSOverview from "./pages/assessment/PRS";
 const PRSOverview = lazy(() => import("./pages/assessment/PRS"));
-// import MarksEntryOverview from "./pages/assessment/marksEntry/MarksEntryOverview";
 const MarksEntryOverview = lazy(() =>
   import("./pages/assessment/marksEntry/MarksEntryOverview")
 );
-// import ScoreBoard from "./pages/assessment/Scoreboard";
 const ScoreBoard = lazy(() => import("./pages/assessment/Scoreboard"));
-// import ReportDownload from "./pages/assessment/ReportDownload";
 const ReportDownload = lazy(() => import("./pages/assessment/ReportDownload"));
-// import SubjectMarksEntry from "./pages/assessment/marksEntry/SubjectMarksEntry";
 const SubjectMarksEntry = lazy(() =>
   import("./pages/assessment/marksEntry/SubjectMarksEntry")
 );
-// import SelectSchool from "./pages/SelectSchool";
 const SelectSchool = lazy(() => import("./pages/SelectSchool"));
-// import AddExam from "./pages/assessment/AddExam";
 const AddExam = lazy(() => import("./pages/assessment/AddExam"));
 
 function App() {

@@ -10,6 +10,7 @@ export const GetSchoolDetails = async (id) => {
     method: "GET",
     headers: {
       Authorization: `Bearer ${Cookies.get("token")}`,
+      // BEAMAPP: true,
     },
   }).catch((err) => console.log(err));
   return res.data;
@@ -21,6 +22,7 @@ export const GetSchoolDetailsWithoutHeader = async (token) => {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token ? token : Cookies.get("token")}`,
+      // BEAMAPP: true,
     },
   }).catch((err) => {
     console.log(err);

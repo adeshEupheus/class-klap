@@ -8,6 +8,7 @@ export const GetApplicableExamType = async (token) => {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token ? token : Cookies.get("token")}`,
+      // BEAMAPP: true,
     },
   }).catch((err) => console.log(err));
 

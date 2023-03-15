@@ -3,7 +3,7 @@ import instance from "../../../../instance";
 
 export const GetExamConfig = async (token) => {
   const res = await instance({
-    url: `https://schoolsbel.xamcheck.com/app/schoolApp/configuration/getExamConfigs`,
+    url: `schoolApp/configuration/getExamConfigs`,
     method: "GET",
     headers: {
       Authorization: `Bearer ${token ? token : Cookies.get("token")}`,

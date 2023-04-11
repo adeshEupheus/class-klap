@@ -8,16 +8,34 @@ import { Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const steps = [
-  "Update Roll List",
+  // "Update Roll List",
   "Conduct Revision",
+  "Generate PRS",
   "Send For Print",
   "Download PRS Soft Copy",
   "Track Performance",
 ];
 
-export default function HorizontalStepper({ data }) {
+export default function HorizontalStepper({ data, GeneratePrs }) {
   const returnStep = (label, data) => {
     switch (label) {
+      case "Generate PRS":
+        return (
+          <>
+            <Chip
+              variant="filled"
+              className="!cursor-pointer"
+              label={label}
+              size="small"
+              color={`${
+                data.sendForPrintStatus === "NOT_SENT" ? "info" : "default"
+              }`}
+            />
+          </>
+        );
+
+        break;
+
       case "Send For Print":
         return (
           <>
@@ -88,12 +106,21 @@ export default function HorizontalStepper({ data }) {
 
   const navigate = useNavigate();
 
+  const prsMutate = (label) => {
+    if (label === "Generate PRS" && data.sendForPrintStatus === "NOT_SENT") {
+      GeneratePrs.mutate();
+    }
+  };
+
   return (
     <Box sx={{ width: "100%" }}>
       <Stepper nonLinear activeStep={5} alternativeLabel>
         {steps.map((label) => (
           <Step key={label}>
-            <StepLabel className="!min-w-[6rem]">
+            <StepLabel
+              onClick={() => prsMutate(label)}
+              className="!min-w-[6rem]"
+            >
               {returnStep(label, data)}
             </StepLabel>
           </Step>

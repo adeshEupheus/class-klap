@@ -17,18 +17,21 @@ import SearchDropDown from "../../components/Material/SearchDropDown";
 import HorizontalStepper from "../../components/Material/Stepper";
 import { GetPrsTrackerData } from "../../apis/fectcher/assessment/prsOverview/TrackerData";
 import { GetPrsTableData } from "../../apis/fectcher/assessment/prsOverview/TableData";
-import {
-  GetSchoolDetails,
-  GetSchoolDetailsWithoutHeader,
-} from "../../apis/fectcher/assessment/GetSchoolDetails";
+import { GetSchoolDetailsWithoutHeader } from "../../apis/fectcher/assessment/GetSchoolDetails";
 import Cookies from "js-cookie";
 import SchoolInfo from "../../components/SchoolInfo";
 import { useSearchParams } from "react-router-dom";
 import { useLayoutEffect } from "react";
+import { GeneratePRS } from "../../apis/mutation/GeneratePRS";
+import Snackbars from "../../components/Material/Snackbar";
+import Loader from "../../components/Material/Loader";
 
 const PRSOverview = () => {
   const [id, setId] = useState("RSA1");
   // const [isUrlToken, setIsUrlToken] = useState(false);
+
+  const [snackbarMsg, setSnackbarMsg] = useState("");
+  const [snackbarErr, setSnackbarErr] = useState(false);
 
   //   const [mainData, setMainData] = useState([]);
   const [queryParameters] = useSearchParams();
@@ -47,6 +50,22 @@ const PRSOverview = () => {
     queryFn: () => GetSchoolDetailsWithoutHeader(returnToken()),
   });
 
+  const GeneratePrs = useMutation({
+    mutationKey: ["generate_key"],
+    mutationFn: () => GeneratePRS(id),
+    onSuccess: (data) => {
+      if (data.success) {
+        setSnackbarMsg(data.message);
+        setSnackbarErr(false);
+        snackbarRef.current.openSnackbar();
+      } else {
+        setSnackbarMsg(data.message);
+        setSnackbarErr(true);
+        snackbarRef.current.openSnackbar();
+      }
+    },
+  });
+
   const {
     data: PRS_Tracker,
     isLoading: Tracker_Loading,
@@ -55,7 +74,7 @@ const PRSOverview = () => {
     queryKey: ["prs_tracker", id],
     queryFn: () => GetPrsTrackerData(id, returnToken()),
     onSuccess: (data) => {
-      console.log(data);
+      // console.log(data);
       //   setMainData(data);
     },
     // enabled: false,
@@ -66,7 +85,7 @@ const PRSOverview = () => {
     queryKey: ["prs_table", id],
     queryFn: () => GetPrsTableData(id, returnToken()),
     onSuccess: (data) => {
-      console.log(data);
+      // console.log(data);
     },
     refetchOnWindowFocus: false,
   });
@@ -77,14 +96,8 @@ const PRSOverview = () => {
 
   const sidebarRef = useRef();
 
-  // useLayoutEffect(() => {
-  //   if (queryParameters.get("auth")) {
-  //     setIsUrlToken(queryParameters.get("auth"));
-  //   }
-  // }, []);
-
   const handleDropDown = (value, type) => {
-    console.log(value, type);
+    // console.log(value, type);
     if (type === "class") {
       //   updateData(value.value);
     } else if ((type = "prs")) {
@@ -96,6 +109,8 @@ const PRSOverview = () => {
   const handleSidebarCollapsed = () => {
     sidebarRef.current.openSidebar();
   };
+
+  const snackbarRef = useRef();
 
   useEffect(() => {
     document.title = "PRS Overview - ClassKlap";
@@ -118,12 +133,19 @@ const PRSOverview = () => {
   }, []);
   return (
     <>
+      <Snackbars
+        ref={snackbarRef}
+        message={snackbarMsg}
+        snackbarErrStatus={snackbarErr}
+      />
       <div className="flex w-[100%] min-h-[100vh]">
         <Sidebar
           highLight={"prs"}
           sidebarCollapsed={sidebarCollapsed}
           show={show}
         />
+
+        <Loader loading={GeneratePrs.isLoading} />
 
         <div>
           <SwipeableTemporaryDrawer
@@ -180,7 +202,10 @@ const PRSOverview = () => {
                 />
               ) : (
                 <div className="w-full flex justify-center bg-gray-100 shadow-2xl rounded-lg overflow-auto py-[2rem]">
-                  <HorizontalStepper data={PRS_Tracker} />
+                  <HorizontalStepper
+                    data={PRS_Tracker}
+                    GeneratePrs={GeneratePrs}
+                  />
                 </div>
               )}
               {PRS_Table_Loading ? (

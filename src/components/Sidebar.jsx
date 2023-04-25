@@ -229,20 +229,20 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
         <Link to="/assessment/scoreboard">
           <aside
             className={`px-6 mt-[1rem] py-2 hover:bg-gray-500 flex ${
-              highLight === "dashboard" ? "bg-gray-500" : ""
+              highLight === "scoreboard" ? "bg-gray-500" : ""
             } rounded-md gap-4 cursor-pointer group`}
           >
             <div className="flex gap-4">
               <Scoreboard
                 className={`${
-                  highLight === "dashboard"
+                  highLight === "scoreboard"
                     ? "!text-gray-100"
                     : "!text-gray-400"
                 } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
               />
               <span
                 className={`${
-                  highLight === "dashboard" ? "text-gray-200" : "text-gray-600"
+                  highLight === "scoreboard" ? "text-gray-200" : "text-gray-600"
                 } group-hover:!text-gray-100 transition-all duration-150 font-semibold ease-linear`}
               >
                 Scoreboard

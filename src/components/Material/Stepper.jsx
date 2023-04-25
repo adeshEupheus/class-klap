@@ -6,6 +6,7 @@ import StepLabel from "@mui/material/StepLabel";
 // import BasicButton from "./Button";
 import { Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const steps = [
   // "Update Roll List",
@@ -16,7 +17,51 @@ const steps = [
   "Track Performance",
 ];
 
-export default function HorizontalStepper({ data, GeneratePrs }) {
+export default function HorizontalStepper({ data, GeneratePrs, SendPrint }) {
+  const [genPRS, setGenPRS] = useState(
+    data.sendForPRSDisabled
+      ? false
+      : data.sendForPrintStatus === "NOT_SENT"
+      ? true
+      : false
+  );
+  const [sendForPRS, setSendForPRS] = useState(
+    data?.downloadPRSActive &&
+      data?.prsDownloadLink &&
+      data?.prsDeliveryDate === null
+      ? true
+      : false
+  );
+
+  // React.useLayoutEffect(() => {
+  //   if(data.sendForPRSDisabled){
+  //     setGenPRS(false)
+  //     if(data.isDownloadPRSActive){
+  //         data.downloadPRSActive = true;
+  //     }
+  // }else{
+  //     if(data.sendForPrintStatus == 'NOT_SENT') {
+  //         $('#generatePRSBtn').attr('disabled', false);
+  //         $('#generatePRSCircle').removeClass('disable');
+  //         $('#sendPrsBtn').attr('disabled', false);
+  //         $('#sendPrsCircle').removeClass('disable');
+  //     } else {
+  //         $('#generatePRSBtn').attr('disabled', true);
+  //         $('#generatePRSCircle').addClass('disable');
+  //         $('#sendPrsBtn').attr('disabled', true);
+  //         $('#sendPrsCircle').addClass('disable');
+  //     }
+  //     if(actionBtnData.sendForPrintStatus == 'SENT') {
+  //         $('#prsDeliveryDate').html(actionBtnData.prsDeliveryDate);
+  //         $('#prsDeliveryDate').show();
+  //     } else {
+  //         $('#prsDeliveryDate').empty();
+  //         $('#prsDeliveryDate').hide();
+  //     }
+  // }
+
+  // },[])
+
   const returnStep = (label, data) => {
     switch (label) {
       case "Generate PRS":
@@ -27,9 +72,7 @@ export default function HorizontalStepper({ data, GeneratePrs }) {
               className="!cursor-pointer"
               label={label}
               size="small"
-              color={`${
-                data.sendForPrintStatus === "NOT_SENT" ? "info" : "default"
-              }`}
+              color={`${genPRS ? "info" : "default"}`}
             />
           </>
         );
@@ -44,7 +87,7 @@ export default function HorizontalStepper({ data, GeneratePrs }) {
               className="!cursor-pointer"
               label={label}
               size="small"
-              color={"default"}
+              color={`${sendForPRS ? "info" : "default"}`}
             />
             <h1 className="text-xs font-semibold italic">
               {data?.prsDeliveryDate}
@@ -109,6 +152,14 @@ export default function HorizontalStepper({ data, GeneratePrs }) {
   const prsMutate = (label) => {
     if (label === "Generate PRS" && data.sendForPrintStatus === "NOT_SENT") {
       GeneratePrs.mutate();
+      setGenPRS(false);
+    }
+    if (label === "Track Performance" && data?.trackPerformanceActive) {
+      navigate("/assessment/scoreboard");
+    }
+    if (label === "Send For Print" && sendForPRS) {
+      SendPrint.mutate();
+      setSendForPRS(false);
     }
   };
 

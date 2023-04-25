@@ -5,14 +5,12 @@ import { useState } from "react";
 import Sidebar from "../../components/Sidebar";
 
 import SwipeableTemporaryDrawer from "../../components/Material/MaterialSidebar";
-import { Button, Skeleton, Switch } from "@mui/material";
+import { Button, Skeleton } from "@mui/material";
 import { Menu } from "@mui/icons-material";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import Breadcrumbs from "../../components/Material/BreadCrumbs";
 import SearchDropDown from "../../components/Material/SearchDropDown";
 import Snackbars from "../../components/Material/Snackbar";
-import Loader from "../../components/Material/Loader";
-// import BasicButton from "../../Components/Material/Button";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import {
   DownloadFeedback,
@@ -154,7 +152,7 @@ const ScoreBoard = () => {
       />
       <div className="flex w-[100%] min-h-[100vh]">
         <Sidebar
-          highLight={"revision_and_exam"}
+          highLight={"scoreboard"}
           sidebarCollapsed={sidebarCollapsed}
           show={show}
         />
@@ -166,7 +164,7 @@ const ScoreBoard = () => {
             ref={sidebarRef}
             sidebarCollapsed={sidebarCollapsed}
             show={show}
-            highLight={"exam_setup"}
+            highLight={"scoreboard"}
           />
         </div>
         <div

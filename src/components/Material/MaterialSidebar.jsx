@@ -241,20 +241,20 @@ const SwipeableTemporaryDrawer = React.forwardRef((props, ref) => {
       <Link to="/assessment/scoreboard">
         <aside
           className={`px-6 py-2 hover:bg-gray-500 flex ${
-            props.highLight === "dashboard" ? "bg-gray-500" : ""
+            props.highLight === "scoreboard" ? "bg-gray-500" : ""
           } rounded-md gap-4 cursor-pointer group`}
         >
           <div className="flex gap-4">
             <Scoreboard
               className={`${
-                props.highLight === "dashboard"
+                props.highLight === "scoreboard"
                   ? "!text-gray-100"
                   : "!text-gray-400"
               } group-hover:!text-gray-100 !transition-all !duration-150 !ease-linear`}
             />
             <span
               className={`${
-                props.highLight === "dashboard"
+                props.highLight === "scoreboard"
                   ? "text-gray-200"
                   : "text-gray-600"
               } group-hover:!text-gray-100 transition-all duration-150 font-semibold ease-linear`}

@@ -11,3 +11,14 @@ export const GeneratePRS = async (id, token) => {
   });
   return res.data;
 };
+
+export const sendPrint = async (id, token) => {
+  const res = await instance({
+    url: `schoolApp/prs/actions/sendPRS/${id}`,
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token ? token : Cookies.get("token")}`,
+    },
+  });
+  return res.data;
+};

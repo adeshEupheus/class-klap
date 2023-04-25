@@ -22,7 +22,7 @@ import Cookies from "js-cookie";
 import SchoolInfo from "../../components/SchoolInfo";
 import { useSearchParams } from "react-router-dom";
 import { useLayoutEffect } from "react";
-import { GeneratePRS } from "../../apis/mutation/GeneratePRS";
+import { GeneratePRS, sendPrint } from "../../apis/mutation/GeneratePRS";
 import Snackbars from "../../components/Material/Snackbar";
 import Loader from "../../components/Material/Loader";
 
@@ -52,7 +52,23 @@ const PRSOverview = () => {
 
   const GeneratePrs = useMutation({
     mutationKey: ["generate_key"],
-    mutationFn: () => GeneratePRS(id),
+    mutationFn: () => GeneratePRS(id, returnToken()),
+    onSuccess: (data) => {
+      if (data.success) {
+        setSnackbarMsg(data.message);
+        setSnackbarErr(false);
+        snackbarRef.current.openSnackbar();
+      } else {
+        setSnackbarMsg(data.message);
+        setSnackbarErr(true);
+        snackbarRef.current.openSnackbar();
+      }
+    },
+  });
+
+  const SendPrint = useMutation({
+    mutationKey: ["send_print"],
+    mutationFn: () => sendPrint(id, returnToken()),
     onSuccess: (data) => {
       if (data.success) {
         setSnackbarMsg(data.message);
@@ -205,6 +221,7 @@ const PRSOverview = () => {
                   <HorizontalStepper
                     data={PRS_Tracker}
                     GeneratePrs={GeneratePrs}
+                    SendPrint={SendPrint}
                   />
                 </div>
               )}

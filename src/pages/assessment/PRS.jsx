@@ -161,7 +161,7 @@ const PRSOverview = () => {
           show={show}
         />
 
-        <Loader loading={GeneratePrs.isLoading} />
+        <Loader loading={GeneratePrs.isLoading || SendPrint.isLoading} />
 
         <div>
           <SwipeableTemporaryDrawer

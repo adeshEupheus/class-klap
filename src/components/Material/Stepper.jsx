@@ -12,8 +12,8 @@ const steps = [
   // "Update Roll List",
   "Conduct Revision",
   "Generate PRS",
-  "Send For Print",
   "Download PRS Soft Copy",
+  "Send For Print",
   "Track Performance",
 ];
 

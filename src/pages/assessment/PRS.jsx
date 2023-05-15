@@ -32,6 +32,7 @@ const PRSOverview = () => {
 
   const [snackbarMsg, setSnackbarMsg] = useState("");
   const [snackbarErr, setSnackbarErr] = useState(false);
+  const [error, setError] = useState(false);
 
   //   const [mainData, setMainData] = useState([]);
   const [queryParameters] = useSearchParams();
@@ -102,6 +103,9 @@ const PRSOverview = () => {
     queryFn: () => GetPrsTableData(id, returnToken()),
     onSuccess: (data) => {
       // console.log(data);
+    },
+    onError: () => {
+      setError(true);
     },
     refetchOnWindowFocus: false,
   });
@@ -247,25 +251,27 @@ const PRSOverview = () => {
                         <TableCell align="right" className="w-[15%]">
                           <div className="flex flex-col items-center gap-2">
                             <h1 className="font-bold">Class</h1>
-                            <div className="w-[5rem]">
-                              <SearchDropDown
-                                handleDropDown={handleDropDown}
-                                data={[
-                                  {
+                            {error ? null : (
+                              <div className="w-[5rem]">
+                                <SearchDropDown
+                                  handleDropDown={handleDropDown}
+                                  data={[
+                                    {
+                                      value: "All",
+                                    },
+                                    ...PRS_Table.map((item) => {
+                                      return { value: item.className };
+                                    }),
+                                  ]}
+                                  variant={"outlined"}
+                                  Name={"class"}
+                                  defaultValue={{
                                     value: "All",
-                                  },
-                                  ...PRS_Table.map((item) => {
-                                    return { value: item.className };
-                                  }),
-                                ]}
-                                variant={"outlined"}
-                                Name={"class"}
-                                defaultValue={{
-                                  value: "All",
-                                }}
-                                size={"small"}
-                              />
-                            </div>
+                                  }}
+                                  size={"small"}
+                                />
+                              </div>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell align="right" className="w-[15%]">
@@ -296,54 +302,68 @@ const PRSOverview = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {PRS_Table?.map((item, index) => (
-                        <TableRow
-                          key={index}
-                          sx={{
-                            "&:last-child td, &:last-child th": { border: 0 },
-                          }}
-                        >
-                          <TableCell component="th" scope="row" align="center">
-                            <h1 className="font-bold">{item.className}</h1>
-                          </TableCell>
-                          <TableCell align="center">
-                            <h1 className="font-bold text-blue-500">
-                              {item.rollListStatus}
-                            </h1>
-                          </TableCell>
-                          <TableCell align="center">
-                            <h1 className="font-bold text-blue-500 text-sm">
-                              {item.examStatus}
-                            </h1>
-                          </TableCell>
-                          <TableCell align="center">
-                            <Chip
-                              variant="outlined"
-                              label={item.printStatus}
-                              color="success"
-                              size="small"
-                            />
-
-                            {/* <h1 className="font-bold">{item.printStatus}</h1> */}
-                          </TableCell>
-                          <TableCell align="center">
-                            <Chip
-                              variant="outlined"
-                              label={item.downloadStatus}
-                              color="warning"
-                              size="small"
-                            />
-                            {/* <h1 className="font-bold ">
-                              {item.downloadStatus}
-                            </h1> */}
-                          </TableCell>
-                          <TableCell align="center">
-                            <h1 className="font-bold text-blue-500 text-sm">
-                              {item.performanceStatus}
+                      {error ? (
+                        <TableRow>
+                          <TableCell colSpan={8} align="center">
+                            <h1 className="sm:text-lg text-base font-semibold text-gray-600">
+                              No data available
                             </h1>
                           </TableCell>
                         </TableRow>
-                      ))}
+                      ) : (
+                        PRS_Table?.map((item, index) => (
+                          <TableRow
+                            key={index}
+                            sx={{
+                              "&:last-child td, &:last-child th": { border: 0 },
+                            }}
+                          >
+                            <TableCell
+                              component="th"
+                              scope="row"
+                              align="center"
+                            >
+                              <h1 className="font-bold">{item.className}</h1>
+                            </TableCell>
+                            <TableCell align="center">
+                              <h1 className="font-bold text-blue-500">
+                                {item.rollListStatus}
+                              </h1>
+                            </TableCell>
+                            <TableCell align="center">
+                              <h1 className="font-bold text-blue-500 text-sm">
+                                {item.examStatus}
+                              </h1>
+                            </TableCell>
+                            <TableCell align="center">
+                              <Chip
+                                variant="outlined"
+                                label={item.printStatus}
+                                color="success"
+                                size="small"
+                              />
+
+                              {/* <h1 className="font-bold">{item.printStatus}</h1> */}
+                            </TableCell>
+                            <TableCell align="center">
+                              <Chip
+                                variant="outlined"
+                                label={item.downloadStatus}
+                                color="warning"
+                                size="small"
+                              />
+                              {/* <h1 className="font-bold ">
+                              {item.downloadStatus}
+                            </h1> */}
+                            </TableCell>
+                            <TableCell align="center">
+                              <h1 className="font-bold text-blue-500 text-sm">
+                                {item.performanceStatus}
+                              </h1>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
                     </TableBody>
                   </Table>
                 </TableContainer>

@@ -61,6 +61,7 @@ const ExamTimeTable = () => {
   const [loading, setLoading] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState("");
   const [snackbarErr, setSnackbarErr] = useState(false);
+  const [error, setError] = useState(false);
   const [queryParameters] = useSearchParams();
   const returnToken = () => {
     return queryParameters.get("auth");
@@ -119,6 +120,9 @@ const ExamTimeTable = () => {
     cacheTime: 0,
     onSuccess: (data) => {
       console.log(data);
+    },
+    onError: () => {
+      setError(true);
     },
     refetchOnWindowFocus: false,
   });
@@ -785,7 +789,7 @@ const ExamTimeTable = () => {
                         Conduct Exam on Learning App?
                       </h1>
                       <SwitchLabels
-                        checked={ExamTimetableData.examNotificationEnabled}
+                        checked={ExamTimetableData?.examNotificationEnabled}
                         ref={switchRef}
                         name={"conduct_exam_status"}
                         handleSwitchChange={handleSwitchChange}
@@ -807,7 +811,7 @@ const ExamTimeTable = () => {
                   >
                     <BasicButton
                       text={`${
-                        ExamTimetableData.examConducted
+                        ExamTimetableData?.examConducted
                           ? "Re-Conduct"
                           : "Conduct"
                       } exam for Class Nursery`}
@@ -913,27 +917,29 @@ const ExamTimeTable = () => {
                               Subjects
                             </h1>
                             <div className="w-full">
-                              <SearchDropDown
-                                handleDropDown={handleDropDown}
-                                data={[
-                                  {
+                              {error ? null : (
+                                <SearchDropDown
+                                  handleDropDown={handleDropDown}
+                                  data={[
+                                    {
+                                      value: "All",
+                                    },
+                                    ...ExamTimetableData?.subjectLevelConfigurationResponses.map(
+                                      (item) => {
+                                        return {
+                                          value: item.subject.displayName,
+                                        };
+                                      }
+                                    ),
+                                  ]}
+                                  variant={"outlined"}
+                                  Name={"class"}
+                                  defaultValue={{
                                     value: "All",
-                                  },
-                                  ...ExamTimetableData.subjectLevelConfigurationResponses.map(
-                                    (item) => {
-                                      return {
-                                        value: item.subject.displayName,
-                                      };
-                                    }
-                                  ),
-                                ]}
-                                variant={"outlined"}
-                                Name={"class"}
-                                defaultValue={{
-                                  value: "All",
-                                }}
-                                size={"small"}
-                              />
+                                  }}
+                                  size={"small"}
+                                />
+                              )}
                             </div>
                           </div>
                         </TableCell>
@@ -989,7 +995,7 @@ const ExamTimeTable = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {ExamTimetableData.subjectLevelConfigurationResponses
+                      {ExamTimetableData?.subjectLevelConfigurationResponses
                         .length < 1 && (
                         <TableRow>
                           <TableCell colSpan={8} align="center">
@@ -999,9 +1005,19 @@ const ExamTimeTable = () => {
                           </TableCell>
                         </TableRow>
                       )}
-                      {returnData().map((item, index) => (
-                        <Row row={item} key={index} />
-                      ))}
+                      {error ? (
+                        <TableRow>
+                          <TableCell colSpan={8} align="center">
+                            <h1 className="sm:text-lg text-base font-semibold text-gray-600">
+                              No data available
+                            </h1>
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        returnData()?.map((item, index) => (
+                          <Row row={item} key={index} />
+                        ))
+                      )}
                     </TableBody>
                   </Table>
                 </TableContainer>

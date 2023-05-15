@@ -3,7 +3,7 @@ import { useState } from "react";
 import Sidebar from "../../components/Sidebar";
 import SwipeableTemporaryDrawer from "../../components/Material/MaterialSidebar";
 import { Skeleton, Switch } from "@mui/material";
-import { Menu } from "@mui/icons-material";
+import { Menu, SentimentVeryDissatisfied } from "@mui/icons-material";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Breadcrumbs from "../../components/Material/BreadCrumbs";
 import SearchDropDown from "../../components/Material/SearchDropDown";
@@ -34,6 +34,7 @@ const OverView = () => {
   const [filter, setFilter] = useState("All");
   const [snackbarMsg, setSnackbarMsg] = useState("");
   const [snackbarErr, setSnackbarErr] = useState(false);
+  const [error, setError] = useState(false);
   const snackbarRef = useRef();
 
   const [queryParameters] = useSearchParams();
@@ -60,6 +61,10 @@ const OverView = () => {
     queryKey: ["overview_data", id],
     enabled: !!id,
     queryFn: () => GetOverviewData(id, returnToken()),
+
+    onError: () => {
+      setError(true);
+    },
   });
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
     queryKey: ["school_info"],
@@ -149,31 +154,31 @@ const OverView = () => {
     let array;
     switch (key) {
       case "class":
-        array = arr.map((item) => item.schoolClass);
+        array = arr?.map((item) => item.schoolClass);
         // console.log([...new Set(array)]);
         return [...new Set(array)];
         break;
 
       case "examName":
-        array = arr.map((item) => item.examName);
+        array = arr?.map((item) => item.examName);
         // console.log([...new Set(array)]);
         return [...new Set(array)];
         break;
 
       case "examSetup":
-        array = arr.map((item) => item.examSetup);
+        array = arr?.map((item) => item.examSetup);
         // console.log([...new Set(array)]);
         return [...new Set(array)];
         break;
 
       case "examSchedule":
-        array = arr.map((item) => item.examSchedule);
+        array = arr?.map((item) => item.examSchedule);
         // console.log([...new Set(array)]);
         return [...new Set(array)];
         break;
 
       case "marksEntryStatus":
-        array = arr.map((item) => item.marksEntryStatus);
+        array = arr?.map((item) => item.marksEntryStatus);
         // console.log([...new Set(array)]);
         return [...new Set(array)];
         break;
@@ -438,7 +443,111 @@ const OverView = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {returnData()?.map((item, index) => (
+                      {error ? (
+                        <TableRow>
+                          <TableCell colSpan={8} align="center">
+                            <h1 className="sm:text-lg text-base font-semibold text-gray-600">
+                              No data available
+                            </h1>
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        returnData()?.map((item, index) => (
+                          <TableRow
+                            key={index}
+                            sx={{
+                              "&:last-child td, &:last-child th": { border: 0 },
+                            }}
+                          >
+                            <TableCell
+                              component="th"
+                              scope="row"
+                              align="center"
+                            >
+                              {item.schoolClass}
+                            </TableCell>
+                            <TableCell align="center">
+                              {item.examName}
+                            </TableCell>
+                            <TableCell align="center">
+                              {item.examSetup}
+                            </TableCell>
+                            <TableCell align="center">
+                              <h1 className="text-red-600 font-semibold">
+                                {item.examSchedule}
+                              </h1>
+                            </TableCell>
+                            <TableCell align="center">
+                              <h1 className="text-red-600 font-semibold">
+                                {item.marksEntryStatus}
+                              </h1>
+                            </TableCell>
+                            <TableCell align="center">
+                              <div className="w-full flex flex-col items-end justify-center">
+                                <button
+                                  onClick={() =>
+                                    mutation.mutate({
+                                      type: "feedback",
+                                      data: item,
+                                    })
+                                  }
+                                >
+                                  <BasicButton
+                                    text={`${
+                                      item.feedbackStatus === "CANNOT_GENERATE"
+                                        ? "Generate"
+                                        : "Regenerate"
+                                    }`}
+                                    size={"small"}
+                                    disable={
+                                      item.feedbackStatus === "CANNOT_GENERATE"
+                                        ? true
+                                        : false
+                                    }
+                                  />
+                                </button>
+
+                                <h1 className="font-semibold italic text-xs">
+                                  {item?.feedbackGenerationDate?.replace(
+                                    "&nbsp;",
+                                    ""
+                                  )}
+                                </h1>
+                              </div>
+                            </TableCell>
+                            <TableCell align="center">
+                              <div className="w-full flex flex-col items-end justify-center">
+                                <button
+                                  onClick={() =>
+                                    mutation.mutate({
+                                      type: "result",
+                                      data: item,
+                                    })
+                                  }
+                                >
+                                  <BasicButton
+                                    text={"Announce"}
+                                    size={"small"}
+                                    disable={
+                                      item.resultAnnouncementStatus ===
+                                      "CANNOT_ANNOUNCE"
+                                        ? true
+                                        : false
+                                    }
+                                  />
+                                </button>
+                                <h1 className="font-semibold italic text-xs">
+                                  {item?.resultAnnouncementDate?.replace(
+                                    "&nbsp;",
+                                    ""
+                                  )}
+                                </h1>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                      {/* {returnData()?.map((item, index) => (
                         <TableRow
                           key={index}
                           sx={{
@@ -523,7 +632,7 @@ const OverView = () => {
                             </div>
                           </TableCell>
                         </TableRow>
-                      ))}
+                      ))} */}
                     </TableBody>
                   </Table>
                 </TableContainer>

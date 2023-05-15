@@ -32,6 +32,7 @@ const ExamSetUp = () => {
   const [loading, setLoading] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState("");
   const [snackbarErr, setSnackbarErr] = useState(false);
+  const [error, setError] = useState(false);
 
   const [queryParameters] = useSearchParams();
   const returnToken = () => {
@@ -81,6 +82,9 @@ const ExamSetUp = () => {
     cacheTime: 0,
     onSuccess: (data) => {
       // console.log(data);
+    },
+    onError: () => {
+      setError(true);
     },
     refetchOnWindowFocus: false,
   });
@@ -394,25 +398,27 @@ const ExamSetUp = () => {
                         <TableCell align="right" className="w-[10%]">
                           <div className="flex flex-col items-center gap-2">
                             <h1 className="font-bold">Class</h1>
-                            <div className="w-[5rem]">
-                              <SearchDropDown
-                                handleDropDown={handleDropDown}
-                                data={[
-                                  {
+                            {error ? null : (
+                              <div className="w-[5rem]">
+                                <SearchDropDown
+                                  handleDropDown={handleDropDown}
+                                  data={[
+                                    {
+                                      value: "All",
+                                    },
+                                    ...Exam_setUpData?.map((item) => {
+                                      return { value: item.grade.displayName };
+                                    }),
+                                  ]}
+                                  variant={"outlined"}
+                                  Name={"class"}
+                                  defaultValue={{
                                     value: "All",
-                                  },
-                                  ...Exam_setUpData.map((item) => {
-                                    return { value: item.grade.displayName };
-                                  }),
-                                ]}
-                                variant={"outlined"}
-                                Name={"class"}
-                                defaultValue={{
-                                  value: "All",
-                                }}
-                                size={"small"}
-                              />
-                            </div>
+                                  }}
+                                  size={"small"}
+                                />
+                              </div>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell align="right" className="w-[25%]">
@@ -447,144 +453,160 @@ const ExamSetUp = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {returnData()?.map((item, index) => (
-                        <TableRow
-                          key={index}
-                          sx={{
-                            "&:last-child td, &:last-child th": { border: 0 },
-                          }}
-                        >
-                          <TableCell component="th" scope="row" align="center">
-                            <h1 className="font-bold">
-                              {item.grade.displayName}
+                      {error ? (
+                        <TableRow>
+                          <TableCell colSpan={8} align="center">
+                            <h1 className="sm:text-lg text-base font-semibold text-gray-600">
+                              No data available
                             </h1>
                           </TableCell>
-                          <TableCell align="center">
-                            <SearchDropDown
-                              minWidth={"14rem"}
-                              handleDropDown={handleDropDown}
-                              item={item}
-                              data={[
-                                ...item.applicableExamNames.map((item) => {
-                                  return { value: item.displayName };
-                                }),
-                              ]}
-                              variant={"outlined"}
-                              Name={"exam_name"}
-                              defaultValue={{
-                                value: item.examName.displayName,
-                              }}
-                              size={"small"}
-                              disable={item.locked}
-                            />
-                          </TableCell>
-                          <TableCell align="center">
-                            <SearchDropDown
-                              minWidth={"12rem"}
-                              disable={item.locked}
-                              handleDropDown={handleDropDown}
-                              item={item}
-                              data={[
-                                ...item.applicableQuestionPaperDeliveryModeTypes.map(
-                                  (item) => {
-                                    return { value: item.displayName };
-                                  }
-                                ),
-                              ]}
-                              variant={"outlined"}
-                              Name={"exam_type"}
-                              defaultValue={{
-                                value:
-                                  item.questionPaperDeliveryModeType
-                                    .displayName,
-                              }}
-                              size={"small"}
-                            />
-                          </TableCell>
-                          <TableCell align="center">
-                            {Object.keys(item.applicableMarksSyllabus)[0] ===
-                            "SUBJECTIVE" ? (
-                              <SearchDropDown
-                                minWidth={"12rem"}
-                                handleDropDown={handleDropDown}
-                                disable={
-                                  item.locked ||
-                                  item.questionPaperDeliveryModeType
-                                    .displayName === null
-                                    ? true
-                                    : false
-                                }
-                                item={item}
-                                data={[
-                                  ...item?.applicableMarksSyllabus?.SUBJECTIVE?.map(
-                                    (item) => {
-                                      return { value: item.displayName };
-                                    }
-                                  ),
-                                ]}
-                                variant={"outlined"}
-                                Name={"mark_syllabus_difficulty"}
-                                defaultValue={{
-                                  value: item.selectedMarksSyllabus.displayName,
-                                }}
-                                size={"small"}
-                              />
-                            ) : (
-                              <SearchDropDown
-                                minWidth={"12rem"}
-                                handleDropDown={handleDropDown}
-                                disable={
-                                  item.locked ||
-                                  item.questionPaperDeliveryModeType
-                                    .displayName === null
-                                    ? true
-                                    : false
-                                }
-                                item={item}
-                                data={[
-                                  ...item?.applicableMarksSyllabus?.OBJECTIVE?.map(
-                                    (item) => {
-                                      return { value: item.displayName };
-                                    }
-                                  ),
-                                ]}
-                                variant={"outlined"}
-                                Name={"mark_syllabus_difficulty"}
-                                defaultValue={{
-                                  value: item.selectedMarksSyllabus.displayName,
-                                }}
-                                size={"small"}
-                              />
-                            )}
-                          </TableCell>
-                          <TableCell align="center">
-                            <BasicTextFields
-                              variant={"standard"}
-                              item={item}
-                              defaultValue={item.duration}
-                              disable={
-                                item.locked ||
-                                item.questionPaperDeliveryModeType
-                                  .displayName === null
-                                  ? true
-                                  : false
-                              }
-                              handleOnBlur={handleOnBlur}
-                              lable={"Time"}
-                              type={"number"}
-                            />
-                          </TableCell>
-                          <TableCell align="center">
-                            <SwitchLabels
-                              checked={item.locked}
-                              item={item}
-                              ref={addToRef}
-                              name={"exam_setup"}
-                              handleSwitchChange={handleSwitchChange}
-                            />
-                          </TableCell>
                         </TableRow>
-                      ))}
+                      ) : (
+                        returnData()?.map((item, index) => (
+                          <TableRow
+                            key={index}
+                            sx={{
+                              "&:last-child td, &:last-child th": { border: 0 },
+                            }}
+                          >
+                            <TableCell
+                              component="th"
+                              scope="row"
+                              align="center"
+                            >
+                              <h1 className="font-bold">
+                                {item.grade.displayName}
+                              </h1>
+                            </TableCell>
+                            <TableCell align="center">
+                              <SearchDropDown
+                                minWidth={"14rem"}
+                                handleDropDown={handleDropDown}
+                                item={item}
+                                data={[
+                                  ...item.applicableExamNames.map((item) => {
+                                    return { value: item.displayName };
+                                  }),
+                                ]}
+                                variant={"outlined"}
+                                Name={"exam_name"}
+                                defaultValue={{
+                                  value: item.examName.displayName,
+                                }}
+                                size={"small"}
+                                disable={item.locked}
+                              />
+                            </TableCell>
+                            <TableCell align="center">
+                              <SearchDropDown
+                                minWidth={"12rem"}
+                                disable={item.locked}
+                                handleDropDown={handleDropDown}
+                                item={item}
+                                data={[
+                                  ...item.applicableQuestionPaperDeliveryModeTypes.map(
+                                    (item) => {
+                                      return { value: item.displayName };
+                                    }
+                                  ),
+                                ]}
+                                variant={"outlined"}
+                                Name={"exam_type"}
+                                defaultValue={{
+                                  value:
+                                    item.questionPaperDeliveryModeType
+                                      .displayName,
+                                }}
+                                size={"small"}
+                              />
+                            </TableCell>
+                            <TableCell align="center">
+                              {Object.keys(item.applicableMarksSyllabus)[0] ===
+                              "SUBJECTIVE" ? (
+                                <SearchDropDown
+                                  minWidth={"12rem"}
+                                  handleDropDown={handleDropDown}
+                                  disable={
+                                    item.locked ||
+                                    item.questionPaperDeliveryModeType
+                                      .displayName === null
+                                      ? true
+                                      : false
+                                  }
+                                  item={item}
+                                  data={[
+                                    ...item?.applicableMarksSyllabus?.SUBJECTIVE?.map(
+                                      (item) => {
+                                        return { value: item.displayName };
+                                      }
+                                    ),
+                                  ]}
+                                  variant={"outlined"}
+                                  Name={"mark_syllabus_difficulty"}
+                                  defaultValue={{
+                                    value:
+                                      item.selectedMarksSyllabus.displayName,
+                                  }}
+                                  size={"small"}
+                                />
+                              ) : (
+                                <SearchDropDown
+                                  minWidth={"12rem"}
+                                  handleDropDown={handleDropDown}
+                                  disable={
+                                    item.locked ||
+                                    item.questionPaperDeliveryModeType
+                                      .displayName === null
+                                      ? true
+                                      : false
+                                  }
+                                  item={item}
+                                  data={[
+                                    ...item?.applicableMarksSyllabus?.OBJECTIVE?.map(
+                                      (item) => {
+                                        return { value: item.displayName };
+                                      }
+                                    ),
+                                  ]}
+                                  variant={"outlined"}
+                                  Name={"mark_syllabus_difficulty"}
+                                  defaultValue={{
+                                    value:
+                                      item.selectedMarksSyllabus.displayName,
+                                  }}
+                                  size={"small"}
+                                />
+                              )}
+                            </TableCell>
+                            <TableCell align="center">
+                              <BasicTextFields
+                                variant={"standard"}
+                                item={item}
+                                defaultValue={item.duration}
+                                disable={
+                                  item.locked ||
+                                  item.questionPaperDeliveryModeType
+                                    .displayName === null
+                                    ? true
+                                    : false
+                                }
+                                handleOnBlur={handleOnBlur}
+                                lable={"Time"}
+                                type={"number"}
+                              />
+                            </TableCell>
+                            <TableCell align="center">
+                              <SwitchLabels
+                                checked={item.locked}
+                                item={item}
+                                ref={addToRef}
+                                name={"exam_setup"}
+                                handleSwitchChange={handleSwitchChange}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
                     </TableBody>
                   </Table>
                 </TableContainer>

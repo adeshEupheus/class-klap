@@ -30,6 +30,7 @@ const ScoreBoard = () => {
   const [loading, setLoading] = useState(true);
   const [snackbarMsg, setSnackbarMsg] = useState("");
   const [snackbarErr, setSnackbarErr] = useState(false);
+  const [error, setError] = useState(false);
 
   const snackbarRef = useRef();
   const switchRefs = useRef([]);
@@ -68,24 +69,24 @@ const ScoreBoard = () => {
     queryFn: () => GetScoreBoardData(returnToken()),
     cacheTime: 0,
     onSuccess: (data) => {
-      // console.log(data);
-      //   let mainData = [];
-      // Object.entries(data.Primary).map((item) => {
-      //   mainData.push({className: item[0], data: item[1]})
-      // })
-      // console.log(mainData);
-      // console.log( );
-      setFilter(Object.keys(data?.Primary)[0]);
+      if (Object.keys(data).length === 0) {
+        setError(true);
+      } else {
+        setFilter(Object.keys(data?.Primary)[0]);
+      }
+
       setLoading(false);
-      // setFilter();
     },
     refetchOnWindowFocus: false,
+    onError: () => {
+      setError(true);
+    },
   });
   const [filter, setFilter] = useState();
 
   const returnArray = () => {
     let mainData = [];
-    Object.entries(ScoreBoardData.Primary).map((item) => {
+    Object.entries(ScoreBoardData?.Primary).map((item) => {
       mainData.push({ className: item[0], data: item[1] });
     });
     return mainData;
@@ -196,7 +197,7 @@ const ScoreBoard = () => {
                   variant="text"
                   sx={{ fontSize: "2rem", width: "5rem" }}
                 />
-              ) : (
+              ) : error ? null : (
                 <div className="flex  flex-col p-3 md:flex-row  justify-between md:p-3 ">
                   <div className="w-[10rem] ">
                     <SearchDropDown
@@ -247,13 +248,15 @@ const ScoreBoard = () => {
                 <Skeleton animation="wave" variant="rectangular" height={300} />
               ) : (
                 <>
-                  {returnClass(returnData()[0].data).map((item, i) => {
-                    return (
-                      <div className="sm:w-full" key={i}>
-                        <Graph data={item} key={item.className} />
-                      </div>
-                    );
-                  })}
+                  {error
+                    ? null
+                    : returnClass(returnData()[0].data).map((item, i) => {
+                        return (
+                          <div className="sm:w-full" key={i}>
+                            <Graph data={item} key={item.className} />
+                          </div>
+                        );
+                      })}
                 </>
               )}
             </div>

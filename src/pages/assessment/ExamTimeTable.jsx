@@ -54,6 +54,7 @@ import SchoolInfo from "../../components/SchoolInfo";
 import { useSearchParams } from "react-router-dom";
 import { useLayoutEffect } from "react";
 import { GetApplicableExamType } from "../../apis/fectcher/assessment/GetApplicableExamType";
+import ViewQP from "../../components/Material/examTimeTable/ViewQP";
 const ExamTimeTable = () => {
   const [examId, setExamId] = useState("");
   const [gradeId, setGradeId] = useState("");
@@ -63,6 +64,7 @@ const ExamTimeTable = () => {
   const [snackbarErr, setSnackbarErr] = useState(false);
   const [error, setError] = useState(false);
   const [queryParameters] = useSearchParams();
+  const [subjectId, setSubjectId] = useState("");
   const returnToken = () => {
     return queryParameters.get("auth");
   };
@@ -188,12 +190,12 @@ const ExamTimeTable = () => {
         );
         if (res.success) {
           refetch();
-          setSnackbarErr(false);
+          // setSnackbarErr(false);
           index = ExamTimetableData.subjectLevelConfigurationResponses.indexOf(
             data.item
           );
-          setSnackbarMsg(res.message);
-          snackbarRef.current.openSnackbar();
+          // setSnackbarMsg(res.message);
+          // snackbarRef.current.openSnackbar();
           setLoading(false);
           examReqrefs.current[index].toggle();
           // console.log(examReqrefs);
@@ -223,13 +225,13 @@ const ExamTimeTable = () => {
         );
         if (res.success) {
           refetch();
-          setSnackbarErr(false);
+          // setSnackbarErr(false);
           index = ExamTimetableData.subjectLevelConfigurationResponses.indexOf(
             data.item
           );
           feedbackReqrefs.current[index].toggle();
-          setSnackbarMsg(res.message);
-          snackbarRef.current.openSnackbar();
+          // setSnackbarMsg(res.message);
+          // snackbarRef.current.openSnackbar();
           setLoading(false);
           // console.log(examReqrefs);
         } else {
@@ -260,9 +262,9 @@ const ExamTimeTable = () => {
         );
         if (res.success) {
           refetch();
-          setSnackbarErr(false);
-          setSnackbarMsg(res.message);
-          snackbarRef.current.openSnackbar();
+          // setSnackbarErr(false);
+          // setSnackbarMsg(res.message);
+          // snackbarRef.current.openSnackbar();
           setLoading(false);
         } else {
           setSnackbarErr(true);
@@ -291,9 +293,9 @@ const ExamTimeTable = () => {
         );
         if (res.success) {
           refetch();
-          setSnackbarErr(false);
-          setSnackbarMsg(res.message);
-          snackbarRef.current.openSnackbar();
+          // setSnackbarErr(false);
+          // setSnackbarMsg(res.message);
+          // snackbarRef.current.openSnackbar();
           setLoading(false);
         } else {
           setSnackbarErr(true);
@@ -322,9 +324,9 @@ const ExamTimeTable = () => {
         );
         if (res.success) {
           refetch();
-          setSnackbarErr(false);
-          setSnackbarMsg(res.message);
-          snackbarRef.current.openSnackbar();
+          // setSnackbarErr(false);
+          // setSnackbarMsg(res.message);
+          // snackbarRef.current.openSnackbar();
           setLoading(false);
         } else {
           setSnackbarErr(true);
@@ -403,6 +405,68 @@ const ExamTimeTable = () => {
           setLoading(false);
         }
       }
+      if (data.name === "examType") {
+        console.log(data);
+        setLoading(true);
+        const apiBodyData = {
+          duration: data.item.duration,
+          examDate: data.item.examDate,
+          examTime: data.item.examTime,
+          feedbackRequired: data.item.feedbackRequired,
+          qpSetTypeDeliveryMode: data.item.newDeliveryMode,
+          skuId: data.item.selectedSku,
+        };
+        res = await UpdateTimeTable(
+          examId,
+          gradeId,
+          data.item.subject.name,
+          apiBodyData,
+          returnToken()
+        );
+        if (res.success) {
+          refetch();
+          // setSnackbarErr(false);
+          // setSnackbarMsg(res.message);
+          // snackbarRef.current.openSnackbar();
+          setLoading(false);
+        } else {
+          setSnackbarErr(true);
+          setSnackbarMsg(res.message);
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        }
+      }
+      if (data.name === "markSyllabus") {
+        console.log(data);
+        setLoading(true);
+        const apiBodyData = {
+          duration: data.item.duration,
+          examDate: data.item.examDate,
+          examTime: data.item.examTime,
+          feedbackRequired: data.item.feedbackRequired,
+          qpSetTypeDeliveryMode: data.item.newDeliveryMode,
+          skuId: data.item.newSyllabus,
+        };
+        res = await UpdateTimeTable(
+          examId,
+          gradeId,
+          data.item.subject.name,
+          apiBodyData,
+          returnToken()
+        );
+        if (res.success) {
+          refetch();
+          // setSnackbarErr(false);
+          // setSnackbarMsg(res.message);
+          // snackbarRef.current.openSnackbar();
+          setLoading(false);
+        } else {
+          setSnackbarErr(true);
+          setSnackbarMsg(res.message);
+          snackbarRef.current.openSnackbar();
+          setLoading(false);
+        }
+      }
     },
   });
 
@@ -466,16 +530,23 @@ const ExamTimeTable = () => {
     }
   };
 
+  const ViewQpRef = useRef();
+
   function Row(props) {
     const { row } = props;
     const [open, setOpen] = React.useState(true);
-
+    console.log(row);
     const dateRef = useRef();
 
     const handleDateChange = (value) => {
       console.log(value);
       row.newDate = value;
       mutation.mutate({ item: row, name: "date" });
+    };
+
+    const openViewQP = (subName) => {
+      setSubjectId(subName);
+      ViewQpRef.current.OpenViewQp();
     };
 
     const handleTimeChange = (value) => {
@@ -493,6 +564,25 @@ const ExamTimeTable = () => {
 
     const handleDropDown = (value, type) => {
       console.log(value, type);
+      row.newDeliveryMode = value.name;
+      mutation.mutate({ item: row, name: "examType" });
+    };
+
+    const handleChangeSyllabus = (value, type) => {
+      console.log(value, type);
+      row.newSyllabus = value.name;
+      mutation.mutate({ item: row, name: "markSyllabus" });
+    };
+
+    const returnSyllabus = (arr, id) => {
+      console.log(arr, id);
+      let ans;
+      arr.map((item) => {
+        if (Number(item.name) === id) {
+          ans = item.displayName;
+        }
+      });
+      return ans;
     };
 
     return (
@@ -542,7 +632,7 @@ const ExamTimeTable = () => {
               handleDropDown={handleDropDown}
               data={[
                 ...row?.applicableQuestionPaperDeliveryModeType.map((item) => {
-                  return { value: item.displayName };
+                  return { value: item?.displayName, name: item?.name };
                 }),
               ]}
               variant={"outlined"}
@@ -559,27 +649,30 @@ const ExamTimeTable = () => {
             "SUBJECTIVE" ? (
               <SearchDropDown
                 minWidth={"12rem"}
-                handleDropDown={handleDropDown}
+                handleDropDown={handleChangeSyllabus}
                 disable={row.locked}
                 data={[
                   ...row?.qpSetTypeApplicableMarksMap?.SUBJECTIVE?.map(
                     (item) => {
-                      return { value: item.displayName };
+                      return { value: item?.displayName, name: item?.name };
                     }
                   ),
                 ]}
                 variant={"outlined"}
                 Name={"mark_syllabus_difficulty"}
                 defaultValue={{
-                  value:
-                    row.qpSetTypeApplicableMarksMap.SUBJECTIVE[0].displayName,
+                  value: returnSyllabus(
+                    row.qpSetTypeApplicableMarksMap.SUBJECTIVE,
+                    row.selectedSku
+                  ),
+                  // row.qpSetTypeApplicableMarksMap.SUBJECTIVE[0].displayName,
                 }}
                 size={"small"}
               />
             ) : (
               <SearchDropDown
                 minWidth={"12rem"}
-                handleDropDown={handleDropDown}
+                handleDropDown={handleChangeSyllabus}
                 disable={row.locked}
                 data={[
                   ...row?.qpSetTypeApplicableMarksMap?.OBJECTIVE?.map(
@@ -598,7 +691,9 @@ const ExamTimeTable = () => {
             )}
           </TableCell>
           <TableCell align="center">
-            <Visibility className="!text-gray-600 !cursor-pointer" />
+            <div onClick={() => openViewQP(row.subject.name)}>
+              <Visibility className="!text-gray-600 !cursor-pointer" />
+            </div>
           </TableCell>
           <TableCell align="center">
             <h1 className="text-red-600 text-xs font-semibold">
@@ -618,7 +713,7 @@ const ExamTimeTable = () => {
                           <h1 className="text-sm font-semibold text-gray-600">
                             Exam Attendance:
                           </h1>
-                          {row.studentsPresent}
+                          {row.studentsPresent + "/" + row.totalStudents}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -682,6 +777,21 @@ const ExamTimeTable = () => {
       window.removeEventListener("resize", handleWidth);
     };
   }, []);
+
+  const returnGrade = (id) => {
+    switch (id.split("_")[0]) {
+      case "NUR":
+        return "Nursery";
+        break;
+      case "GRADE":
+        return `${id.split("_")[0]} ${id.split("_")[1]}`;
+        break;
+      default:
+        return id;
+        break;
+    }
+  };
+
   return (
     <>
       <Snackbars
@@ -696,7 +806,6 @@ const ExamTimeTable = () => {
           show={show}
         />
         <Loader loading={loading} />
-
         <DialogSlide
           ref={dialogRef}
           handleDialogButton={handleDialogButton}
@@ -718,6 +827,14 @@ const ExamTimeTable = () => {
             window.innerWidth < 1024 ? null : "md:ml-[30vw] ml-[85vw]"
           } `}
         >
+          <ViewQP
+            ref={ViewQpRef}
+            returnToken={returnToken}
+            examId={examId}
+            gradeId={gradeId}
+            subjectId={subjectId}
+          />
+
           <div
             className="lg:hidden absolute cursor-pointer top-4 left-4"
             onClick={handleSidebarCollapsed}
@@ -814,7 +931,7 @@ const ExamTimeTable = () => {
                         ExamTimetableData?.examConducted
                           ? "Re-Conduct"
                           : "Conduct"
-                      } exam for Class Nursery`}
+                      } exam for Class ${returnGrade(gradeId)}`}
                       size={"small"}
                     />
                   </div>
@@ -855,7 +972,13 @@ const ExamTimeTable = () => {
                       </h1>
                     </div>
                     <a href={ExamTimetableData?.questionPaperLink}>
-                      <Download className="!text-gray-600 !cursor-pointer" />
+                      <Download
+                        className={` ${
+                          ExamTimetableData?.questionPaperLink
+                            ? "text-blue-500 !cursor-pointer"
+                            : "text-gray-300"
+                        }`}
+                      />
                     </a>
                   </div>
                   <div className="px-8 py-4 w-full justify-center flex gap-3 shadow-lg rounded-md items-center bg-slate-300">
@@ -887,7 +1010,13 @@ const ExamTimeTable = () => {
                       </h1>
                     </div>
                     <a href={PersonalizedQPData?.qpUrl}>
-                      <Download className="!text-gray-600 !cursor-pointer" />
+                      <Download
+                        className={`${
+                          PersonalizedQPData?.qpUrl
+                            ? "text-blue-500 !cursor-pointer"
+                            : "text-gray-400"
+                        }`}
+                      />
                     </a>
                   </div>
                 </div>

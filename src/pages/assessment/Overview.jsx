@@ -152,6 +152,7 @@ const OverView = () => {
 
   function removeDuplicates(arr, key) {
     let array;
+
     switch (key) {
       case "class":
         array = arr?.map((item) => item.schoolClass);
@@ -470,17 +471,31 @@ const OverView = () => {
                               {item.examName}
                             </TableCell>
                             <TableCell align="center">
-                              {item.examSetup}
+                              <p className="text-blue-600 font-semibold">
+                                {item.examSetup}
+                              </p>
                             </TableCell>
                             <TableCell align="center">
-                              <h1 className="text-red-600 font-semibold">
+                              <p
+                                className={`${
+                                  item.examSchedule === "Not Scheduled"
+                                    ? "text-red-600"
+                                    : "text-blue-600"
+                                } font-semibold`}
+                              >
                                 {item.examSchedule}
-                              </h1>
+                              </p>
                             </TableCell>
                             <TableCell align="center">
-                              <h1 className="text-red-600 font-semibold">
+                              <p
+                                className={`${
+                                  item.marksEntryStatus === "Pending"
+                                    ? "text-blue-600"
+                                    : "text-green-600"
+                                } font-semibold`}
+                              >
                                 {item.marksEntryStatus}
-                              </h1>
+                              </p>
                             </TableCell>
                             <TableCell align="center">
                               <div className="w-full flex flex-col items-end justify-center">
@@ -494,7 +509,7 @@ const OverView = () => {
                                 >
                                   <BasicButton
                                     text={`${
-                                      item.feedbackStatus === "CANNOT_GENERATE"
+                                      item.feedbackStatus === "NOT_GENERATED"
                                         ? "Generate"
                                         : "Regenerate"
                                     }`}
@@ -526,7 +541,12 @@ const OverView = () => {
                                   }
                                 >
                                   <BasicButton
-                                    text={"Announce"}
+                                    text={`${
+                                      item.resultAnnouncementStatus ===
+                                      "NOT_ANNOUNCED"
+                                        ? "Announce"
+                                        : "Reannounce"
+                                    }`}
                                     size={"small"}
                                     disable={
                                       item.resultAnnouncementStatus ===

@@ -114,6 +114,8 @@ const ExamSetUp = () => {
             returnToken()
           );
         }
+        setSnackbarMsg(res.message.replace(/<b>/g, " ").replace("</b>", " "));
+        snackbarRef.current.openSnackbar();
       } else {
         res = await LockExamSetup(
           data.examType,
@@ -128,8 +130,8 @@ const ExamSetUp = () => {
         if (data.item) {
           index = Exam_setUpData.indexOf(data.item);
         }
-        setSnackbarMsg(res.message.replace(/<b>/g, " ").replace("</b>", " "));
-        snackbarRef.current.openSnackbar();
+        // setSnackbarMsg(res.message.replace(/<b>/g, " ").replace("</b>", " "));
+        // snackbarRef.current.openSnackbar();
         setLoading(false);
         if (data.item) {
           switchRefs.current[index].toggle();

@@ -976,7 +976,7 @@ const ExamTimeTable = () => {
                         className={` ${
                           ExamTimetableData?.questionPaperLink
                             ? "text-blue-500 !cursor-pointer"
-                            : "text-gray-300"
+                            : "text-gray-400"
                         }`}
                       />
                     </a>

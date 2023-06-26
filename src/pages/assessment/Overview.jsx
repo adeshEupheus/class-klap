@@ -511,6 +511,9 @@ const OverView = () => {
                                     text={`${
                                       item.feedbackStatus === "NOT_GENERATED"
                                         ? "Generate"
+                                        : item.feedbackStatus ===
+                                          "CANNOT_GENERATE"
+                                        ? "Generate"
                                         : "Regenerate"
                                     }`}
                                     size={"small"}
@@ -544,6 +547,9 @@ const OverView = () => {
                                     text={`${
                                       item.resultAnnouncementStatus ===
                                       "NOT_ANNOUNCED"
+                                        ? "Announce"
+                                        : item.resultAnnouncementStatus ===
+                                          "CANNOT_ANNOUNCE"
                                         ? "Announce"
                                         : "Reannounce"
                                     }`}

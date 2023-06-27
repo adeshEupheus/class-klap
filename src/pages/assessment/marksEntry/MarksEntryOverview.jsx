@@ -10,7 +10,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import SwipeableTemporaryDrawer from "../../../components/Material/MaterialSidebar";
 import { Chip, Skeleton, Switch } from "@mui/material";
-import { Menu } from "@mui/icons-material";
+import { InfoOutlined, Menu } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
 import Breadcrumbs from "../../../components/Material/BreadCrumbs";
 import SearchDropDown from "../../../components/Material/SearchDropDown";
@@ -23,12 +23,15 @@ import { GetSchoolDetailsWithoutHeader } from "../../../apis/fectcher/assessment
 import SchoolInfo from "../../../components/SchoolInfo";
 import { useSearchParams } from "react-router-dom";
 import Cookies from "js-cookie";
+import LightTooltip from "../../../components/Material/marksEntry/Tooltip";
+import CustomizeTooltip from "../../../components/Material/marksEntry/Tooltip";
 
 const MarksEntryOverview = () => {
-  const [id, setId] = useState("FA1");
-  const [sectionId, setSectionId] = useState("112424");
+  const [id, setId] = useState("");
+  const [sectionId, setSectionId] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [queryParameters] = useSearchParams();
+  const [filter, setFilter] = useState("All");
 
   const returnToken = () => {
     return queryParameters.get("auth");
@@ -46,6 +49,7 @@ const MarksEntryOverview = () => {
   } = useQuery({
     queryKey: ["marks_entryOverview", id, sectionId],
     queryFn: () => GetMarksEntryOverviewData(id, sectionId, returnToken()),
+    enabled: !!id && !!sectionId,
     onSuccess: (data) => {
       console.log(data);
     },
@@ -62,7 +66,9 @@ const MarksEntryOverview = () => {
     queryFn: () => GetExamConfig(returnToken()),
     onSuccess: (data) => {
       console.log(data);
-      setDisplayName(examConfigData.exams[0].displayName);
+      setId(data?.exams[0].name);
+      setSectionId(data?.sections[0][0]);
+      setDisplayName(data.exams[0].displayName);
     },
     refetchOnWindowFocus: false,
   });
@@ -74,20 +80,34 @@ const MarksEntryOverview = () => {
   const sidebarRef = useRef();
 
   const handleDropDown = (value, type) => {
-    console.log(value, type);
+    // console.log(value, type);
     switch (type) {
       case "grade":
-        console.log(value, type);
+        // console.log(value, type);
         setSectionId(value.sectionId);
         break;
       case "exam":
         setId(value.value);
         setDisplayName(value.name);
         break;
+      case "class":
+        setFilter(value.value);
+        break;
 
       default:
         break;
     }
+  };
+
+  const returnData = () => {
+    if (filter === "All") {
+      return Overview_TableData;
+    }
+
+    const newArray = Overview_TableData.filter(
+      (item) => item.subject.displayName === filter
+    );
+    return newArray;
   };
 
   const handleSidebarCollapsed = () => {
@@ -265,8 +285,11 @@ const MarksEntryOverview = () => {
                           </div>
                         </TableCell>
                         <TableCell align="right" className="w-[15%]">
-                          <div className="flex flex-col items-center gap-2">
-                            <h1 className="font-semibold">Progress</h1>
+                          <div className="flex justify-center items-center gap-2">
+                            <h1 className="font-semibold">Progress </h1>
+                            <CustomizeTooltip>
+                              <InfoOutlined className="!text-sm sm:!text-base" />
+                            </CustomizeTooltip>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -281,7 +304,7 @@ const MarksEntryOverview = () => {
                           </TableCell>
                         </TableRow>
                       )}
-                      {Overview_TableData?.map((item, index) => (
+                      {returnData()?.map((item, index) => (
                         <TableRow
                           key={index}
                           sx={{
@@ -305,12 +328,17 @@ const MarksEntryOverview = () => {
                               color="error"
                               size="small"
                             />
+                            <h1 className="font-semibold sm:text-sm text-xs">
+                              {item.lockedOn}
+                            </h1>
                           </TableCell>
                           <TableCell align="center">
-                            <h1 className="font-semibold">{item.lockedBy}</h1>
+                            <h1 className="font-semibold sm:text-base text-xs">
+                              {item.lockedBy}
+                            </h1>
                           </TableCell>
                           <TableCell align="center">
-                            <h1 className="font-semibold">
+                            <h1 className="font-semibold sm:text-base text-xs">
                               {item.lockedByUserRole.displayName}
                             </h1>
                           </TableCell>

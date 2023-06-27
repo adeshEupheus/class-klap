@@ -10,7 +10,9 @@ export const GetOverviewData = async (id, Token) => {
       Authorization: `Bearer ${Token ? Token : Cookies.get("token")}`,
       // BEAMAPP: true,
     },
-  }).catch((err) => console.log(err));
+  }).catch((err) => {
+    return err;
+  });
 
   const result = res.data.examOverviewData;
   return result;

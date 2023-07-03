@@ -31,8 +31,12 @@ export default function SelectMUI({ size, data, disable, handleSelectAction }) {
         size="small"
         onChange={handleChange}
       >
-        {marksArray.map((item) => {
-          return <MenuItem value={item}>{item}</MenuItem>;
+        {marksArray.map((item, index) => {
+          return (
+            <MenuItem key={index} value={item}>
+              {item}
+            </MenuItem>
+          );
         })}
       </Select>
     </FormControl>

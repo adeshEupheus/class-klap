@@ -1,5 +1,5 @@
 import * as React from "react";
-import Box from "@mui/material/Box";
+// import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 
 export default function BasicTextFields({
@@ -12,10 +12,20 @@ export default function BasicTextFields({
   handleOnBlur,
   disable,
   size,
+  handleChange,
+  name,
 }) {
   const onBlur = (e) => {
-    handleOnBlur(e.target.value, item);
+    if (handleOnBlur) {
+      handleOnBlur(e.target.value, item);
+    }
     // console.log(e.target.value);
+  };
+
+  const onChange = (e) => {
+    if (handleChange) {
+      handleChange({ val: e.target.value, name });
+    }
   };
 
   return (
@@ -27,6 +37,7 @@ export default function BasicTextFields({
       defaultValue={defaultValue}
       size={size ? size : "medium"}
       onBlur={onBlur}
+      onChange={onChange}
       // value={value}
       variant={variant}
     />

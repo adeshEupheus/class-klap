@@ -23,7 +23,9 @@ function App() {
   const client = new QueryClient();
   const user = useSelector((state) => state.auth.user);
   const Id = useSelector((state) => state.auth.id);
-  const isAuth = user ? (Id ? true : false) : false;
+  // const isAuth = user ? (Id ? true : false) : false;
+  const isAuth = user ? true : false;
+
   const queryParameters = new URLSearchParams(window.location.search);
   return (
     <div className="font-Roboto">

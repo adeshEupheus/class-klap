@@ -23,6 +23,8 @@ import Cookies from "js-cookie";
 import SchoolInfo from "../../components/SchoolInfo";
 import { useSearchParams } from "react-router-dom";
 import { useLayoutEffect } from "react";
+import instance from "../../instance";
+import { saveAs } from "file-saver";
 
 const ScoreBoard = () => {
   // const [id, setId] = useState("RSA1");
@@ -51,13 +53,6 @@ const ScoreBoard = () => {
     queryKey: ["school_info"],
     queryFn: () => GetSchoolDetailsWithoutHeader(returnToken()),
   });
-
-  const addToRef = (el) => {
-    // console.count(el);
-    if (el && !switchRefs.current.includes(el)) {
-      switchRefs.current.push(el);
-    }
-  };
 
   const {
     data: ScoreBoardData,
@@ -126,6 +121,23 @@ const ScoreBoard = () => {
       await DownloadPerformance(filter, returnToken());
     }
     dialogRef.current.openDialog();
+  };
+
+  const examAttendance = async () => {
+    const res = await instance({
+      url: `schoolApp/configuration/examAttendance/${filter}`,
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${Cookies.get("token")}`,
+      },
+    }).catch((err) => console.log(err));
+    const convertOctetStreamToExcel = (octetStreamData, fileName) => {
+      const blob = new Blob([octetStreamData], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      saveAs(blob, fileName);
+    };
+    convertOctetStreamToExcel(res.data, "fileName.xlsx");
   };
 
   useEffect(() => {
@@ -212,35 +224,49 @@ const ScoreBoard = () => {
                     />
                   </div>
                   <div className="flex sm:flex-row flex-col gap-3 mt-3 md:mt-0 ">
-                    <Button
-                      variant="contained"
-                      className="!font-semibold"
-                      size="small"
-                    >
-                      <FileDownloadIcon />
-                      Exam Attendance
-                    </Button>
-
-                    <Button
-                      variant="contained"
-                      className="!font-semibold"
-                      onClick={() => openDialog("feedback")}
-                      size="small"
-                    >
-                      {" "}
-                      <FileDownloadIcon />
-                      Feedback Report
-                    </Button>
-                    <Button
-                      variant="contained"
-                      className="!font-semibold"
-                      onClick={() => openDialog("performance")}
-                      size="small"
-                    >
-                      {" "}
-                      <FileDownloadIcon />
-                      Performance
-                    </Button>
+                    <div onClick={examAttendance} className="w-1/3">
+                      <Button
+                        variant="contained"
+                        className="!font-semibold"
+                        size="small"
+                        sx={{
+                          width: "100%",
+                        }}
+                      >
+                        <FileDownloadIcon />
+                        Exam Attendance
+                      </Button>
+                    </div>
+                    <div className="w-1/3">
+                      <Button
+                        variant="contained"
+                        className="!font-semibold"
+                        onClick={() => openDialog("feedback")}
+                        size="small"
+                        sx={{
+                          width: "100%",
+                        }}
+                      >
+                        {" "}
+                        <FileDownloadIcon />
+                        Feedback Report
+                      </Button>
+                    </div>
+                    <div className="w-1/3">
+                      <Button
+                        variant="contained"
+                        className="!font-semibold"
+                        onClick={() => openDialog("performance")}
+                        size="small"
+                        sx={{
+                          width: "100%",
+                        }}
+                      >
+                        {" "}
+                        <FileDownloadIcon />
+                        Performance
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}

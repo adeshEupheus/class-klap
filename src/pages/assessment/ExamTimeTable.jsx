@@ -1103,7 +1103,7 @@ const ExamTimeTable = () => {
                         <TableCell align="right" className="w-[20%]">
                           <div className="flex flex-col items-center gap-2">
                             <h1 className="font-semibold sm:text-sm text-xs">
-                              Marks - Syllabus
+                              Marks - Syllabus - Difficulty
                             </h1>
                           </div>
                         </TableCell>

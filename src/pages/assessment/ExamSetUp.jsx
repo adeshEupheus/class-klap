@@ -26,6 +26,7 @@ import SchoolInfo from "../../components/SchoolInfo";
 import { useSearchParams } from "react-router-dom";
 import { useLayoutEffect } from "react";
 import { GetApplicableExamType } from "../../apis/fectcher/assessment/GetApplicableExamType";
+import instance from "../../instance";
 const ExamSetUp = () => {
   const [id, setId] = useState("");
   const [filter, setFilter] = useState("All");
@@ -70,6 +71,30 @@ const ExamSetUp = () => {
     }
   };
 
+  const autoLock = async () => {
+    setLoading(true);
+    const res = await instance({
+      url: `schoolApp/configuration/updateDefaultSku/${id}`,
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${Cookies.get("token")}`,
+      },
+    }).catch((err) => console.log(err));
+    setLoading(false);
+    const regex = /<\/?b>/g;
+    setSnackbarErr(!res.data.success);
+
+    setSnackbarMsg(res.data.message.replaceAll(regex, ""));
+    snackbarRef.current.openSnackbar();
+    refetch();
+  };
+
+  useEffect(() => {
+    if (id) {
+      autoLock();
+    }
+  }, [id]);
+
   const {
     data: Exam_setUpData,
     isLoading,
@@ -80,7 +105,7 @@ const ExamSetUp = () => {
     enabled: !!id,
     queryFn: () => GetExamSetUpData(id, returnToken()),
     cacheTime: 0,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       // console.log(data);
     },
     onError: () => {
@@ -331,7 +356,7 @@ const ExamSetUp = () => {
           sidebarCollapsed={sidebarCollapsed}
           show={show}
         />
-        <Loader loading={loading} />
+        <Loader loading={loading || isRefetching} />
 
         <div>
           <SwipeableTemporaryDrawer

@@ -29,6 +29,7 @@ export default function OverviewStepper({ data, examId }) {
   const [loading, setLoading] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState("");
   const [snackbarErr, setSnackbarErr] = useState(false);
+  const [enableSendQp, setEnableSendQp] = useState(null);
   const returnStatus = () => {
     switch (data.status) {
       case "PENDING FOR SETUP":
@@ -83,7 +84,22 @@ export default function OverviewStepper({ data, examId }) {
       default:
         break;
     }
+    if (data?.personalizedQpGenerated) {
+      setEnableSendQp(data.personalizedQpGenerated);
+    }
   };
+
+  // const returnStatusOfqpPrint = () => {
+  //   if (enableSendQp !== null) {
+  //     if (enableSendQp) {
+  //       return "info";
+  //     } else {
+  //       return "default";
+  //     }
+  //   } else {
+  //     return DialogRef.current.openDialog();
+  //   }
+  // };
 
   const returnStep = (label, data) => {
     switch (label) {
@@ -131,7 +147,11 @@ export default function OverviewStepper({ data, examId }) {
           <>
             <Chip
               onClick={
-                returnStatus().print === "info"
+                enableSendQp !== null
+                  ? enableSendQp
+                    ? () => DialogRef.current.openDialog()
+                    : null
+                  : returnStatus().print === "info"
                   ? () => DialogRef.current.openDialog()
                   : null
               }
@@ -139,7 +159,13 @@ export default function OverviewStepper({ data, examId }) {
               className="!cursor-pointer"
               label={label}
               size="small"
-              color={returnStatus().print}
+              color={
+                enableSendQp !== null
+                  ? enableSendQp
+                    ? "info"
+                    : "default"
+                  : returnStatus().print
+              }
             />
             <h1 className="text-xs font-semibold italic">{data.trigerDate}</h1>
           </>

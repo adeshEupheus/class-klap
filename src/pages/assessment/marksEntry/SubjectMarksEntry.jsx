@@ -500,10 +500,12 @@ const SubjectMarksEntry = () => {
                   />
                 ) : (
                   <a
-                    href={`https://schoolsbel.xamcheck.com/app/schoolApp/configuration/previewAnswerKey/${sectionId}/${id}/${subjectId}`}
+                    href={`https://stage.ddntbsdmvxh69.amplifyapp.com/app/schoolApp/configuration/previewAnswerKey/${sectionId}/${id}/${subjectId}`}
                     target="_blank"
                   >
-                    <BasicButton size={"small"} text={"View Answer Key"} />
+                    <div onClick={async () => {}}>
+                      <BasicButton size={"small"} text={"View Answer Key"} />
+                    </div>
                   </a>
                 )}
 

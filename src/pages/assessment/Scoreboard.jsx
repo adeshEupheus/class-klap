@@ -5,7 +5,13 @@ import { useState } from "react";
 import Sidebar from "../../components/Sidebar";
 
 import SwipeableTemporaryDrawer from "../../components/Material/MaterialSidebar";
-import { Button, Skeleton } from "@mui/material";
+import {
+  Backdrop,
+  Button,
+  CircularProgress,
+  LinearProgress,
+  Skeleton,
+} from "@mui/material";
 import { Menu } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
 import Breadcrumbs from "../../components/Material/BreadCrumbs";
@@ -23,6 +29,8 @@ import Cookies from "js-cookie";
 import SchoolInfo from "../../components/SchoolInfo";
 import { useSearchParams } from "react-router-dom";
 import { useLayoutEffect } from "react";
+import instance from "../../instance";
+import { saveAs } from "file-saver";
 
 const ScoreBoard = () => {
   // const [id, setId] = useState("RSA1");
@@ -51,13 +59,6 @@ const ScoreBoard = () => {
     queryKey: ["school_info"],
     queryFn: () => GetSchoolDetailsWithoutHeader(returnToken()),
   });
-
-  const addToRef = (el) => {
-    // console.count(el);
-    if (el && !switchRefs.current.includes(el)) {
-      switchRefs.current.push(el);
-    }
-  };
 
   const {
     data: ScoreBoardData,
@@ -128,6 +129,20 @@ const ScoreBoard = () => {
     dialogRef.current.openDialog();
   };
 
+  const examAttendance = async () => {
+    setLoading(true);
+    const res = await instance({
+      url: `schoolApp/configuration/examAttendanceForSM/${filter}`,
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${Cookies.get("token")}`,
+      },
+    }).catch((err) => console.log(err));
+    setLoading(false);
+    window.open(res.data?.examAttendanceReport, "_blank");
+    console.log(res);
+  };
+
   useEffect(() => {
     document.title = "Exam Set Up - ClassKlap";
     const handleWidth = () => {
@@ -146,6 +161,17 @@ const ScoreBoard = () => {
   }, []);
   return (
     <>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <div className="flex flex-col gap-2 items-center">
+          <CircularProgress color="inherit" />
+          <p className="font-semibold text-gray-200">
+            Exam Attendance getting downloaded please wait...
+          </p>
+        </div>
+      </Backdrop>
       <Snackbars
         ref={snackbarRef}
         message={snackbarMsg}
@@ -212,15 +238,20 @@ const ScoreBoard = () => {
                     />
                   </div>
                   <div className="flex sm:flex-row flex-col gap-3 mt-3 md:mt-0 ">
+                    {/* <div onClick={examAttendance} className="w-1/3"> */}
                     <Button
                       variant="contained"
                       className="!font-semibold"
                       size="small"
+                      onClick={() => {
+                        examAttendance();
+                      }}
                     >
                       <FileDownloadIcon />
                       Exam Attendance
                     </Button>
-
+                    {/* </div>
+                    <div className="w-1/3"> */}
                     <Button
                       variant="contained"
                       className="!font-semibold"
@@ -231,6 +262,8 @@ const ScoreBoard = () => {
                       <FileDownloadIcon />
                       Feedback Report
                     </Button>
+                    {/* </div>
+                    <div className="w-1/3"> */}
                     <Button
                       variant="contained"
                       className="!font-semibold"
@@ -241,6 +274,7 @@ const ScoreBoard = () => {
                       <FileDownloadIcon />
                       Performance
                     </Button>
+                    {/* </div> */}
                   </div>
                 </div>
               )}

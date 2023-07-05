@@ -5,7 +5,13 @@ import { useState } from "react";
 import Sidebar from "../../components/Sidebar";
 
 import SwipeableTemporaryDrawer from "../../components/Material/MaterialSidebar";
-import { Button, Skeleton } from "@mui/material";
+import {
+  Backdrop,
+  Button,
+  CircularProgress,
+  LinearProgress,
+  Skeleton,
+} from "@mui/material";
 import { Menu } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
 import Breadcrumbs from "../../components/Material/BreadCrumbs";
@@ -124,20 +130,17 @@ const ScoreBoard = () => {
   };
 
   const examAttendance = async () => {
+    setLoading(true);
     const res = await instance({
-      url: `schoolApp/configuration/examAttendance/${filter}`,
+      url: `schoolApp/configuration/examAttendanceForSM/${filter}`,
       method: "GET",
       headers: {
         Authorization: `Bearer ${Cookies.get("token")}`,
       },
     }).catch((err) => console.log(err));
-    const convertOctetStreamToExcel = (octetStreamData, fileName) => {
-      const blob = new Blob([octetStreamData], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-      saveAs(blob, fileName);
-    };
-    convertOctetStreamToExcel(res.data, "fileName.xlsx");
+    setLoading(false);
+    window.open(res.data?.examAttendanceReport, "_blank");
+    console.log(res);
   };
 
   useEffect(() => {
@@ -158,6 +161,17 @@ const ScoreBoard = () => {
   }, []);
   return (
     <>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <div className="flex flex-col gap-2 items-center">
+          <CircularProgress color="inherit" />
+          <p className="font-semibold text-gray-200">
+            Exam Attendance getting downloaded please wait...
+          </p>
+        </div>
+      </Backdrop>
       <Snackbars
         ref={snackbarRef}
         message={snackbarMsg}
@@ -224,49 +238,43 @@ const ScoreBoard = () => {
                     />
                   </div>
                   <div className="flex sm:flex-row flex-col gap-3 mt-3 md:mt-0 ">
-                    <div onClick={examAttendance} className="w-1/3">
-                      <Button
-                        variant="contained"
-                        className="!font-semibold"
-                        size="small"
-                        sx={{
-                          width: "100%",
-                        }}
-                      >
-                        <FileDownloadIcon />
-                        Exam Attendance
-                      </Button>
-                    </div>
-                    <div className="w-1/3">
-                      <Button
-                        variant="contained"
-                        className="!font-semibold"
-                        onClick={() => openDialog("feedback")}
-                        size="small"
-                        sx={{
-                          width: "100%",
-                        }}
-                      >
-                        {" "}
-                        <FileDownloadIcon />
-                        Feedback Report
-                      </Button>
-                    </div>
-                    <div className="w-1/3">
-                      <Button
-                        variant="contained"
-                        className="!font-semibold"
-                        onClick={() => openDialog("performance")}
-                        size="small"
-                        sx={{
-                          width: "100%",
-                        }}
-                      >
-                        {" "}
-                        <FileDownloadIcon />
-                        Performance
-                      </Button>
-                    </div>
+                    {/* <div onClick={examAttendance} className="w-1/3"> */}
+                    <Button
+                      variant="contained"
+                      className="!font-semibold"
+                      size="small"
+                      onClick={() => {
+                        examAttendance();
+                      }}
+                    >
+                      <FileDownloadIcon />
+                      Exam Attendance
+                    </Button>
+                    {/* </div>
+                    <div className="w-1/3"> */}
+                    <Button
+                      variant="contained"
+                      className="!font-semibold"
+                      onClick={() => openDialog("feedback")}
+                      size="small"
+                    >
+                      {" "}
+                      <FileDownloadIcon />
+                      Feedback Report
+                    </Button>
+                    {/* </div>
+                    <div className="w-1/3"> */}
+                    <Button
+                      variant="contained"
+                      className="!font-semibold"
+                      onClick={() => openDialog("performance")}
+                      size="small"
+                    >
+                      {" "}
+                      <FileDownloadIcon />
+                      Performance
+                    </Button>
+                    {/* </div> */}
                   </div>
                 </div>
               )}

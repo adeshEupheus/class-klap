@@ -129,7 +129,7 @@ export const Graph = ({ data: GraphData }) => {
         min: 0, // Set minimum value of the y-axis
         max: 100, // Set maximum value of the y-axis
         ticks: {
-          stepSize: 10, // Set step size between ticks
+          stepSize: 20, // Set step size between ticks
         },
       },
       x: {

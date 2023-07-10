@@ -665,10 +665,10 @@ const Row = (props) => {
   let obtainedMarks = 0;
   let totalMarks = 0;
   row.studentQuestionAttemptResponses.map((item) => {
-    if (typeof item.maxMarks === "number" && typeof item.marks === "number") {
-      obtainedMarks += item.marks;
-      totalMarks += item.maxMarks;
-    }
+    // if (typeof item.maxMarks === "number" && typeof item.marks === "number") {
+    obtainedMarks += Number(item.marks);
+    totalMarks += Number(item.maxMarks);
+    // }
   });
   return (
     <React.Fragment>

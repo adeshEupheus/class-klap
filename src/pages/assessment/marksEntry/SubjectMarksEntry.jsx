@@ -59,6 +59,7 @@ const SubjectMarksEntry = () => {
     students: "",
     attendance: "All",
   });
+  const [total, setTotal] = useState(0);
 
   const [snackbarMsg, setSnackbarMsg] = useState("");
   const [snackbarErr, setSnackbarErr] = useState(false);
@@ -161,7 +162,11 @@ const SubjectMarksEntry = () => {
       GetSubjectMarksEntry(id, sectionId, subjectId, returnToken()),
     onSuccess: (data) => {
       console.log(data);
-
+      let total = 0;
+      data.questions.map((item) => {
+        total += item.maxMarks;
+      });
+      setTotal(total);
       setDisableEdit(data.locked);
     },
     refetchOnWindowFocus: false,
@@ -625,6 +630,7 @@ const SubjectMarksEntry = () => {
                           )
                           .map((item, index) => (
                             <MemoRow
+                              total={total}
                               row={item}
                               key={item.uuid}
                               handleSelectAction={handleSelectAction}
@@ -655,7 +661,8 @@ const SubjectMarksEntry = () => {
 };
 
 const Row = (props) => {
-  const { row, handleSelectAction, SubjectMarksEntryData, editButtons } = props;
+  const { row, handleSelectAction, SubjectMarksEntryData, editButtons, total } =
+    props;
   const [open, setOpen] = React.useState(false);
 
   useEffect(() => {
@@ -663,7 +670,7 @@ const Row = (props) => {
   });
 
   let obtainedMarks = 0;
-  let totalMarks = 0;
+  // let totalMarks = 0;
   // row.studentQuestionAttemptResponses.map((item) => {
   // if (typeof item.maxMarks === "number" && typeof item.marks === "number") {
   // obtainedMarks += Number(item.marks);
@@ -672,7 +679,7 @@ const Row = (props) => {
   for (let i = 0; i < row.studentQuestionAttemptResponses.length; i++) {
     const item = row.studentQuestionAttemptResponses[i];
     obtainedMarks += Number(item.marks);
-    totalMarks += Number(item.maxMarks);
+    // totalMarks += Number(item.maxMarks);
   }
   // });
   return (
@@ -708,7 +715,7 @@ const Row = (props) => {
         </TableCell>
         <TableCell align="center">
           <h1 className="font-semibold">
-            {obtainedMarks}/{totalMarks}
+            {obtainedMarks}/{total}
           </h1>
         </TableCell>
       </TableRow>

@@ -55,6 +55,7 @@ import { useSearchParams } from "react-router-dom";
 import { useLayoutEffect } from "react";
 import { GetApplicableExamType } from "../../apis/fectcher/assessment/GetApplicableExamType";
 import ViewQP from "../../components/Material/examTimeTable/ViewQP";
+import ViewQpAddExamSub from "../../components/Material/examTimeTable/ViewQpAddExamSub";
 const ExamTimeTable = () => {
   const [examId, setExamId] = useState("");
   const [gradeId, setGradeId] = useState("");
@@ -65,9 +66,11 @@ const ExamTimeTable = () => {
   const [error, setError] = useState(false);
   const [queryParameters] = useSearchParams();
   const [subjectId, setSubjectId] = useState("");
+  const [resetQpDialog, setResetQpDialog] = useState(true);
   const returnToken = () => {
     return queryParameters.get("auth");
   };
+  const [tableData, setTableData] = useState([]);
 
   useLayoutEffect(() => {
     if (queryParameters.get("auth")) {
@@ -531,6 +534,7 @@ const ExamTimeTable = () => {
   };
 
   const ViewQpRef = useRef();
+  const ViewQpAddExamSubRef = useRef();
 
   function Row(props) {
     const { row } = props;
@@ -544,9 +548,19 @@ const ExamTimeTable = () => {
       mutation.mutate({ item: row, name: "date" });
     };
 
-    const openViewQP = (subName) => {
+    const openViewQP = (subName, addExam, deliveryType) => {
+      console.log(subName, addExam, deliveryType);
+      if (deliveryType.includes("Subjective")) {
+        setTableData(ApplicableExamTypes.applicableExamQuestionTypes);
+      } else {
+        setTableData(ApplicableExamTypes.applicableObjectiveQuestionTypes);
+      }
       setSubjectId(subName);
-      ViewQpRef.current.OpenViewQp();
+      if (addExam) {
+        ViewQpAddExamSubRef.current.OpenViewQpSub();
+      } else {
+        ViewQpRef.current.OpenViewQp();
+      }
     };
 
     const handleTimeChange = (value) => {
@@ -691,7 +705,15 @@ const ExamTimeTable = () => {
             )}
           </TableCell>
           <TableCell align="center">
-            <div onClick={() => openViewQP(row.subject.name)}>
+            <div
+              onClick={() =>
+                openViewQP(
+                  row.subject.name,
+                  row.schoolCreatedExam,
+                  row?.questionPaperDeliveryModeType?.displayName
+                )
+              }
+            >
               <Visibility className="!text-gray-600 !cursor-pointer" />
             </div>
           </TableCell>
@@ -829,6 +851,16 @@ const ExamTimeTable = () => {
         >
           <ViewQP
             ref={ViewQpRef}
+            returnToken={returnToken}
+            examId={examId}
+            gradeId={gradeId}
+            subjectId={subjectId}
+          />
+          <ViewQpAddExamSub
+            ref={ViewQpAddExamSubRef}
+            key={resetQpDialog}
+            setResetQpDialog={setResetQpDialog}
+            dropDownData={tableData}
             returnToken={returnToken}
             examId={examId}
             gradeId={gradeId}

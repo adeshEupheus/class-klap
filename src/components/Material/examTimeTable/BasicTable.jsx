@@ -7,23 +7,6 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
-function createData(name, calories, fat, carbs) {
-  return { name, calories, fat, carbs };
-}
-
-const rows = [
-  createData(1, 159, "MCQ", "My Dog Rex"),
-  createData(2, 237, "MCQ", "My Dog Rex"),
-  createData(2, 237, "MCQ", "My Dog Rex"),
-  createData(2, 237, "MCQ", "My Dog Rex"),
-  createData(2, 237, "MCQ", "My Dog Rex"),
-  createData(2, 237, "MCQ", "My Dog Rex"),
-  createData(2, 237, "MCQ", "My Dog Rex"),
-  createData(2, 237, "MCQ", "My Dog Rex"),
-  createData(2, 237, "MCQ", "My Dog Rex"),
-  createData(2, 237, "MCQ", "My Dog Rex"),
-];
-
 export default function BasicTable({ tableData }) {
   return (
     <TableContainer component={Paper}>

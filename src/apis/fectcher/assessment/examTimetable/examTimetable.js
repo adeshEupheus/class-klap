@@ -38,3 +38,21 @@ export const QPGenerationStatus = async (examId, gradeId, token) => {
 
   return res.data;
 };
+
+export const GetAddExamQuestions = async (
+  examId,
+  gradeId,
+  subjectId,
+  token
+) => {
+  const res = await instance({
+    url: `schoolApp/configuration/getQuestions/examType/${examId}/grade/${gradeId}/subject/${subjectId}`,
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token ? token : Cookies.get("token")}`,
+    },
+  }).catch((err) => console.log(err));
+
+  const result = res.data;
+  return result;
+};

@@ -44,6 +44,9 @@ const ViewQpAddExamSub = React.forwardRef((props, ref) => {
   React.useImperativeHandle(ref, () => ({
     OpenViewQpSub() {
       setOpen(true);
+      if (QpData) {
+        refetch();
+      }
     },
   }));
   const [totalMarks, setTotalMarks] = useState(0);

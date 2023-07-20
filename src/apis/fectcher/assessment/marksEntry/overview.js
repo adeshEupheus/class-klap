@@ -13,3 +13,20 @@ export const GetMarksEntryOverviewData = async (examId, sectionId, token) => {
 
   return res.data;
 };
+
+export const GetAnswerKeyStatus = async (
+  examId,
+  sectionId,
+  subjectId,
+  token
+) => {
+  const res = await instance({
+    url: `schoolApp/configuration/previewAnswerKeyStatus/${sectionId}/${examId}/${subjectId}`,
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token ? token : Cookies.get("token")}`,
+    },
+  }).catch((err) => console.log(err));
+
+  return res.data;
+};

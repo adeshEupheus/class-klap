@@ -70,29 +70,6 @@ const ExamSetUp = () => {
       switchRefs.current.push(el);
     }
   };
-  const autoLock = async () => {
-    setLoading(true);
-    const res = await instance({
-      url: `schoolApp/configuration/updateDefaultSku/${id}`,
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${Cookies.get("token")}`,
-      },
-    }).catch((err) => console.log(err));
-    setLoading(false);
-    const regex = /<\/?b>/g;
-    setSnackbarErr(!res.data.success);
-
-    setSnackbarMsg(res.data.message.replaceAll(regex, ""));
-    snackbarRef.current.openSnackbar();
-    refetch();
-  };
-
-  useEffect(() => {
-    if (id) {
-      autoLock();
-    }
-  }, [id]);
 
   const autoLock = async () => {
     setLoading(true);

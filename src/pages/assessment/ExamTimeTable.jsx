@@ -413,13 +413,20 @@ const ExamTimeTable = () => {
       if (data.name === "examType") {
         console.log(data);
         setLoading(true);
+        const subjective = data.item.newDeliveryMode?.includes("SUBJECTIVE");
+        let sku = 0;
+        if (subjective) {
+          sku = data?.item?.qpSetTypeApplicableMarksMap?.SUBJECTIVE[0]?.name;
+        } else {
+          sku = data?.item?.qpSetTypeApplicableMarksMap?.OBJECTIVE[0]?.name;
+        }
         const apiBodyData = {
           duration: data.item.duration,
           examDate: data.item.examDate,
           examTime: data.item.examTime,
           feedbackRequired: data.item.feedbackRequired,
           qpSetTypeDeliveryMode: data.item.newDeliveryMode,
-          skuId: data.item.selectedSku,
+          skuId: sku,
         };
         await instance({
           url: `schoolApp/configuration/conductExamProgress/${examId}/${gradeId}`,
@@ -685,8 +692,7 @@ const ExamTimeTable = () => {
             />
           </TableCell>
           <TableCell align="center">
-            {Object.keys(row.qpSetTypeApplicableMarksMap)[0] ===
-            "SUBJECTIVE" ? (
+            {row?.questionPaperDeliveryModeType?.name.includes("SUBJECTIVE") ? (
               <SearchDropDown
                 minWidth={"12rem"}
                 handleDropDown={handleChangeSyllabus}
@@ -724,7 +730,10 @@ const ExamTimeTable = () => {
                 variant={"outlined"}
                 Name={"mark_syllabus_difficulty"}
                 defaultValue={{
-                  value: row?.selectedMarksSyllabus?.displayName,
+                  value: returnSyllabus(
+                    row?.qpSetTypeApplicableMarksMap?.OBJECTIVE,
+                    row.selectedSku
+                  ),
                 }}
                 size={"small"}
               />
@@ -853,7 +862,7 @@ const ExamTimeTable = () => {
           sidebarCollapsed={sidebarCollapsed}
           show={show}
         />
-        <Loader loading={loading} />
+        <Loader loading={loading || isRefetching} />
         <DialogSlide
           ref={dialogRef}
           handleDialogButton={handleDialogButton}

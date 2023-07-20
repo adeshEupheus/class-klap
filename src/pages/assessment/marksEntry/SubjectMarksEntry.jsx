@@ -41,7 +41,8 @@ import { useLayoutEffect } from "react";
 import Snackbars from "../../../components/Material/Snackbar";
 import BasicTextFields from "../../../components/Material/TextField";
 import AttendanceFilter from "../../../components/Material/marksEntry/FilterAttendance";
-// import { data, data } from "autoprefixer";
+import instance from "../../../instance";
+import { GetAnswerKeyStatus } from "../../../apis/fectcher/assessment/marksEntry/overview";
 
 const SubjectMarksEntry = () => {
   const [id, setId] = useState("");
@@ -75,7 +76,6 @@ const SubjectMarksEntry = () => {
     }
   }, []);
 
-  // console.log("parent called");
   const { data: schoolInfo, isLoading: SchoolInfoLoading } = useQuery({
     queryKey: ["school_info"],
     queryFn: () => GetSchoolDetailsWithoutHeader(returnToken()),
@@ -168,6 +168,15 @@ const SubjectMarksEntry = () => {
       });
       setTotal(total);
       setDisableEdit(data.locked);
+    },
+    refetchOnWindowFocus: false,
+  });
+  const { data: AnswerKey, isLoading: AnswerKeyLoading } = useQuery({
+    queryKey: ["subject_marks_entry_answer_key", id, sectionId, subjectId],
+    enabled: !!id && !!sectionId && !!subjectId,
+    queryFn: () => GetAnswerKeyStatus(id, sectionId, subjectId, returnToken()),
+    onSuccess: (data) => {
+      console.log(data);
     },
     refetchOnWindowFocus: false,
   });
@@ -496,23 +505,46 @@ const SubjectMarksEntry = () => {
               </div>
 
               <div className="w-full flex sm:flex-row flex-col-reverse gap-4 sm:gap-0 justify-between items-center">
-                {SubjectMarksEntryData?.studentQuestionPaperAttemptResponses
-                  .length < 1 ? (
-                  <BasicButton
-                    disable={true}
-                    size={"small"}
-                    text={"View Answer Key"}
-                  />
-                ) : (
-                  <a
-                    href={`https://stage.ddntbsdmvxh69.amplifyapp.com/app/schoolApp/configuration/previewAnswerKey/${sectionId}/${id}/${subjectId}`}
-                    target="_blank"
+                {/* {SubjectMarksEntryData?.studentQuestionPaperAttemptResponses
+                  .length < 1 ? ( */}
+
+                <BasicButton
+                  disable={!AnswerKey?.success}
+                  handleButtonAction={async () => {
+                    const res = await instance({
+                      url: `schoolApp/configuration/previewAnswerKeyForSM/${sectionId}/${id}/${subjectId}`,
+                      method: "GET",
+                      headers: {
+                        Authorization: `Bearer ${
+                          returnToken() ? returnToken() : Cookies.get("token")
+                        }`,
+                      },
+                    }).catch((err) => console.log(err));
+                    if (res.data.success) {
+                      window.open(res.data.PdfUrl, "_blank");
+                    }
+                  }}
+                  size={"small"}
+                  text={"View Answer Key"}
+                />
+                {/* ) : (
+                  <div
+                    onClick={async () => {
+                      const res = await instance({
+                        url: `schoolApp/configuration/previewAnswerKey/${sectionId}/${id}/${subjectId}`,
+                        method: "GET",
+                        headers: {
+                          Authorization: `Bearer ${
+                            returnToken() ? returnToken() : Cookies.get("token")
+                          }`,
+                        },
+                      }).catch((err) => console.log(err));
+                      setPdfData(res.data);
+                    }}
                   >
-                    <div onClick={async () => {}}>
-                      <BasicButton size={"small"} text={"View Answer Key"} />
-                    </div>
-                  </a>
-                )}
+                    <BasicButton size={"small"} text={"View Answer Key"} />
+                  </div>
+                )} */}
 
                 <div className="flex gap-2 flex-col">
                   {SubjectMarksEntryDataLoading ? (

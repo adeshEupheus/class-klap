@@ -55,6 +55,8 @@ import { useSearchParams } from "react-router-dom";
 import { useLayoutEffect } from "react";
 import { GetApplicableExamType } from "../../apis/fectcher/assessment/GetApplicableExamType";
 import ViewQP from "../../components/Material/examTimeTable/ViewQP";
+import ViewQpAddExamSub from "../../components/Material/examTimeTable/ViewQpAddExamSub";
+import instance from "../../instance";
 const ExamTimeTable = () => {
   const [examId, setExamId] = useState("");
   const [gradeId, setGradeId] = useState("");
@@ -65,9 +67,12 @@ const ExamTimeTable = () => {
   const [error, setError] = useState(false);
   const [queryParameters] = useSearchParams();
   const [subjectId, setSubjectId] = useState("");
+  const [sub, setSub] = useState(true);
+  const [resetQpDialog, setResetQpDialog] = useState(true);
   const returnToken = () => {
     return queryParameters.get("auth");
   };
+  const [tableData, setTableData] = useState([]);
 
   useLayoutEffect(() => {
     if (queryParameters.get("auth")) {
@@ -148,7 +153,7 @@ const ExamTimeTable = () => {
   const {
     data: QPGenerateStatus,
     isLoading: QPGenerateStatusLoading,
-    // refetch,
+    refetch: QPGeneraterefetch,
     // isRefetching,
   } = useQuery({
     queryKey: ["QPGenerateStatus", examId, gradeId],
@@ -408,14 +413,31 @@ const ExamTimeTable = () => {
       if (data.name === "examType") {
         console.log(data);
         setLoading(true);
+        const subjective = data.item.newDeliveryMode?.includes("SUBJECTIVE");
+        let sku = 0;
+        if (subjective) {
+          sku = data?.item?.qpSetTypeApplicableMarksMap?.SUBJECTIVE[0]?.name;
+        } else {
+          sku = data?.item?.qpSetTypeApplicableMarksMap?.OBJECTIVE[0]?.name;
+        }
         const apiBodyData = {
           duration: data.item.duration,
           examDate: data.item.examDate,
           examTime: data.item.examTime,
           feedbackRequired: data.item.feedbackRequired,
           qpSetTypeDeliveryMode: data.item.newDeliveryMode,
-          skuId: data.item.selectedSku,
+          skuId: sku,
         };
+        await instance({
+          url: `schoolApp/configuration/conductExamProgress/${examId}/${gradeId}`,
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${
+              returnToken() ? returnToken() : Cookies.get("token")
+            }`,
+          },
+        }).catch((err) => console.log(err));
+        // await QPGeneraterefetch();
         res = await UpdateTimeTable(
           examId,
           gradeId,
@@ -425,6 +447,7 @@ const ExamTimeTable = () => {
         );
         if (res.success) {
           refetch();
+          QPGeneraterefetch();
           // setSnackbarErr(false);
           // setSnackbarMsg(res.message);
           // snackbarRef.current.openSnackbar();
@@ -531,6 +554,7 @@ const ExamTimeTable = () => {
   };
 
   const ViewQpRef = useRef();
+  const ViewQpAddExamSubRef = useRef();
 
   function Row(props) {
     const { row } = props;
@@ -544,9 +568,21 @@ const ExamTimeTable = () => {
       mutation.mutate({ item: row, name: "date" });
     };
 
-    const openViewQP = (subName) => {
+    const openViewQP = (subName, addExam, deliveryType) => {
+      console.log(subName, addExam, deliveryType);
+      if (deliveryType.includes("Subjective")) {
+        setSub(true);
+        setTableData(ApplicableExamTypes.applicableExamQuestionTypes);
+      } else {
+        setSub(false);
+        setTableData(ApplicableExamTypes.applicableObjectiveQuestionTypes);
+      }
       setSubjectId(subName);
-      ViewQpRef.current.OpenViewQp();
+      if (addExam) {
+        ViewQpAddExamSubRef.current.OpenViewQpSub();
+      } else {
+        ViewQpRef.current.OpenViewQp();
+      }
     };
 
     const handleTimeChange = (value) => {
@@ -562,8 +598,19 @@ const ExamTimeTable = () => {
       mutation.mutate({ item: row, name: "duration" });
     };
 
-    const handleDropDown = (value, type) => {
+    const handleDropDown = async (value, type) => {
       console.log(value, type);
+
+      // await instance({
+      //   url: `schoolApp/configuration/conductExamProgress/${examId}/${gradeId}`,
+      //   method: "GET",
+      //   headers: {
+      //     Authorization: `Bearer ${
+      //       returnToken() ? returnToken() : Cookies.get("token")
+      //     }`,
+      //   },
+      // }).catch((err) => console.log(err));
+      // QPGeneraterefetch();
       row.newDeliveryMode = value.name;
       mutation.mutate({ item: row, name: "examType" });
     };
@@ -645,8 +692,7 @@ const ExamTimeTable = () => {
             />
           </TableCell>
           <TableCell align="center">
-            {Object.keys(row.qpSetTypeApplicableMarksMap)[0] ===
-            "SUBJECTIVE" ? (
+            {row?.questionPaperDeliveryModeType?.name.includes("SUBJECTIVE") ? (
               <SearchDropDown
                 minWidth={"12rem"}
                 handleDropDown={handleChangeSyllabus}
@@ -684,14 +730,25 @@ const ExamTimeTable = () => {
                 variant={"outlined"}
                 Name={"mark_syllabus_difficulty"}
                 defaultValue={{
-                  value: row?.selectedMarksSyllabus?.displayName,
+                  value: returnSyllabus(
+                    row?.qpSetTypeApplicableMarksMap?.OBJECTIVE,
+                    row.selectedSku
+                  ),
                 }}
                 size={"small"}
               />
             )}
           </TableCell>
           <TableCell align="center">
-            <div onClick={() => openViewQP(row.subject.name)}>
+            <div
+              onClick={() =>
+                openViewQP(
+                  row.subject.name,
+                  row.schoolCreatedExam,
+                  row?.questionPaperDeliveryModeType?.displayName
+                )
+              }
+            >
               <Visibility className="!text-gray-600 !cursor-pointer" />
             </div>
           </TableCell>
@@ -805,7 +862,7 @@ const ExamTimeTable = () => {
           sidebarCollapsed={sidebarCollapsed}
           show={show}
         />
-        <Loader loading={loading} />
+        <Loader loading={loading || isRefetching} />
         <DialogSlide
           ref={dialogRef}
           handleDialogButton={handleDialogButton}
@@ -830,6 +887,17 @@ const ExamTimeTable = () => {
           <ViewQP
             ref={ViewQpRef}
             returnToken={returnToken}
+            examId={examId}
+            gradeId={gradeId}
+            subjectId={subjectId}
+          />
+          <ViewQpAddExamSub
+            ref={ViewQpAddExamSubRef}
+            key={resetQpDialog}
+            setResetQpDialog={setResetQpDialog}
+            dropDownData={tableData}
+            returnToken={returnToken}
+            subjective={sub}
             examId={examId}
             gradeId={gradeId}
             subjectId={subjectId}

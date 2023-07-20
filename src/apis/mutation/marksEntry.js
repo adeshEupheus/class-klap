@@ -38,6 +38,8 @@ export const EditMarks = async (data, token) => {
       Authorization: `Bearer ${token ? token : Cookies.get("token")}`,
     },
     data,
+  }).catch((err) => {
+    console.log(err);
   });
   return res;
 };

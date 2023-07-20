@@ -34,18 +34,8 @@ export const Graph = ({ data: GraphData }) => {
           });
         });
       }
-      //   console.log(addInfo);
       return addInfo;
     };
-    // console.log(typeof addInfo);
-    // Object.entries(addInfo);
-    // console.log(addInfo);
-
-    // let Info=[];
-    // addInfo.map((item)=>
-    // Info.push(item.subjectTeacher)
-    // )
-    // console.log(Info);
 
     //from where sName is coming subjectname
     const returnData = (sName) => {
@@ -69,19 +59,48 @@ export const Graph = ({ data: GraphData }) => {
           // console.log(item);
           num += item.averagePercentage;
         });
-        num = num / 2;
+        num = num / object[key].length;
         dataArray.push(num.toFixed(1));
       }
       return dataArray;
+    };
+
+    // const color = {
+    //   English: "#facc15",
+    //   EVS: "#16a34a",
+    //   SCIENCE: "#16a34a",
+    //   Maths: "#3b82f6",
+    //   Social: "#854d0e",
+    // };
+    const returnColor = (sub) => {
+      switch (sub) {
+        case "English":
+          return "#facc15";
+          break;
+        case "EVS":
+          return "#16a34a";
+          break;
+        case "SCIENCE":
+          return "#16a34a";
+          break;
+        case "Maths":
+          return "#3b82f6";
+          break;
+        case "Social":
+          return "#854d0e";
+          break;
+        default:
+          return "#854d0e";
+
+          break;
+      }
     };
 
     for (let key in object) {
       array.push({
         label: "Class Average",
         data: returnAvg(),
-        backgroundColor: `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(
-          Math.random() * 256
-        )}, ${Math.floor(Math.random() * 256)}, 0.93)`,
+        backgroundColor: `#9ca3af`,
         addInfo: returnAddInfo(),
       });
 
@@ -90,11 +109,7 @@ export const Graph = ({ data: GraphData }) => {
         array.push({
           label: item.subjectDisplayName,
           data: returnData(item.subjectDisplayName),
-          backgroundColor: `rgba(${Math.floor(
-            Math.random() * 256
-          )}, ${Math.floor(Math.random() * 256)}, ${Math.floor(
-            Math.random() * 256
-          )}, 0.93)`,
+          backgroundColor: returnColor(item.subjectDisplayName),
           addInfo: returnAddInfo(),
         });
       });
@@ -109,7 +124,18 @@ export const Graph = ({ data: GraphData }) => {
 
   const options = {
     responsive: true,
-
+    scales: {
+      y: {
+        min: 0, // Set minimum value of the y-axis
+        max: 100, // Set maximum value of the y-axis
+        ticks: {
+          stepSize: 20, // Set step size between ticks
+        },
+      },
+      x: {
+        display: true, // Hide x-axis
+      },
+    },
     plugins: {
       title: {
         display: true,
@@ -134,12 +160,7 @@ export const Graph = ({ data: GraphData }) => {
               }
             });
 
-            // console.log(tooltipItem);
-            // console.log(tooltipItem.dataset.addInfo);
-            // console.log(info);
             return `${tooltipItem.formattedValue}% -` + info;
-
-            // console.log(info);
           },
           title: function (tooltipItem) {
             // console.log(tooltipItem);
@@ -149,22 +170,17 @@ export const Graph = ({ data: GraphData }) => {
       },
     },
   };
-  // console.log(faker.datatype.number);
-  // console.log(GraphData.data.A[0].averagePercentage);
 
   const data1 = {
     labels: Object.keys(GraphData.data),
     datasets: returnGraphValue(GraphData.data),
   };
 
-
-
   const {
     data: { A },
   } = GraphData;
 
   return (
-    // <section className=" !w-full sm:!w-full !bg-slate-400 " >
     <div className="!m-1 sm:!m-[5%] bg-slate-100 rounded-md">
       <div className=" text-base sm:text-2xl font-bold text-slate-400 p-3">
         Class {GraphData.className.split("")[1]}
@@ -175,6 +191,5 @@ export const Graph = ({ data: GraphData }) => {
         Sections
       </div>
     </div>
-    // </section>
   );
 };

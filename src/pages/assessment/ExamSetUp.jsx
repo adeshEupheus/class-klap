@@ -94,6 +94,30 @@ const ExamSetUp = () => {
     }
   }, [id]);
 
+  const autoLock = async () => {
+    setLoading(true);
+    const res = await instance({
+      url: `schoolApp/configuration/updateDefaultSku/${id}`,
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${Cookies.get("token")}`,
+      },
+    }).catch((err) => console.log(err));
+    setLoading(false);
+    const regex = /<\/?b>/g;
+    setSnackbarErr(!res.data.success);
+
+    setSnackbarMsg(res.data.message.replaceAll(regex, ""));
+    snackbarRef.current.openSnackbar();
+    refetch();
+  };
+
+  useEffect(() => {
+    if (id) {
+      autoLock();
+    }
+  }, [id]);
+
   const {
     data: Exam_setUpData,
     isLoading,
@@ -104,7 +128,7 @@ const ExamSetUp = () => {
     enabled: !!id,
     queryFn: () => GetExamSetUpData(id, returnToken()),
     cacheTime: 0,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       // console.log(data);
     },
     onError: () => {

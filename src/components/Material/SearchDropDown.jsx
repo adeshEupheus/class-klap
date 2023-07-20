@@ -29,6 +29,9 @@ const SearchDropDown = ({
         case "exam_name":
           return option.value;
           break;
+        case "AddExamTable":
+          return option.displayName;
+          break;
         case "exam_type":
           return option.value;
           break;

@@ -38,6 +38,9 @@ import Cookies from "js-cookie";
 import SchoolInfo from "../../../components/SchoolInfo";
 import { useSearchParams } from "react-router-dom";
 import { useLayoutEffect } from "react";
+import Snackbars from "../../../components/Material/Snackbar";
+import BasicTextFields from "../../../components/Material/TextField";
+import AttendanceFilter from "../../../components/Material/marksEntry/FilterAttendance";
 // import { data, data } from "autoprefixer";
 
 const SubjectMarksEntry = () => {
@@ -51,6 +54,15 @@ const SubjectMarksEntry = () => {
     attendance: false,
     marks: false,
   });
+  const [filter, setFilter] = useState({
+    rollNo: "",
+    students: "",
+    attendance: "All",
+  });
+  const [total, setTotal] = useState(0);
+
+  const [snackbarMsg, setSnackbarMsg] = useState("");
+  const [snackbarErr, setSnackbarErr] = useState(false);
 
   const [queryParameters] = useSearchParams();
   const returnToken = () => {
@@ -90,8 +102,23 @@ const SubjectMarksEntry = () => {
           ],
           subject: subjectId,
         };
-        await UpdateAttendance(AttendanceData, returnToken());
-        // refetch();
+        setLoading(true);
+        const res2 = await UpdateAttendance(
+          AttendanceData,
+          returnToken()
+        ).catch((err) => {
+          setSnackbarErr(true);
+          setSnackbarMsg("something went wrong");
+          snackbarRef.current.openSnackbar();
+        });
+        if (res2.success === true) {
+          setSnackbarErr(false);
+          setSnackbarMsg(res2.message);
+          snackbarRef.current.openSnackbar();
+        }
+        refetch();
+        setLoading(false);
+
         break;
       case "marks":
         let bodyFormData = new FormData();
@@ -100,8 +127,22 @@ const SubjectMarksEntry = () => {
         bodyFormData.append("subject", subjectId);
         bodyFormData.append("marks", data.value);
         bodyFormData.append("questionAttemptId", data.questionAttemptId);
-        await EditMarks(bodyFormData, returnToken());
-        // refetch();
+        setLoading(true);
+        const res = await EditMarks(bodyFormData, returnToken()).catch(
+          (err) => {
+            setSnackbarErr(true);
+            setSnackbarMsg("something went wrong");
+            snackbarRef.current.openSnackbar();
+          }
+        );
+        if (res.status === 200) {
+          setSnackbarErr(false);
+          setSnackbarMsg("Your changes have been savedly");
+          snackbarRef.current.openSnackbar();
+        }
+        refetch();
+        setLoading(false);
+
         break;
 
       default:
@@ -121,6 +162,11 @@ const SubjectMarksEntry = () => {
       GetSubjectMarksEntry(id, sectionId, subjectId, returnToken()),
     onSuccess: (data) => {
       console.log(data);
+      let total = 0;
+      data.questions.map((item) => {
+        total += item.maxMarks;
+      });
+      setTotal(total);
       setDisableEdit(data.locked);
     },
     refetchOnWindowFocus: false,
@@ -151,90 +197,46 @@ const SubjectMarksEntry = () => {
     }
   };
 
-  const Row = (props) => {
-    const { row, key } = props;
-    //   console.log(props.no);
-    const [open, setOpen] = React.useState(false);
-    let obtainedMarks = 0;
-    let totalMarks = 0;
-    row.studentQuestionAttemptResponses.map((item) => {
-      obtainedMarks += item.marks;
-      totalMarks += item.maxMarks;
-    });
-    return (
-      <React.Fragment>
-        <TableRow
-          key={key}
-          sx={{
-            "&:last-child td, &:last-child th": { border: 0 },
-          }}
-        >
-          <TableCell component="th" scope="row" align="center">
-            <IconButton
-              aria-label="expand row"
-              size="small"
-              onClick={() => setOpen(!open)}
-            >
-              {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-            </IconButton>
-            {row.rollNo}
-          </TableCell>
-          <TableCell align="center">
-            <h1 className="font-bold">{row.studentName}</h1>
-          </TableCell>
-          <TableCell align="center">
-            <h1 className="font-bold">{row.uuid}</h1>
-          </TableCell>
-          <TableCell align="center">
-            <AttendanceSelect
-              handleSelectAction={handleSelectAction}
-              disable={!editButtons.attendance}
-              data={row.studentPresent}
-              QpaId={row.questionPaperAttemptId}
-            />
-          </TableCell>
-          <TableCell align="center">
-            <h1 className="font-semibold">
-              {obtainedMarks}/{totalMarks}
-            </h1>
-          </TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
-            <Collapse in={open} timeout="auto" unmountOnExit>
-              {/* <Box sx={{ margin: 1, flexDirection: "row", flex: "none" }}> */}
-              <div className="w-full grid grid-cols-4 gap-4 place-content-center place-items-center py-4">
-                {row.studentQuestionAttemptResponses.map((item, index) => {
-                  let data = {};
-                  SubjectMarksEntryData.questions.map((item2) => {
-                    if (item2.questionId === item.questionId) {
-                      data = item2;
-                    }
-                  });
-                  item.qNo = data.questionNo;
-                  item.maxMarks = data.maxMarks;
-                  return (
-                    <h1
-                      key={item.qNo}
-                      className="font-semibold text-sm flex items-center sm:w-auto w-full"
-                    >
-                      Q.{item.qNo}
-                      <SelectMUI
-                        disable={!editButtons.marks}
-                        handleSelectAction={handleSelectAction}
-                        size={"small"}
-                        data={item}
-                      />
-                    </h1>
-                  );
-                })}
-              </div>
-              {/* </Box> */}
-            </Collapse>
-          </TableCell>
-        </TableRow>
-      </React.Fragment>
-    );
+  const returnData = () => {
+    if (filter.attendance == "All" && !filter.rollNo && !filter.students) {
+      return SubjectMarksEntryData?.studentQuestionPaperAttemptResponses;
+    } else {
+      const checkVal = (a, b) => {
+        if (a == b) {
+          return true;
+        } else {
+          return false;
+        }
+      };
+      // console.log(filter);
+      let newArr = SubjectMarksEntryData?.studentQuestionPaperAttemptResponses;
+      if (filter.rollNo) {
+        newArr = newArr.filter((item) => {
+          if (checkVal(Number(filter.rollNo), Number(item.rollNo))) {
+            return item;
+          }
+        });
+      }
+      if (filter.students) {
+        newArr = newArr.filter((item) => {
+          if (
+            item.studentName
+              .toLowerCase()
+              .includes(filter.students.toLowerCase())
+          ) {
+            return item;
+          }
+        });
+      }
+      if (filter.attendance !== "All") {
+        newArr = newArr.filter((item) => {
+          if (item.studentPresent === filter.attendance) {
+            return item;
+          }
+        });
+      }
+      return newArr;
+    }
   };
 
   const mutation = useMutation({
@@ -254,6 +256,7 @@ const SubjectMarksEntry = () => {
         if (res.status === 200) {
           switchRef.current.toggle();
           setDisableEdit((prev) => !prev);
+          setEditButtons({ attendance: false, marks: false });
         }
       }
     },
@@ -334,6 +337,8 @@ const SubjectMarksEntry = () => {
     sidebarRef.current.openSidebar();
   };
 
+  const snackbarRef = useRef();
+
   useEffect(() => {
     document.title = "Marks Entry Overview - ClassKlap";
     const handleWidth = () => {
@@ -351,8 +356,48 @@ const SubjectMarksEntry = () => {
       window.removeEventListener("resize", handleWidth);
     };
   }, []);
+
+  const handleChange = (data) => {
+    switch (data.name) {
+      case "rollNo":
+        setFilter((prev) => {
+          return {
+            students: prev.students,
+            rollNo: data.val,
+            attendance: prev.attendance,
+          };
+        });
+        break;
+      case "students":
+        setFilter((prev) => {
+          return {
+            students: data.val,
+            rollNo: prev.rollNo,
+            attendance: prev.attendance,
+          };
+        });
+        break;
+      case "attendanceFilter":
+        setFilter((prev) => {
+          return {
+            students: prev.students,
+            rollNo: prev.rollNo,
+            attendance: data.val,
+          };
+        });
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <>
+      <Snackbars
+        ref={snackbarRef}
+        message={snackbarMsg}
+        snackbarErrStatus={snackbarErr}
+      />
       <div className="flex w-[100%] min-h-[100vh]">
         <Sidebar
           highLight={""}
@@ -369,6 +414,7 @@ const SubjectMarksEntry = () => {
             highLight={""}
           />
         </div>
+
         <div
           className={`flex flex-col w-[100vw] bg-gray-200 relative transition-all overflow-hidden ease-linear duration-300 lg:w-[83vw] lg:ml-[18vw] ${
             window.innerWidth < 1024 ? null : "md:ml-[30vw] ml-[85vw]"
@@ -459,10 +505,12 @@ const SubjectMarksEntry = () => {
                   />
                 ) : (
                   <a
-                    href={`https://schoolsbel.xamcheck.com/app/schoolApp/configuration/previewAnswerKey/${sectionId}/${id}/${subjectId}`}
+                    href={`https://stage.ddntbsdmvxh69.amplifyapp.com/app/schoolApp/configuration/previewAnswerKey/${sectionId}/${id}/${subjectId}`}
                     target="_blank"
                   >
-                    <BasicButton size={"small"} text={"View Answer Key"} />
+                    <div onClick={async () => {}}>
+                      <BasicButton size={"small"} text={"View Answer Key"} />
+                    </div>
                   </a>
                 )}
 
@@ -525,11 +573,22 @@ const SubjectMarksEntry = () => {
                           <TableCell align="right" className="w-[10%]">
                             <div className="flex flex-col items-center gap-2">
                               <h1 className="font-bold">Roll No</h1>
+                              <BasicTextFields
+                                handleChange={handleChange}
+                                name={"rollNo"}
+                                size={"small"}
+                                type={"number"}
+                              />
                             </div>
                           </TableCell>
                           <TableCell align="right" className="w-[20%]">
                             <div className="flex flex-col items-center gap-2">
                               <h1 className="font-bold">Students</h1>
+                              <BasicTextFields
+                                handleChange={handleChange}
+                                name={"students"}
+                                size={"small"}
+                              />
                             </div>
                           </TableCell>
                           <TableCell align="right" className="w-[15%]">
@@ -540,6 +599,10 @@ const SubjectMarksEntry = () => {
                           <TableCell align="right" className="w-[15%]">
                             <div className="flex flex-col items-center gap-2">
                               <h1 className="font-semibold">Attendance</h1>
+                              <AttendanceFilter
+                                handleChange={handleChange}
+                                data={"All"}
+                              />
                             </div>
                           </TableCell>
                           <TableCell align="right" className="w-[15%]">
@@ -560,13 +623,20 @@ const SubjectMarksEntry = () => {
                             </TableCell>
                           </TableRow>
                         )}
-                        {SubjectMarksEntryData?.studentQuestionPaperAttemptResponses
+                        {returnData()
                           ?.slice(
                             page * rowsPerPage,
                             page * rowsPerPage + rowsPerPage
                           )
                           .map((item, index) => (
-                            <Row row={item} key={index} />
+                            <MemoRow
+                              total={total}
+                              row={item}
+                              key={item.uuid}
+                              handleSelectAction={handleSelectAction}
+                              editButtons={editButtons}
+                              SubjectMarksEntryData={SubjectMarksEntryData}
+                            />
                           ))}
                       </TableBody>
                     </Table>
@@ -574,10 +644,7 @@ const SubjectMarksEntry = () => {
                   <TablePagination
                     component={Paper}
                     rowsPerPageOptions={[10, 25, 100]}
-                    count={
-                      SubjectMarksEntryData
-                        ?.studentQuestionPaperAttemptResponses.length
-                    }
+                    count={returnData()?.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
@@ -592,5 +659,106 @@ const SubjectMarksEntry = () => {
     </>
   );
 };
+
+const Row = (props) => {
+  const { row, handleSelectAction, SubjectMarksEntryData, editButtons, total } =
+    props;
+  const [open, setOpen] = React.useState(false);
+
+  useEffect(() => {
+    console.log("re-render");
+  });
+
+  let obtainedMarks = 0;
+  // let totalMarks = 0;
+  // row.studentQuestionAttemptResponses.map((item) => {
+  // if (typeof item.maxMarks === "number" && typeof item.marks === "number") {
+  // obtainedMarks += Number(item.marks);
+  // totalMarks += Number(item.maxMarks);
+  // }
+  for (let i = 0; i < row.studentQuestionAttemptResponses.length; i++) {
+    const item = row.studentQuestionAttemptResponses[i];
+    obtainedMarks += Number(item.marks);
+    // totalMarks += Number(item.maxMarks);
+  }
+  // });
+  return (
+    <React.Fragment>
+      <TableRow
+        sx={{
+          "&:last-child td, &:last-child th": { border: 0 },
+        }}
+      >
+        <TableCell component="th" scope="row" align="center">
+          <IconButton
+            aria-label="expand row"
+            size="small"
+            onClick={() => setOpen((prev) => !prev)}
+          >
+            {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+          </IconButton>
+          {row.rollNo}
+        </TableCell>
+        <TableCell align="center">
+          <h1 className="font-bold">{row.studentName}</h1>
+        </TableCell>
+        <TableCell align="center">
+          <h1 className="font-bold">{row.uuid}</h1>
+        </TableCell>
+        <TableCell align="center">
+          <AttendanceSelect
+            handleSelectAction={handleSelectAction}
+            disable={!editButtons.attendance}
+            data={row.studentPresent}
+            QpaId={row.questionPaperAttemptId}
+          />
+        </TableCell>
+        <TableCell align="center">
+          <h1 className="font-semibold">
+            {obtainedMarks}/{total}
+          </h1>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            {/* <Box sx={{ margin: 1, flexDirection: "row", flex: "none" }}> */}
+            <div className="w-full grid grid-cols-4 gap-4 place-content-center place-items-center py-4">
+              {row.studentQuestionAttemptResponses.map((item, index) => {
+                let data = {};
+                SubjectMarksEntryData.questions.map((item2) => {
+                  if (item2.questionId === item.questionId) {
+                    data = item2;
+                  }
+                });
+                item.qNo = data.questionNo;
+                item.maxMarks = data.maxMarks;
+                return (
+                  <h1
+                    key={item.qNo}
+                    className="font-semibold text-sm flex items-center sm:w-auto w-full"
+                  >
+                    <div className="flex sm:flex-row flex-col">
+                      <p>Q.{item.qNo}</p>
+                      <p>({item?.maxMarks})</p>
+                    </div>
+                    <SelectMUI
+                      disable={!editButtons.marks}
+                      handleSelectAction={handleSelectAction}
+                      size={"small"}
+                      data={item}
+                    />
+                  </h1>
+                );
+              })}
+            </div>
+            {/* </Box> */}
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </React.Fragment>
+  );
+};
+const MemoRow = React.memo(Row);
 
 export default SubjectMarksEntry;

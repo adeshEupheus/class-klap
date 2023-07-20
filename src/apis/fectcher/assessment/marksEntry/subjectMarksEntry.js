@@ -15,6 +15,5 @@ export const GetSubjectMarksEntry = async (
       Authorization: `Bearer ${token ? token : Cookies.get("token")}`,
     },
   }).catch((err) => console.log(err));
-
   return res.data;
 };

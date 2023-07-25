@@ -137,7 +137,7 @@ const SubjectMarksEntry = () => {
         );
         if (res.status === 200) {
           setSnackbarErr(false);
-          setSnackbarMsg("Your changes have been savedly");
+          setSnackbarMsg("Your changes have been saved");
           snackbarRef.current.openSnackbar();
         }
         refetch();

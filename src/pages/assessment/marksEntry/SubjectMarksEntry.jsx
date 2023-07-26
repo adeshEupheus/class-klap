@@ -111,11 +111,11 @@ const SubjectMarksEntry = () => {
           setSnackbarMsg("something went wrong");
           snackbarRef.current.openSnackbar();
         });
-        if (res2.success === true) {
-          setSnackbarErr(false);
-          setSnackbarMsg(res2.message);
-          snackbarRef.current.openSnackbar();
-        }
+        // if (res2.success === true) {
+        //   setSnackbarErr(false);
+        //   setSnackbarMsg(res2.message);
+        //   snackbarRef.current.openSnackbar();
+        // }
         refetch();
         setLoading(false);
 
@@ -135,11 +135,11 @@ const SubjectMarksEntry = () => {
             snackbarRef.current.openSnackbar();
           }
         );
-        if (res.status === 200) {
-          setSnackbarErr(false);
-          setSnackbarMsg("Your changes have been saved");
-          snackbarRef.current.openSnackbar();
-        }
+        // if (res.status === 200) {
+        //   setSnackbarErr(false);
+        //   setSnackbarMsg("Your changes have been saved");
+        //   snackbarRef.current.openSnackbar();
+        // }
         refetch();
         setLoading(false);
 
@@ -187,6 +187,9 @@ const SubjectMarksEntry = () => {
       case "attendance":
         if (editButtons.attendance) {
           refetch();
+          setSnackbarErr(false);
+          setSnackbarMsg("Your changes have been saved");
+          snackbarRef.current.openSnackbar();
         }
         setEditButtons((prev) => {
           return { ...editButtons, attendance: !prev.attendance };
@@ -195,6 +198,9 @@ const SubjectMarksEntry = () => {
       case "marks":
         if (editButtons.marks) {
           refetch();
+          setSnackbarErr(false);
+          setSnackbarMsg("Your changes have been saved");
+          snackbarRef.current.openSnackbar();
         }
         setEditButtons((prev) => {
           return { ...editButtons, marks: !prev.marks };
@@ -772,7 +778,6 @@ const Row = (props) => {
                   >
                     <div className="flex sm:flex-row flex-col">
                       <p>Q.{item.qNo}</p>
-                      <p>({item?.maxMarks})</p>
                     </div>
                     <SelectMUI
                       disable={!editButtons.marks}
@@ -780,6 +785,10 @@ const Row = (props) => {
                       size={"small"}
                       data={item}
                     />
+                    <p className="flex gap-1">
+                      <p>/</p>
+                      <p>{item?.maxMarks}</p>
+                    </p>
                   </h1>
                 );
               })}

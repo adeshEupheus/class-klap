@@ -366,9 +366,10 @@ const ExamTimeTable = () => {
         setLoading(true);
         res = await QpGenerate(gradeId, examId, returnToken()).catch((err) => {
           setSnackbarErr(true);
-          setSnackbarMsg(err.response.data.message);
+          setSnackbarMsg(err.response.data.error);
           snackbarRef.current.openSnackbar();
           setLoading(false);
+          // console.log(err);
         });
         if (res.success) {
           refetch();

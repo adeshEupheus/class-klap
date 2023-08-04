@@ -127,7 +127,7 @@ const SubjectMarksEntry = () => {
         bodyFormData.append("subject", subjectId);
         bodyFormData.append("marks", data.value);
         bodyFormData.append("questionAttemptId", data.questionAttemptId);
-        setLoading(true);
+        // setLoading(true);
         const res = await EditMarks(bodyFormData, returnToken()).catch(
           (err) => {
             setSnackbarErr(true);
@@ -140,8 +140,8 @@ const SubjectMarksEntry = () => {
         //   setSnackbarMsg("Your changes have been saved");
         //   snackbarRef.current.openSnackbar();
         // }
-        refetch();
-        setLoading(false);
+        // refetch();
+        // setLoading(false);
 
         break;
 
@@ -419,7 +419,7 @@ const SubjectMarksEntry = () => {
           sidebarCollapsed={sidebarCollapsed}
           show={show}
         />
-        <Loader loading={isRefetching || loading} />
+        <Loader loading={loading || isRefetching} />
 
         <div>
           <SwipeableTemporaryDrawer
@@ -669,6 +669,7 @@ const SubjectMarksEntry = () => {
                           .map((item, index) => (
                             <MemoRow
                               total={total}
+                              refetch={refetch}
                               row={item}
                               key={item.uuid}
                               handleSelectAction={handleSelectAction}
@@ -699,8 +700,14 @@ const SubjectMarksEntry = () => {
 };
 
 const Row = (props) => {
-  const { row, handleSelectAction, SubjectMarksEntryData, editButtons, total } =
-    props;
+  const {
+    row,
+    handleSelectAction,
+    SubjectMarksEntryData,
+    editButtons,
+    total,
+    refetch,
+  } = props;
   const [open, setOpen] = React.useState(false);
 
   useEffect(() => {
@@ -731,7 +738,12 @@ const Row = (props) => {
           <IconButton
             aria-label="expand row"
             size="small"
-            onClick={() => setOpen((prev) => !prev)}
+            onClick={() => {
+              setOpen((prev) => !prev);
+              if (open) {
+                refetch();
+              }
+            }}
           >
             {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
           </IconButton>

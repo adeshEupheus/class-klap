@@ -82,6 +82,7 @@ const SubjectMarksEntry = () => {
   });
 
   const handleChangePage = (event, newPage) => {
+    refetch();
     setPage(newPage);
   };
 
@@ -102,7 +103,7 @@ const SubjectMarksEntry = () => {
           ],
           subject: subjectId,
         };
-        setLoading(true);
+        // setLoading(true);
         const res2 = await UpdateAttendance(
           AttendanceData,
           returnToken()
@@ -116,8 +117,8 @@ const SubjectMarksEntry = () => {
         //   setSnackbarMsg(res2.message);
         //   snackbarRef.current.openSnackbar();
         // }
-        refetch();
-        setLoading(false);
+        // refetch();
+        // setLoading(false);
 
         break;
       case "marks":
@@ -127,7 +128,7 @@ const SubjectMarksEntry = () => {
         bodyFormData.append("subject", subjectId);
         bodyFormData.append("marks", data.value);
         bodyFormData.append("questionAttemptId", data.questionAttemptId);
-        setLoading(true);
+        // setLoading(true);
         const res = await EditMarks(bodyFormData, returnToken()).catch(
           (err) => {
             setSnackbarErr(true);
@@ -140,8 +141,8 @@ const SubjectMarksEntry = () => {
         //   setSnackbarMsg("Your changes have been saved");
         //   snackbarRef.current.openSnackbar();
         // }
-        refetch();
-        setLoading(false);
+        // refetch();
+        // setLoading(false);
 
         break;
 
@@ -419,7 +420,7 @@ const SubjectMarksEntry = () => {
           sidebarCollapsed={sidebarCollapsed}
           show={show}
         />
-        <Loader loading={isRefetching || loading} />
+        <Loader loading={loading || isRefetching} />
 
         <div>
           <SwipeableTemporaryDrawer
@@ -669,6 +670,7 @@ const SubjectMarksEntry = () => {
                           .map((item, index) => (
                             <MemoRow
                               total={total}
+                              refetch={refetch}
                               row={item}
                               key={item.uuid}
                               handleSelectAction={handleSelectAction}
@@ -681,7 +683,7 @@ const SubjectMarksEntry = () => {
                   </TableContainer>
                   <TablePagination
                     component={Paper}
-                    rowsPerPageOptions={[10, 25, 100]}
+                    rowsPerPageOptions={[5, 10, 25, 100]}
                     count={returnData()?.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
@@ -699,8 +701,14 @@ const SubjectMarksEntry = () => {
 };
 
 const Row = (props) => {
-  const { row, handleSelectAction, SubjectMarksEntryData, editButtons, total } =
-    props;
+  const {
+    row,
+    handleSelectAction,
+    SubjectMarksEntryData,
+    editButtons,
+    total,
+    refetch,
+  } = props;
   const [open, setOpen] = React.useState(false);
 
   useEffect(() => {
@@ -731,7 +739,12 @@ const Row = (props) => {
           <IconButton
             aria-label="expand row"
             size="small"
-            onClick={() => setOpen((prev) => !prev)}
+            onClick={() => {
+              setOpen((prev) => !prev);
+              if (open) {
+                refetch();
+              }
+            }}
           >
             {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
           </IconButton>

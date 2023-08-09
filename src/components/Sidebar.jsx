@@ -180,7 +180,7 @@ const Sidebar = ({ sidebarCollapsed, highLight, show }) => {
             {" "}
             <div
               className={`${
-                marsksEntry ? "h-[10vh] opacity-100 visible" : null
+                marsksEntry ? "h-fit opacity-100 visible" : null
               } transition-all ease-linear duration-200`}
             >
               <Link to="/marks_entry_overview">

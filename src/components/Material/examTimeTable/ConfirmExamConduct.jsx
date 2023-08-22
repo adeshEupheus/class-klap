@@ -28,7 +28,7 @@ const ConfirmExamConduct = React.forwardRef((props, ref) => {
     <div>
       <Dialog
         maxWidth={false}
-        fullWidth={false}
+        fullWidth={true}
         open={open}
         TransitionComponent={Transition}
         keepMounted
@@ -60,7 +60,7 @@ const ConfirmExamConduct = React.forwardRef((props, ref) => {
           <div className="w-full gap-2 flex px-4 justify-end">
             <BasicButton
               size={"small"}
-              text={"Cancle"}
+              text={"Cancel"}
               handleButtonAction={handleClose}
             />
             <BasicButton

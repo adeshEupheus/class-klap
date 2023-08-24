@@ -57,6 +57,8 @@ import { GetApplicableExamType } from "../../apis/fectcher/assessment/GetApplica
 import ViewQP from "../../components/Material/examTimeTable/ViewQP";
 import ViewQpAddExamSub from "../../components/Material/examTimeTable/ViewQpAddExamSub";
 import instance from "../../instance";
+import { saveAs } from "file-saver";
+import ConfirmExamConduct from "../../components/Material/examTimeTable/ConfirmExamConduct";
 const ExamTimeTable = () => {
   const [examId, setExamId] = useState("");
   const [gradeId, setGradeId] = useState("");
@@ -554,8 +556,24 @@ const ExamTimeTable = () => {
     }
   };
 
+  const downloadRollList = async () => {
+    const res = await instance({
+      url: `schoolApp/configuration/studentRollList/${gradeId}`,
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${Cookies.get("token")}`,
+      },
+      responseType: "arraybuffer",
+    });
+    const blob = new Blob([res.data], {
+      type: "application/zip",
+    });
+    saveAs(blob, `${schoolInfo.schoolCode}-${gradeId}`);
+  };
+
   const ViewQpRef = useRef();
   const ViewQpAddExamSubRef = useRef();
+  const ConfirmExamConductRef = useRef();
 
   function Row(props) {
     const { row } = props;
@@ -903,6 +921,13 @@ const ExamTimeTable = () => {
             gradeId={gradeId}
             subjectId={subjectId}
           />
+          <ConfirmExamConduct
+            ref={ConfirmExamConductRef}
+            downloadRollList={downloadRollList}
+            ConductExam={() =>
+              mutation.mutate({ item: {}, name: "conductExam" })
+            }
+          />
 
           <div
             className="lg:hidden absolute cursor-pointer top-4 left-4"
@@ -991,9 +1016,26 @@ const ExamTimeTable = () => {
                   />
                 ) : (
                   <div
-                    onClick={() =>
-                      mutation.mutate({ item: {}, name: "conductExam" })
-                    }
+                    // onClick={() =>
+                    //   mutation.mutate({ item: {}, name: "conductExam" })
+                    // }
+                    // onClick={async () => {
+                    //   const res = await instance({
+                    //     url: `schoolApp/configuration/studentRollList/${gradeId}`,
+                    //     method: "GET",
+                    //     headers: {
+                    //       Authorization: `Bearer ${Cookies.get("token")}`,
+                    //     },
+                    //     responseType: "arraybuffer",
+                    //   });
+                    //   const blob = new Blob([res.data], {
+                    //     type: "application/zip",
+                    //   });
+                    //   saveAs(blob, `${schoolInfo.schoolCode}-${gradeId}`);
+                    // }}
+                    onClick={() => {
+                      ConfirmExamConductRef.current.OpenConfirmConductExam();
+                    }}
                   >
                     <BasicButton
                       text={`${

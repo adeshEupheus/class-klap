@@ -28,14 +28,14 @@ const ConfirmExamConduct = React.forwardRef((props, ref) => {
     <div>
       <Dialog
         maxWidth={false}
-        fullWidth={true}
+        fullWidth={false}
         open={open}
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
       >
-        <div className="flex flex-col gap-2 justify-start px-4 font-semibold py-4">
+        <div className="flex flex-col gap-2 justify-start px-4 font-semibold py-4 sm:w-[70vw] md:w-[80vw]">
           <p>Kindly confirm the Roll-list before conducting the Exam.</p>
           <p>
             Click{" "}

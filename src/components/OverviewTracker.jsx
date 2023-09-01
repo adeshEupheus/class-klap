@@ -226,7 +226,8 @@ export default function OverviewStepper({ data, examId }) {
       />
       <DialogSlide
         ref={DialogRef}
-        estDate={Object.values(data)[0].split("+")[0]}
+        // estDate={Object.values(data)[0].split("+")[0]}
+        estDate={data["estimated-date"].split("+")[0]}
         handleDialogButton={handleDialogButton}
       />
       <Loader loading={loading} />

@@ -154,7 +154,7 @@ const ViewQpAddExamSub = React.forwardRef((props, ref) => {
     setOpen(false);
     props.setResetQpDialog((prev) => !prev);
   };
-  console.log(qpData);
+  // console.log(qpData);
 
   const handleQueChange = (val, item) => {
     // console.log(val, item);

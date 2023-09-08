@@ -128,7 +128,7 @@ const ExamTimeTable = () => {
     queryFn: () => GetExamTimetableData(examId, gradeId, returnToken()),
     cacheTime: 0,
     onSuccess: (data) => {
-      console.log(data);
+      // console.log(data);
     },
     onError: () => {
       setError(true);
@@ -163,7 +163,7 @@ const ExamTimeTable = () => {
     queryFn: () => QPGenerationStatus(examId, gradeId, returnToken()),
     cacheTime: 0,
     onSuccess: (data) => {
-      console.log(data);
+      // console.log(data);
     },
     refetchOnWindowFocus: false,
   });
@@ -281,7 +281,7 @@ const ExamTimeTable = () => {
         }
       }
       if (data.name === "time") {
-        console.log(data);
+        // console.log(data);
         setLoading(true);
         const apiBodyData = {
           duration: data.item.duration,
@@ -312,7 +312,7 @@ const ExamTimeTable = () => {
         }
       }
       if (data.name === "duration") {
-        console.log(data);
+        // console.log(data);
         setLoading(true);
         const apiBodyData = {
           duration: data.item.newDuration,
@@ -414,7 +414,7 @@ const ExamTimeTable = () => {
         }
       }
       if (data.name === "examType") {
-        console.log(data);
+        // console.log(data);
         setLoading(true);
         const subjective = data.item.newDeliveryMode?.includes("SUBJECTIVE");
         let sku = 0;
@@ -463,7 +463,7 @@ const ExamTimeTable = () => {
         }
       }
       if (data.name === "markSyllabus") {
-        console.log(data);
+        // console.log(data);
         setLoading(true);
         const apiBodyData = {
           duration: data.item.duration,
@@ -506,6 +506,7 @@ const ExamTimeTable = () => {
 
   const returnData = () => {
     if (filter === "All") {
+      console.log(ExamTimetableData.subjectLevelConfigurationResponses);
       return ExamTimetableData.subjectLevelConfigurationResponses;
     }
 
@@ -513,6 +514,7 @@ const ExamTimeTable = () => {
       ExamTimetableData.subjectLevelConfigurationResponses.filter(
         (item) => item.subject.displayName === filter
       );
+    console.log(newArray);
     return newArray;
   };
 
@@ -526,7 +528,7 @@ const ExamTimeTable = () => {
     if (name === "feedback_status") {
       mutation.mutate({ item: item, name });
     }
-    console.log(name, status, item);
+    // console.log(name, status, item);
   };
 
   const handleDialogButton = async () => {
@@ -537,7 +539,7 @@ const ExamTimeTable = () => {
   const sidebarRef = useRef();
 
   const handleDropDown = (value, type) => {
-    console.log(value, type);
+    // console.log(value, type);
     switch (type) {
       case "exam":
         setFilter("All");
@@ -635,20 +637,31 @@ const ExamTimeTable = () => {
     };
 
     const handleChangeSyllabus = (value, type) => {
-      console.log(value, type);
+      // console.log(value, type);
       row.newSyllabus = value.name;
       mutation.mutate({ item: row, name: "markSyllabus" });
     };
 
     const returnSyllabus = (arr, id) => {
       console.log(arr, id);
-      let ans;
-      arr.map((item) => {
+      let ans = "NA";
+      arr?.map((item) => {
         if (Number(item.name) === id) {
           ans = item.displayName;
         }
       });
       return ans;
+    };
+
+    const returnSubArray = (arr) => {
+      if (arr && Array.isArray(arr)) {
+        const ans = arr.map((item) => {
+          return { value: item?.displayName, name: item?.name };
+        });
+        return ans;
+      } else {
+        return [];
+      }
     };
 
     return (
@@ -716,19 +729,22 @@ const ExamTimeTable = () => {
                 minWidth={"12rem"}
                 handleDropDown={handleChangeSyllabus}
                 disable={row.locked}
-                data={[
-                  ...row?.qpSetTypeApplicableMarksMap?.SUBJECTIVE?.map(
-                    (item) => {
-                      return { value: item?.displayName, name: item?.name };
-                    }
-                  ),
-                ]}
+                data={
+                  // [
+                  //   ...row?.qpSetTypeApplicableMarksMap?.SUBJECTIVE?.map(
+                  //     (item) => {
+                  //       return { value: item?.displayName, name: item?.name };
+                  //     }
+                  //   ),
+                  // ]
+                  returnSubArray(row?.qpSetTypeApplicableMarksMap?.SUBJECTIVE)
+                }
                 variant={"outlined"}
                 Name={"mark_syllabus_difficulty"}
                 defaultValue={{
                   value: returnSyllabus(
-                    row.qpSetTypeApplicableMarksMap.SUBJECTIVE,
-                    row.selectedSku
+                    row?.qpSetTypeApplicableMarksMap?.SUBJECTIVE,
+                    row?.selectedSku
                   ),
                   // row.qpSetTypeApplicableMarksMap.SUBJECTIVE[0].displayName,
                 }}

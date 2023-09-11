@@ -227,7 +227,7 @@ export default function OverviewStepper({ data, examId }) {
       <DialogSlide
         ref={DialogRef}
         // estDate={Object.values(data)[0].split("+")[0]}
-        estDate={data["estimated-date"].split("+")[0]}
+        estDate={data["estimated-date"]?.split("+")[0]}
         handleDialogButton={handleDialogButton}
       />
       <Loader loading={loading} />
@@ -266,6 +266,28 @@ const DialogSlide = React.forwardRef((props, ref) => {
     setOpen(false);
   };
 
+  const returnDate = () => {
+    let delays = 15;
+    let date = new Date(Date.now()).toDateString();
+    let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    let totalSundays = 0;
+    let currentDay = days[new Date(date).getDay()];
+    let index = days.indexOf(currentDay);
+    for (let i = 0; i < 15; i++) {
+      if (index === 0) {
+        totalSundays += 1;
+      }
+      if (index === 6) {
+        index = 0;
+      } else {
+        index += 1;
+      }
+    }
+    delays += totalSundays;
+    date = new Date(Date.now() + delays * 24 * 60 * 60 * 1000).toDateString();
+    return date;
+  };
+
   return (
     <div>
       <Dialog
@@ -286,7 +308,7 @@ const DialogSlide = React.forwardRef((props, ref) => {
               ClassKlap would receive your files for print
             </h1>
             <h1 className="py-4 px-2 font-semibold">
-              The question paper delivery will reach you on {props?.estDate}
+              The question paper delivery will reach you on {returnDate()}
             </h1>
             <h1 className="py-4 px-2 font-semibold">
               After confirmation, you cannot make any changes to the exam set up
@@ -295,7 +317,7 @@ const DialogSlide = React.forwardRef((props, ref) => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancle</Button>
+          <Button onClick={handleClose}>Cancel</Button>
           <Button onClick={() => handleButtonClick()}>Send For Print</Button>
         </DialogActions>
       </Dialog>

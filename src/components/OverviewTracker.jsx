@@ -249,7 +249,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const DialogSlide = React.forwardRef((props, ref) => {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
 
   React.useImperativeHandle(ref, () => ({
     openDialog() {
@@ -317,7 +317,7 @@ const DialogSlide = React.forwardRef((props, ref) => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancle</Button>
+          <Button onClick={handleClose}>Cancel</Button>
           <Button onClick={() => handleButtonClick()}>Send For Print</Button>
         </DialogActions>
       </Dialog>

@@ -822,7 +822,7 @@ const ObjQuestionFIB = ({ item, lockQues, updateQuestion }) => {
             handleOnBlur={updateData}
           />
         </div>
-        {item?.fibQuestionChoiceGroupResponses.map((item, index) => {
+        {item?.fibQuestionChoiceGroupResponses?.map((item, index) => {
           return (
             <div className="flex gap-2">
               <p>Option {index + 1}:</p>
